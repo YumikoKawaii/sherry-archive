@@ -9,16 +9,132 @@ import "validate/validate.proto";
 option go_package = "sherry-archive/api;api";
 
 service ArchiveService {
-  // Dummy
-  rpc Dummy(DummyRequest) returns (DummyResponse) {
+  // GetBooks
+  rpc GetBooks(GetBookRequest) returns (GetBookResponse) {
     option (google.api.http) = {
-      get: "/api/v1/dummy"
+      post: "/api/v1/books"
+      body: "*"
     };
+  }
+
+  // GetAuthors
+  rpc GetAuthors(GetAuthorsRequest) returns (GetAuthorsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/authors"
+      body: "*"
+    };
+  }
+
+  // GetPublishers
+  rpc GetPublishers(GetPublishersRequest) returns (GetPublishersResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/publisher"
+      body: "*"
+    };
+  }
+
+}
+
+message GetBookRequest {
+  repeated uint32 book_ids = 1;
+  google.protobuf.UInt32Value category_id = 2;
+  google.protobuf.UInt32Value author_id = 3;
+  google.protobuf.UInt32Value publisher_id = 4;
+  int32 page = 5;
+  int32 page_size = 6;
+}
+
+message GetBookResponse {
+  int32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    repeated Book books = 1;
+    Pagination pagination = 2;
   }
 }
 
-message DummyRequest {}
+message GetPagesRequest {
+  google.protobuf.UInt32Value book_id = 1;
+  repeated uint32 ids = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
 
-message DummyResponse {
+message GetPagesResponse {
   int32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    repeated Page pages = 1;
+    Pagination pagination = 2;
+  }
+}
+
+message GetAuthorsRequest {
+  repeated uint32 author_ids = 1;
+}
+
+message GetAuthorsResponse {
+  int32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    repeated Author authors = 1;
+    Pagination pagination = 2;
+  }
+}
+
+message GetPublishersRequest {
+  repeated uint32 publisher_ids = 1;
+}
+
+message GetPublishersResponse {
+  int32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    repeated Publisher publishers = 1;
+    Pagination pagination = 2;
+  }
+}
+
+message Book {
+  uint32 id = 1;
+  string title = 2;
+  string description = 3;
+  string image_url = 4;
+  int32 author_id = 5;
+  int32 publisher_id = 6;
+  int32 category_id = 7;
+  string publication_date = 8;
+}
+
+message Page {
+  uint32 id = 1;
+  uint32 book_id = 2;
+  string image_url = 3;
+}
+
+message Author {
+  uint32 id = 1;
+  string name = 2;
+  string description = 3;
+  string image_url = 4;
+}
+
+message Publisher {
+  uint32 id = 1;
+  string name = 2;
+  string description = 3;
+  string image_url = 4;
+}
+
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
 }
