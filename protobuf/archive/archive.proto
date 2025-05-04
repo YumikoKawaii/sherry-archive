@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package sherry.archive.api.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
+
+option go_package = "sherry-archive/api;api";
+
+service ArchiveService {
+  // Dummy
+  rpc Dummy(DummyRequest) returns (DummyResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/dummy"
+    };
+  }
+}
+
+message DummyRequest {}
+
+message DummyResponse {}
