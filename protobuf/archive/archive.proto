@@ -17,6 +17,13 @@ service ArchiveService {
     };
   }
 
+  rpc GetPages(GetPagesRequest) returns (GetPagesResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pages"
+      body: "*"
+    };
+  }
+
   // GetAuthors
   rpc GetAuthors(GetAuthorsRequest) returns (GetAuthorsResponse) {
     option (google.api.http) = {
