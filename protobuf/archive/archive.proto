@@ -19,4 +19,6 @@ service ArchiveService {
 
 message DummyRequest {}
 
-message DummyResponse {}
+message DummyResponse {
+  int32 code = 1;
+}
