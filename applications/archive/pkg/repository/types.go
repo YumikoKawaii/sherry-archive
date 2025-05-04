@@ -5,12 +5,12 @@ import "time"
 type Book struct {
 	ID              uint32     `gorm:"id"`
 	Title           string     `gorm:"title"`
-	Description     string     `gorm:"description"`
-	ImageUrl        string     `gorm:"image_url"`
-	AuthorId        uint32     `gorm:"author_id"`
-	PublisherId     uint32     `gorm:"publisher_id"`
-	CategoryId      uint32     `gorm:"category_id"`
-	PublicationDate time.Time  `gorm:"publication_date"`
+	Description     *string    `gorm:"description"`
+	ImageUrl        *string    `gorm:"image_url"`
+	AuthorId        *uint32    `gorm:"author_id"`
+	PublisherId     *uint32    `gorm:"publisher_id"`
+	CategoryId      *uint32    `gorm:"category_id"`
+	PublicationDate *time.Time `gorm:"publication_date"`
 	CreatedAt       time.Time  `gorm:"created_at"`
 	UpdatedAt       time.Time  `gorm:"updated_at"`
 	DeletedAt       *time.Time `gorm:"deleted_at"`
@@ -18,16 +18,17 @@ type Book struct {
 
 type GetBooksFilter struct {
 	IDs         []uint32
-	AuthorId    uint32
-	PublisherId uint32
-	CategoryId  uint32
+	AuthorId    *uint32
+	PublisherId *uint32
+	CategoryId  *uint32
 	Pagination  *Pagination
 }
 
 type Page struct {
 	ID        uint32     `gorm:"id"`
 	BookID    uint32     `gorm:"book_id"`
-	ImageUrl  string     `gorm:"image_url"`
+	ImageUrl  *string    `gorm:"image_url"`
+	Index     *uint32    `gorm:"index"`
 	CreatedAt time.Time  `gorm:"created_at"`
 	UpdatedAt time.Time  `gorm:"updated_at"`
 	DeletedAt *time.Time `gorm:"deleted_at"`
@@ -35,7 +36,7 @@ type Page struct {
 
 type GetPagesFilter struct {
 	IDs        []uint32
-	BookId     uint32
+	BookId     *uint32
 	Pagination *Pagination
 }
 

@@ -7,9 +7,12 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"sherry.archive.com/applications/archive/adapters/multimedia"
 	"sherry.archive.com/applications/archive/config"
+	"sherry.archive.com/applications/archive/pkg/repository"
 	"sherry.archive.com/applications/archive/servers/apis"
 	"sherry.archive.com/applications/archive/services"
+	"sherry.archive.com/shared/database"
 	"sherry.archive.com/shared/logger"
 	"sherry.archive.com/shared/middleware/grpc_error"
 	"sherry.archive.com/shared/middleware/grpc_recovery"
@@ -19,15 +22,17 @@ func Serve(cfg *config.Application) {
 	prometheus := grpc_prometheus.NewServerMetrics()
 	zapSugaredLogger := logger.GetDelegate().(*zap.SugaredLogger)
 	zapLogger := zapSugaredLogger.Desugar()
-	//mysqlGorm := database.NewMysqlGormDatabase(cfg.MysqlConfig.DSN())
+	mysqlGorm := database.NewMysqlGormDatabase(cfg.MysqlConfig.DSN())
 	grpc_zap.ReplaceGrpcLoggerV2(zapLogger)
 
-	//repository := repo.NewRepository(mysqlGorm)
-	service := apis.NewService()
+	querier := repository.NewQuerier(mysqlGorm)
+	multimediaStorage := multimedia.NewCloudinaryClient(cfg.CloudinaryConfig)
+	service := apis.NewService(querier, multimediaStorage)
 
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	sv := services.NewServer(
 		services.NewConfig(cfg.GRPCPort, cfg.HTTPPort),
+		grpc.MaxRecvMsgSize(10*1024*1024),
 		grpc.ChainUnaryInterceptor(
 			prometheus.UnaryServerInterceptor(),
 			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),

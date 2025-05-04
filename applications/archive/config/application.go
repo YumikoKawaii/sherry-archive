@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/alecthomas/kong"
 	"os"
+	"sherry.archive.com/applications/archive/adapters/multimedia"
 	"sherry.archive.com/shared/configs"
 	"sherry.archive.com/shared/logger"
 )
@@ -26,6 +27,8 @@ type Application struct {
 
 	KafkaConfig  configs.KafkaConfig `kong:"embed"`
 	RedisAddress string              `env:"REDIS_ADDRESS" default:"localhost:6379"`
+
+	CloudinaryConfig multimedia.CloudinaryConfig `kong:"embed"`
 }
 
 func Initialize() (*Application, *kong.Context) {

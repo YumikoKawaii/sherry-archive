@@ -17,6 +17,13 @@ service ArchiveService {
     };
   }
 
+  rpc UpsertBook(UpsertBookRequest) returns (UpsertBookResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/upsert-book"
+      body: "*"
+    };
+  }
+
   rpc GetPages(GetPagesRequest) returns (GetPagesResponse) {
     option (google.api.http) = {
       post: "/api/v1/pages"
@@ -59,6 +66,28 @@ message GetBookResponse {
   message Data {
     repeated Book books = 1;
     Pagination pagination = 2;
+  }
+}
+
+message UpsertBookRequest {
+  google.protobuf.UInt32Value id = 1;
+  string title = 2;
+  google.protobuf.StringValue description = 3;
+  google.protobuf.BytesValue image = 4;
+  google.protobuf.UInt32Value author_id = 5;
+  google.protobuf.UInt32Value publisher_id = 6;
+  google.protobuf.UInt32Value category_id = 7;
+  google.protobuf.UInt64Value publication_date = 8;
+}
+
+
+message UpsertBookResponse {
+  int32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    Book book = 1;
   }
 }
 
@@ -113,12 +142,12 @@ message GetPublishersResponse {
 message Book {
   uint32 id = 1;
   string title = 2;
-  string description = 3;
-  string image_url = 4;
-  int32 author_id = 5;
-  int32 publisher_id = 6;
-  int32 category_id = 7;
-  string publication_date = 8;
+  google.protobuf.StringValue description = 3;
+  google.protobuf.StringValue image_url = 4;
+  google.protobuf.UInt32Value author_id = 5;
+  google.protobuf.UInt32Value publisher_id = 6;
+  google.protobuf.UInt32Value category_id = 7;
+  google.protobuf.UInt64Value publication_date = 8;
 }
 
 message Page {

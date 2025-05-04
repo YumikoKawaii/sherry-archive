@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ArchiveService_GetBooks_FullMethodName      = "/sherry.archive.api.v1.ArchiveService/GetBooks"
+	ArchiveService_UpsertBook_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/UpsertBook"
 	ArchiveService_GetPages_FullMethodName      = "/sherry.archive.api.v1.ArchiveService/GetPages"
 	ArchiveService_GetAuthors_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/GetAuthors"
 	ArchiveService_GetPublishers_FullMethodName = "/sherry.archive.api.v1.ArchiveService/GetPublishers"
@@ -31,6 +32,7 @@ const (
 type ArchiveServiceClient interface {
 	// GetBooks
 	GetBooks(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
+	UpsertBook(ctx context.Context, in *UpsertBookRequest, opts ...grpc.CallOption) (*UpsertBookResponse, error)
 	GetPages(ctx context.Context, in *GetPagesRequest, opts ...grpc.CallOption) (*GetPagesResponse, error)
 	// GetAuthors
 	GetAuthors(ctx context.Context, in *GetAuthorsRequest, opts ...grpc.CallOption) (*GetAuthorsResponse, error)
@@ -50,6 +52,16 @@ func (c *archiveServiceClient) GetBooks(ctx context.Context, in *GetBookRequest,
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetBookResponse)
 	err := c.cc.Invoke(ctx, ArchiveService_GetBooks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *archiveServiceClient) UpsertBook(ctx context.Context, in *UpsertBookRequest, opts ...grpc.CallOption) (*UpsertBookResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpsertBookResponse)
+	err := c.cc.Invoke(ctx, ArchiveService_UpsertBook_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +104,7 @@ func (c *archiveServiceClient) GetPublishers(ctx context.Context, in *GetPublish
 type ArchiveServiceServer interface {
 	// GetBooks
 	GetBooks(context.Context, *GetBookRequest) (*GetBookResponse, error)
+	UpsertBook(context.Context, *UpsertBookRequest) (*UpsertBookResponse, error)
 	GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error)
 	// GetAuthors
 	GetAuthors(context.Context, *GetAuthorsRequest) (*GetAuthorsResponse, error)
@@ -109,6 +122,9 @@ type UnimplementedArchiveServiceServer struct{}
 
 func (UnimplementedArchiveServiceServer) GetBooks(context.Context, *GetBookRequest) (*GetBookResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBooks not implemented")
+}
+func (UnimplementedArchiveServiceServer) UpsertBook(context.Context, *UpsertBookRequest) (*UpsertBookResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertBook not implemented")
 }
 func (UnimplementedArchiveServiceServer) GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPages not implemented")
@@ -154,6 +170,24 @@ func _ArchiveService_GetBooks_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArchiveServiceServer).GetBooks(ctx, req.(*GetBookRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArchiveService_UpsertBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertBookRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArchiveServiceServer).UpsertBook(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArchiveService_UpsertBook_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArchiveServiceServer).UpsertBook(ctx, req.(*UpsertBookRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -222,6 +256,10 @@ var ArchiveService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBooks",
 			Handler:    _ArchiveService_GetBooks_Handler,
+		},
+		{
+			MethodName: "UpsertBook",
+			Handler:    _ArchiveService_UpsertBook_Handler,
 		},
 		{
 			MethodName: "GetPages",

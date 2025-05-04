@@ -359,6 +359,448 @@ var _ interface {
 	ErrorName() string
 } = GetBookResponseValidationError{}
 
+// Validate checks the field values on UpsertBookRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpsertBookRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpsertBookRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpsertBookRequestMultiError, or nil if none found.
+func (m *UpsertBookRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpsertBookRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "Id",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "Id",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Title
+
+	if all {
+		switch v := interface{}(m.GetDescription()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "Description",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "Description",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDescription()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookRequestValidationError{
+				field:  "Description",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetImage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "Image",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "Image",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetImage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookRequestValidationError{
+				field:  "Image",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAuthorId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "AuthorId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "AuthorId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAuthorId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookRequestValidationError{
+				field:  "AuthorId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPublisherId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "PublisherId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "PublisherId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPublisherId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookRequestValidationError{
+				field:  "PublisherId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCategoryId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "CategoryId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "CategoryId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCategoryId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookRequestValidationError{
+				field:  "CategoryId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPublicationDate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "PublicationDate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "PublicationDate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPublicationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookRequestValidationError{
+				field:  "PublicationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpsertBookRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpsertBookRequestMultiError is an error wrapping multiple validation errors
+// returned by UpsertBookRequest.ValidateAll() if the designated constraints
+// aren't met.
+type UpsertBookRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpsertBookRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpsertBookRequestMultiError) AllErrors() []error { return m }
+
+// UpsertBookRequestValidationError is the validation error returned by
+// UpsertBookRequest.Validate if the designated constraints aren't met.
+type UpsertBookRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertBookRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertBookRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertBookRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertBookRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertBookRequestValidationError) ErrorName() string {
+	return "UpsertBookRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertBookRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertBookRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertBookRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertBookRequestValidationError{}
+
+// Validate checks the field values on UpsertBookResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpsertBookResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpsertBookResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpsertBookResponseMultiError, or nil if none found.
+func (m *UpsertBookResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpsertBookResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookResponseValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookResponseValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookResponseValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpsertBookResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpsertBookResponseMultiError is an error wrapping multiple validation errors
+// returned by UpsertBookResponse.ValidateAll() if the designated constraints
+// aren't met.
+type UpsertBookResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpsertBookResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpsertBookResponseMultiError) AllErrors() []error { return m }
+
+// UpsertBookResponseValidationError is the validation error returned by
+// UpsertBookResponse.Validate if the designated constraints aren't met.
+type UpsertBookResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertBookResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertBookResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertBookResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertBookResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertBookResponseValidationError) ErrorName() string {
+	return "UpsertBookResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertBookResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertBookResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertBookResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertBookResponseValidationError{}
+
 // Validate checks the field values on GetPagesRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -1124,17 +1566,179 @@ func (m *Book) validate(all bool) error {
 
 	// no validation rules for Title
 
-	// no validation rules for Description
+	if all {
+		switch v := interface{}(m.GetDescription()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "Description",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "Description",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDescription()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BookValidationError{
+				field:  "Description",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
-	// no validation rules for ImageUrl
+	if all {
+		switch v := interface{}(m.GetImageUrl()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "ImageUrl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "ImageUrl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetImageUrl()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BookValidationError{
+				field:  "ImageUrl",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
-	// no validation rules for AuthorId
+	if all {
+		switch v := interface{}(m.GetAuthorId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "AuthorId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "AuthorId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAuthorId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BookValidationError{
+				field:  "AuthorId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
-	// no validation rules for PublisherId
+	if all {
+		switch v := interface{}(m.GetPublisherId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "PublisherId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "PublisherId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPublisherId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BookValidationError{
+				field:  "PublisherId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
-	// no validation rules for CategoryId
+	if all {
+		switch v := interface{}(m.GetCategoryId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "CategoryId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "CategoryId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCategoryId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BookValidationError{
+				field:  "CategoryId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
-	// no validation rules for PublicationDate
+	if all {
+		switch v := interface{}(m.GetPublicationDate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "PublicationDate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BookValidationError{
+					field:  "PublicationDate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPublicationDate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BookValidationError{
+				field:  "PublicationDate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return BookMultiError(errors)
@@ -1797,6 +2401,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetBookResponse_DataValidationError{}
+
+// Validate checks the field values on UpsertBookResponse_Data with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpsertBookResponse_Data) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpsertBookResponse_Data with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpsertBookResponse_DataMultiError, or nil if none found.
+func (m *UpsertBookResponse_Data) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpsertBookResponse_Data) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetBook()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookResponse_DataValidationError{
+					field:  "Book",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookResponse_DataValidationError{
+					field:  "Book",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBook()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookResponse_DataValidationError{
+				field:  "Book",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpsertBookResponse_DataMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpsertBookResponse_DataMultiError is an error wrapping multiple validation
+// errors returned by UpsertBookResponse_Data.ValidateAll() if the designated
+// constraints aren't met.
+type UpsertBookResponse_DataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpsertBookResponse_DataMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpsertBookResponse_DataMultiError) AllErrors() []error { return m }
+
+// UpsertBookResponse_DataValidationError is the validation error returned by
+// UpsertBookResponse_Data.Validate if the designated constraints aren't met.
+type UpsertBookResponse_DataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertBookResponse_DataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertBookResponse_DataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertBookResponse_DataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertBookResponse_DataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertBookResponse_DataValidationError) ErrorName() string {
+	return "UpsertBookResponse_DataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertBookResponse_DataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertBookResponse_Data.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertBookResponse_DataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertBookResponse_DataValidationError{}
 
 // Validate checks the field values on GetPagesResponse_Data with the rules
 // defined in the proto definition for this message. If any rules are
