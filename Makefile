@@ -27,7 +27,7 @@ start-infra:
 	docker compose --env-file .env.docker -f infrastructures/archive.docker-compose.yaml up -d
 
 stop-infra:
-	docker compose -f infrastructures/archive.docker-compose.yaml down
+	docker compose --env-file .env.docker -f infrastructures/archive.docker-compose.yaml down
 
 .PHONY: generate-proto
 

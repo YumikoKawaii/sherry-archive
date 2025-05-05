@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package sherry.archive.messages.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
+
+option go_package = "sherry-archive/messages;messages";
+
+message Pages {
+  uint32 book_id = 1;
+  bytes data = 2;
+}

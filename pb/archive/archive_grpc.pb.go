@@ -22,6 +22,7 @@ const (
 	ArchiveService_GetBooks_FullMethodName      = "/sherry.archive.api.v1.ArchiveService/GetBooks"
 	ArchiveService_UpsertBook_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/UpsertBook"
 	ArchiveService_GetPages_FullMethodName      = "/sherry.archive.api.v1.ArchiveService/GetPages"
+	ArchiveService_CreatePages_FullMethodName   = "/sherry.archive.api.v1.ArchiveService/CreatePages"
 	ArchiveService_GetAuthors_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/GetAuthors"
 	ArchiveService_GetPublishers_FullMethodName = "/sherry.archive.api.v1.ArchiveService/GetPublishers"
 )
@@ -34,6 +35,7 @@ type ArchiveServiceClient interface {
 	GetBooks(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
 	UpsertBook(ctx context.Context, in *UpsertBookRequest, opts ...grpc.CallOption) (*UpsertBookResponse, error)
 	GetPages(ctx context.Context, in *GetPagesRequest, opts ...grpc.CallOption) (*GetPagesResponse, error)
+	CreatePages(ctx context.Context, in *CreatePagesRequest, opts ...grpc.CallOption) (*CreatePagesResponse, error)
 	// GetAuthors
 	GetAuthors(ctx context.Context, in *GetAuthorsRequest, opts ...grpc.CallOption) (*GetAuthorsResponse, error)
 	// GetPublishers
@@ -78,6 +80,16 @@ func (c *archiveServiceClient) GetPages(ctx context.Context, in *GetPagesRequest
 	return out, nil
 }
 
+func (c *archiveServiceClient) CreatePages(ctx context.Context, in *CreatePagesRequest, opts ...grpc.CallOption) (*CreatePagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePagesResponse)
+	err := c.cc.Invoke(ctx, ArchiveService_CreatePages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *archiveServiceClient) GetAuthors(ctx context.Context, in *GetAuthorsRequest, opts ...grpc.CallOption) (*GetAuthorsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetAuthorsResponse)
@@ -106,6 +118,7 @@ type ArchiveServiceServer interface {
 	GetBooks(context.Context, *GetBookRequest) (*GetBookResponse, error)
 	UpsertBook(context.Context, *UpsertBookRequest) (*UpsertBookResponse, error)
 	GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error)
+	CreatePages(context.Context, *CreatePagesRequest) (*CreatePagesResponse, error)
 	// GetAuthors
 	GetAuthors(context.Context, *GetAuthorsRequest) (*GetAuthorsResponse, error)
 	// GetPublishers
@@ -128,6 +141,9 @@ func (UnimplementedArchiveServiceServer) UpsertBook(context.Context, *UpsertBook
 }
 func (UnimplementedArchiveServiceServer) GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPages not implemented")
+}
+func (UnimplementedArchiveServiceServer) CreatePages(context.Context, *CreatePagesRequest) (*CreatePagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePages not implemented")
 }
 func (UnimplementedArchiveServiceServer) GetAuthors(context.Context, *GetAuthorsRequest) (*GetAuthorsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAuthors not implemented")
@@ -210,6 +226,24 @@ func _ArchiveService_GetPages_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArchiveService_CreatePages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArchiveServiceServer).CreatePages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArchiveService_CreatePages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArchiveServiceServer).CreatePages(ctx, req.(*CreatePagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ArchiveService_GetAuthors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAuthorsRequest)
 	if err := dec(in); err != nil {
@@ -264,6 +298,10 @@ var ArchiveService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPages",
 			Handler:    _ArchiveService_GetPages_Handler,
+		},
+		{
+			MethodName: "CreatePages",
+			Handler:    _ArchiveService_CreatePages_Handler,
 		},
 		{
 			MethodName: "GetAuthors",

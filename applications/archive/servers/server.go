@@ -16,6 +16,7 @@ import (
 	"sherry.archive.com/shared/logger"
 	"sherry.archive.com/shared/middleware/grpc_error"
 	"sherry.archive.com/shared/middleware/grpc_recovery"
+	"sherry.archive.com/shared/topics"
 )
 
 func Serve(cfg *config.Application) {
@@ -27,7 +28,8 @@ func Serve(cfg *config.Application) {
 
 	querier := repository.NewQuerier(mysqlGorm)
 	multimediaStorage := multimedia.NewCloudinaryClient(cfg.CloudinaryConfig)
-	service := apis.NewService(querier, multimediaStorage)
+	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig)
+	service := apis.NewService(querier, multimediaStorage, publisher)
 
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	sv := services.NewServer(

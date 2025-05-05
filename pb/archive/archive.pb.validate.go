@@ -1067,6 +1067,218 @@ var _ interface {
 	ErrorName() string
 } = GetPagesResponseValidationError{}
 
+// Validate checks the field values on CreatePagesRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CreatePagesRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreatePagesRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CreatePagesRequestMultiError, or nil if none found.
+func (m *CreatePagesRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreatePagesRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for BookId
+
+	// no validation rules for Pages
+
+	if len(errors) > 0 {
+		return CreatePagesRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// CreatePagesRequestMultiError is an error wrapping multiple validation errors
+// returned by CreatePagesRequest.ValidateAll() if the designated constraints
+// aren't met.
+type CreatePagesRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreatePagesRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreatePagesRequestMultiError) AllErrors() []error { return m }
+
+// CreatePagesRequestValidationError is the validation error returned by
+// CreatePagesRequest.Validate if the designated constraints aren't met.
+type CreatePagesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreatePagesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreatePagesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreatePagesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreatePagesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreatePagesRequestValidationError) ErrorName() string {
+	return "CreatePagesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreatePagesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreatePagesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreatePagesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreatePagesRequestValidationError{}
+
+// Validate checks the field values on CreatePagesResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CreatePagesResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreatePagesResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CreatePagesResponseMultiError, or nil if none found.
+func (m *CreatePagesResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreatePagesResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if len(errors) > 0 {
+		return CreatePagesResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// CreatePagesResponseMultiError is an error wrapping multiple validation
+// errors returned by CreatePagesResponse.ValidateAll() if the designated
+// constraints aren't met.
+type CreatePagesResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreatePagesResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreatePagesResponseMultiError) AllErrors() []error { return m }
+
+// CreatePagesResponseValidationError is the validation error returned by
+// CreatePagesResponse.Validate if the designated constraints aren't met.
+type CreatePagesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreatePagesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreatePagesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreatePagesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreatePagesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreatePagesResponseValidationError) ErrorName() string {
+	return "CreatePagesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreatePagesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreatePagesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreatePagesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreatePagesResponseValidationError{}
+
 // Validate checks the field values on GetAuthorsRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.

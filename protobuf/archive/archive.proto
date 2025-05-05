@@ -31,6 +31,13 @@ service ArchiveService {
     };
   }
 
+  rpc CreatePages(CreatePagesRequest) returns (CreatePagesResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/create-pages"
+      body: "*"
+    };
+  }
+
   // GetAuthors
   rpc GetAuthors(GetAuthorsRequest) returns (GetAuthorsResponse) {
     option (google.api.http) = {
@@ -107,6 +114,16 @@ message GetPagesResponse {
     repeated Page pages = 1;
     Pagination pagination = 2;
   }
+}
+
+message CreatePagesRequest {
+  uint32 book_id = 1;
+  bytes pages = 2;
+}
+
+message CreatePagesResponse {
+  int32 code = 1;
+  string message = 2;
 }
 
 message GetAuthorsRequest {

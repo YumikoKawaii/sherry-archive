@@ -6,19 +6,24 @@ import (
 	"sherry.archive.com/applications/archive/adapters/multimedia"
 	"sherry.archive.com/applications/archive/pkg/repository"
 	pb "sherry.archive.com/pb/archive"
+	messages "sherry.archive.com/pb/messages"
+	"sherry.archive.com/shared/constants"
 	"sherry.archive.com/shared/logger"
+	"sherry.archive.com/shared/topics"
 )
 
 type Service struct {
 	pb.ArchiveServiceServer
 	querier           repository.Querier
 	multimediaStorage multimedia.StorageClient
+	publisher         topics.Publisher
 }
 
-func NewService(querier repository.Querier, multimediaClient multimedia.StorageClient) *Service {
+func NewService(querier repository.Querier, multimediaClient multimedia.StorageClient, publisher topics.Publisher) *Service {
 	return &Service{
 		querier:           querier,
 		multimediaStorage: multimediaClient,
+		publisher:         publisher,
 	}
 }
 
@@ -60,6 +65,20 @@ func (s *Service) GetPages(ctx context.Context, request *pb.GetPagesRequest) (*p
 		Code:    int32(http.StatusOK),
 		Message: "Success",
 		Data:    nil,
+	}, nil
+}
+
+func (s *Service) CreatePages(ctx context.Context, request *pb.CreatePagesRequest) (*pb.CreatePagesResponse, error) {
+	message := &messages.Pages{
+		BookId: request.BookId,
+		Data:   request.Pages,
+	}
+	if err := s.publisher.Publish(ctx, message, constants.MultimediaCompressionTopic, nil); err != nil {
+		return nil, err
+	}
+	return &pb.CreatePagesResponse{
+		Code:    int32(http.StatusOK),
+		Message: "Success",
 	}, nil
 }
 
