@@ -18,6 +18,8 @@ func main() {
 	switch kongCtx.Command() {
 	case "serve":
 		servers.Serve(cfg)
+	case "extract":
+		servers.Extract(cfg)
 	case "migrate <command>":
 		switch cfg.Migrate.Command {
 		case "up":

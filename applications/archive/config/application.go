@@ -11,6 +11,7 @@ import (
 
 type Application struct {
 	Serve   struct{} `kong:"cmd"`
+	Extract struct{} `kong:"cmd"`
 	Migrate struct {
 		Command string `kong:"arg,name:'command',enum:'up,create'"`
 		Option  string `kong:"arg,optional,name:'option'"`

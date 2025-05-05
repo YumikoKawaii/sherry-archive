@@ -1,6 +1,7 @@
 package servers
 
 import (
+	"context"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
@@ -11,6 +12,7 @@ import (
 	"sherry.archive.com/applications/archive/config"
 	"sherry.archive.com/applications/archive/pkg/repository"
 	"sherry.archive.com/applications/archive/servers/apis"
+	"sherry.archive.com/applications/archive/servers/file_processors/extractor"
 	"sherry.archive.com/applications/archive/services"
 	"sherry.archive.com/shared/database"
 	"sherry.archive.com/shared/logger"
@@ -52,4 +54,10 @@ func Serve(cfg *config.Application) {
 	if err := sv.Serve(); err != nil {
 		logger.Fatalf("failed to serve: %s", err.Error())
 	}
+}
+
+func Extract(cfg *config.Application) {
+	consumer := topics.NewKafkaConsumer(cfg.KafkaConfig)
+	ext := extractor.NewExtractor(consumer)
+	ext.Extract(context.Background())
 }
