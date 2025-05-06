@@ -80,14 +80,78 @@ func (m *Pages) GetData() []byte {
 	return nil
 }
 
+type Page struct {
+	BookId               uint32   `protobuf:"varint,1,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	Index                uint32   `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty"`
+	Data                 []byte   `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Page) Reset()         { *m = Page{} }
+func (m *Page) String() string { return proto.CompactTextString(m) }
+func (*Page) ProtoMessage()    {}
+func (*Page) Descriptor() ([]byte, []int) {
+	return fileDescriptor_83994550f81e9f35, []int{1}
+}
+func (m *Page) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Page) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Page.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Page) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Page.Merge(m, src)
+}
+func (m *Page) XXX_Size() int {
+	return m.Size()
+}
+func (m *Page) XXX_DiscardUnknown() {
+	xxx_messageInfo_Page.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Page proto.InternalMessageInfo
+
+func (m *Page) GetBookId() uint32 {
+	if m != nil {
+		return m.BookId
+	}
+	return 0
+}
+
+func (m *Page) GetIndex() uint32 {
+	if m != nil {
+		return m.Index
+	}
+	return 0
+}
+
+func (m *Page) GetData() []byte {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Pages)(nil), "sherry.archive.messages.v1.Pages")
+	proto.RegisterType((*Page)(nil), "sherry.archive.messages.v1.Page")
 }
 
 func init() { proto.RegisterFile("messages/messages.proto", fileDescriptor_83994550f81e9f35) }
 
 var fileDescriptor_83994550f81e9f35 = []byte{
-	// 204 bytes of a gzipped FileDescriptorProto
+	// 232 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0xcf, 0x4d, 0x2d, 0x2e,
 	0x4e, 0x4c, 0x4f, 0x2d, 0xd6, 0x87, 0x31, 0xf4, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2, 0x85, 0xa4, 0x8a,
 	0x33, 0x52, 0x8b, 0x8a, 0x2a, 0xf5, 0x12, 0x8b, 0x92, 0x33, 0x32, 0xcb, 0x52, 0xf5, 0xe0, 0xd2,
@@ -97,10 +161,12 @@ var fileDescriptor_83994550f81e9f35 = []byte{
 	0x98, 0x93, 0x99, 0x92, 0x58, 0x92, 0xaa, 0x0f, 0x63, 0x40, 0x24, 0x94, 0x4c, 0xb8, 0x58, 0x03,
 	0x40, 0x56, 0x08, 0x89, 0x73, 0xb1, 0x27, 0xe5, 0xe7, 0x67, 0xc7, 0x67, 0xa6, 0x48, 0x30, 0x2a,
 	0x30, 0x6a, 0xf0, 0x06, 0xb1, 0x81, 0xb8, 0x9e, 0x29, 0x42, 0x42, 0x5c, 0x2c, 0x29, 0x89, 0x25,
-	0x89, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0x3c, 0x41, 0x60, 0xb6, 0x93, 0xd1, 0x89, 0x47, 0x72, 0x8c,
-	0x17, 0x1e, 0xc9, 0x31, 0x3e, 0x78, 0x24, 0xc7, 0x38, 0xe3, 0xb1, 0x1c, 0x43, 0x94, 0x02, 0xc4,
-	0xe9, 0xba, 0x50, 0xa7, 0xc3, 0x7d, 0x66, 0x0d, 0x63, 0x24, 0xb1, 0x81, 0x2d, 0x34, 0x06, 0x04,
-	0x00, 0x00, 0xff, 0xff, 0xdc, 0x4e, 0x51, 0xc1, 0xfe, 0x00, 0x00, 0x00,
+	0x89, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0x3c, 0x41, 0x60, 0xb6, 0x92, 0x27, 0x17, 0x0b, 0x48, 0x17,
+	0x6e, 0x4d, 0x22, 0x5c, 0xac, 0x99, 0x79, 0x29, 0xa9, 0x15, 0x60, 0x5d, 0xbc, 0x41, 0x10, 0x0e,
+	0xdc, 0x28, 0x66, 0x84, 0x51, 0x4e, 0x46, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8,
+	0xe0, 0x91, 0x1c, 0xe3, 0x8c, 0xc7, 0x72, 0x0c, 0x51, 0x0a, 0x90, 0x50, 0xd0, 0x85, 0x86, 0x02,
+	0x3c, 0x90, 0xac, 0x61, 0x8c, 0x24, 0x36, 0xb0, 0xdb, 0x8d, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff,
+	0xf9, 0xc6, 0x0d, 0x2f, 0x49, 0x01, 0x00, 0x00,
 }
 
 func (m *Pages) Marshal() (dAtA []byte, err error) {
@@ -142,6 +208,50 @@ func (m *Pages) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *Page) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Page) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Page) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Data) > 0 {
+		i -= len(m.Data)
+		copy(dAtA[i:], m.Data)
+		i = encodeVarintMessages(dAtA, i, uint64(len(m.Data)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Index != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.Index))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.BookId != 0 {
+		i = encodeVarintMessages(dAtA, i, uint64(m.BookId))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintMessages(dAtA []byte, offset int, v uint64) int {
 	offset -= sovMessages(v)
 	base := offset
@@ -161,6 +271,28 @@ func (m *Pages) Size() (n int) {
 	_ = l
 	if m.BookId != 0 {
 		n += 1 + sovMessages(uint64(m.BookId))
+	}
+	l = len(m.Data)
+	if l > 0 {
+		n += 1 + l + sovMessages(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *Page) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.BookId != 0 {
+		n += 1 + sovMessages(uint64(m.BookId))
+	}
+	if m.Index != 0 {
+		n += 1 + sovMessages(uint64(m.Index))
 	}
 	l = len(m.Data)
 	if l > 0 {
@@ -227,6 +359,129 @@ func (m *Pages) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthMessages
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMessages
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
+			if m.Data == nil {
+				m.Data = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMessages(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthMessages
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Page) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMessages
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Page: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Page: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BookId", wireType)
+			}
+			m.BookId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BookId |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Index", wireType)
+			}
+			m.Index = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMessages
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Index |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
 			}

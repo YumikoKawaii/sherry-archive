@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/IBM/sarama"
-	"github.com/golang/protobuf/proto"
 	"sherry.archive.com/shared/configs"
 	"sherry.archive.com/shared/logger"
 	"sync"
@@ -12,7 +11,7 @@ import (
 )
 
 type Consumer interface {
-	Consume(ctx context.Context, topic string, handler func(message proto.Message) error) error
+	Consume(ctx context.Context, topic string, handler func(message *sarama.ConsumerMessage) error) error
 	Close() error
 }
 
@@ -49,7 +48,7 @@ type kafkaConsumer struct {
 	//groupId  string
 }
 
-func (c *kafkaConsumer) Consume(ctx context.Context, topic string, handler func(message proto.Message) error) error {
+func (c *kafkaConsumer) Consume(ctx context.Context, topic string, handler func(message *sarama.ConsumerMessage) error) error {
 	partitions, err := c.consumer.Partitions(topic)
 	if err != nil {
 		return err
@@ -77,13 +76,7 @@ func (c *kafkaConsumer) Consume(ctx context.Context, topic string, handler func(
 				select {
 				case msg := <-consumer.Messages():
 					logger.Debugf("receive message on topic %s, partition %d", topic, partition)
-					var protoMsg proto.Message
-					if err := proto.Unmarshal(msg.Value, protoMsg); err != nil {
-						logger.Errorf("error process message on topic %s: %s", topic, err.Error())
-						errChan <- err
-						return
-					}
-					if err := handler(protoMsg); err != nil {
+					if err := handler(msg); err != nil {
 						logger.Errorf("error process message on topic %s: %s", topic, err.Error())
 						errChan <- err
 						return

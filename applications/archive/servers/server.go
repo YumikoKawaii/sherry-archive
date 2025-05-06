@@ -58,6 +58,7 @@ func Serve(cfg *config.Application) {
 
 func Extract(cfg *config.Application) {
 	consumer := topics.NewKafkaConsumer(cfg.KafkaConfig)
-	ext := extractor.NewExtractor(consumer)
+	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig)
+	ext := extractor.NewExtractor(consumer, publisher)
 	ext.Extract(context.Background())
 }

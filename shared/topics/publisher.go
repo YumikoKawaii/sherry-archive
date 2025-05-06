@@ -17,6 +17,7 @@ func NewKafkaSyncPublisher(cfg configs.KafkaConfig) Publisher {
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Retry.Max = 5
 	config.Producer.Return.Successes = true
+	//config.Producer.Idempotent = true
 
 	producer, err := sarama.NewSyncProducer(cfg.Brokers, config)
 	if err != nil {
