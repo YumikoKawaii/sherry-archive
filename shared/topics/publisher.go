@@ -5,6 +5,7 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/golang/protobuf/proto"
 	"sherry.archive.com/shared/configs"
+	"sherry.archive.com/shared/logger"
 	"sync"
 )
 
@@ -55,5 +56,8 @@ func (p *kafkaSyncPublisher) Publish(ctx context.Context, message proto.Message,
 	}
 
 	_, _, err = p.publisher.SendMessage(msg)
+	if err != nil {
+		logger.Infof("publish message to topic %s", topic)
+	}
 	return err
 }

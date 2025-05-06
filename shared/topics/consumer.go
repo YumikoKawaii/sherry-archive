@@ -75,7 +75,7 @@ func (c *kafkaConsumer) Consume(ctx context.Context, topic string, handler func(
 			for {
 				select {
 				case msg := <-consumer.Messages():
-					logger.Debugf("receive message on topic %s, partition %d", topic, partition)
+					logger.Infof("receive message on topic %s, partition %d", topic, partition)
 					if err := handler(msg); err != nil {
 						logger.Errorf("error process message on topic %s: %s", topic, err.Error())
 						errChan <- err

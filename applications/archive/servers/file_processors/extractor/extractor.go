@@ -91,7 +91,7 @@ func (e *extractorImpl) extractFile(message *sarama.ConsumerMessage) error {
 			return err
 		}
 	}
-
+	logger.Infof("process pages for book_id %d", pagesMessage.BookId)
 	return nil
 }
 

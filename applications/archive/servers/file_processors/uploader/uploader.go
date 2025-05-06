@@ -65,5 +65,9 @@ func (u *uploaderImpl) upload(message *sarama.ConsumerMessage) error {
 		ImageUrl: url,
 		Index:    pageMessage.Index,
 	}
-	return u.querier.UpsertPage(context.Background(), page)
+	err = u.querier.UpsertPage(context.Background(), page)
+	if err != nil {
+		logger.Infof("process page %d, book_id %d", page.Index, page.BookID)
+	}
+	return err
 }
