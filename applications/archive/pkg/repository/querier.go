@@ -10,6 +10,7 @@ type Querier interface {
 	GetBooks(ctx context.Context, filter *GetBooksFilter) ([]Book, error)
 	UpsertBook(ctx context.Context, book *Book) error
 	GetPages(ctx context.Context, filter *GetPagesFilter) ([]Page, error)
+	UpsertPage(ctx context.Context, page *Page) error
 	GetAuthors(ctx context.Context, filter *GetAuthorsFilter) ([]Author, error)
 	GetPublishers(ctx context.Context, filter *GetPublishersFilter) ([]Publisher, error)
 }
@@ -76,6 +77,12 @@ func (q *querierImpl) GetPages(ctx context.Context, filter *GetPagesFilter) ([]P
 	}
 	pages := make([]Page, 0)
 	return pages, queryBuilder.Scan(pages).Error
+}
+
+func (q *querierImpl) UpsertPage(ctx context.Context, page *Page) error {
+	return q.db.Model(&Page{}).Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).Create(page).Error
 }
 
 func (q *querierImpl) GetAuthors(ctx context.Context, filter *GetAuthorsFilter) ([]Author, error) {

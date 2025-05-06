@@ -27,8 +27,8 @@ type GetBooksFilter struct {
 type Page struct {
 	ID        uint32     `gorm:"id"`
 	BookID    uint32     `gorm:"book_id"`
-	ImageUrl  *string    `gorm:"image_url"`
-	Index     *uint32    `gorm:"index"`
+	ImageUrl  string     `gorm:"image_url"`
+	Index     uint32     `gorm:"index"`
 	CreatedAt time.Time  `gorm:"created_at"`
 	UpdatedAt time.Time  `gorm:"updated_at"`
 	DeletedAt *time.Time `gorm:"deleted_at"`

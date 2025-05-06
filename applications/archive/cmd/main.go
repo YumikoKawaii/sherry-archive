@@ -20,6 +20,8 @@ func main() {
 		servers.Serve(cfg)
 	case "extract":
 		servers.Extract(cfg)
+	case "upload":
+		servers.Upload(cfg)
 	case "migrate <command>":
 		switch cfg.Migrate.Command {
 		case "up":

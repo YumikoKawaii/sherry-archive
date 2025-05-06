@@ -13,6 +13,7 @@ import (
 	"sherry.archive.com/applications/archive/pkg/repository"
 	"sherry.archive.com/applications/archive/servers/apis"
 	"sherry.archive.com/applications/archive/servers/file_processors/extractor"
+	"sherry.archive.com/applications/archive/servers/file_processors/uploader"
 	"sherry.archive.com/applications/archive/services"
 	"sherry.archive.com/shared/database"
 	"sherry.archive.com/shared/logger"
@@ -61,4 +62,13 @@ func Extract(cfg *config.Application) {
 	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig)
 	ext := extractor.NewExtractor(consumer, publisher)
 	ext.Extract(context.Background())
+}
+
+func Upload(cfg *config.Application) {
+	mysqlGorm := database.NewMysqlGormDatabase(cfg.MysqlConfig.DSN())
+	multimediaStorage := multimedia.NewCloudinaryClient(cfg.CloudinaryConfig)
+	consumer := topics.NewKafkaConsumer(cfg.KafkaConfig)
+	querier := repository.NewQuerier(mysqlGorm)
+	upl := uploader.NewUploader(multimediaStorage, consumer, querier)
+	upl.Process(context.Background())
 }
