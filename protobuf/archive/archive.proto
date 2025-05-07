@@ -38,6 +38,13 @@ service ArchiveService {
     };
   }
 
+  rpc UpdatePage(UpdatePageRequest) returns (UpdatePageResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/update-pages"
+      body: "*"
+    };
+  }
+
   // GetAuthors
   rpc GetAuthors(GetAuthorsRequest) returns (GetAuthorsResponse) {
     option (google.api.http) = {
@@ -61,12 +68,12 @@ message GetBookRequest {
   google.protobuf.UInt32Value category_id = 2;
   google.protobuf.UInt32Value author_id = 3;
   google.protobuf.UInt32Value publisher_id = 4;
-  int32 page = 5;
-  int32 page_size = 6;
+  uint32 page = 5;
+  uint32 page_size = 6;
 }
 
 message GetBookResponse {
-  int32 code = 1;
+  uint32 code = 1;
   string message = 2;
   Data data = 3;
 
@@ -80,16 +87,17 @@ message UpsertBookRequest {
   google.protobuf.UInt32Value id = 1;
   string title = 2;
   google.protobuf.StringValue description = 3;
-  google.protobuf.BytesValue image = 4;
-  google.protobuf.UInt32Value author_id = 5;
-  google.protobuf.UInt32Value publisher_id = 6;
-  google.protobuf.UInt32Value category_id = 7;
-  google.protobuf.UInt64Value publication_date = 8;
+  google.protobuf.StringValue image_url = 4;
+  google.protobuf.BytesValue image = 5;
+  google.protobuf.UInt32Value author_id = 6;
+  google.protobuf.UInt32Value publisher_id = 7;
+  google.protobuf.UInt32Value category_id = 8;
+  google.protobuf.UInt64Value publication_date = 9;
 }
 
 
 message UpsertBookResponse {
-  int32 code = 1;
+  uint32 code = 1;
   string message = 2;
   Data data = 3;
 
@@ -101,12 +109,12 @@ message UpsertBookResponse {
 message GetPagesRequest {
   google.protobuf.UInt32Value book_id = 1;
   repeated uint32 ids = 2;
-  int32 page = 3;
-  int32 page_size = 4;
+  uint32 page = 3;
+  uint32 page_size = 4;
 }
 
 message GetPagesResponse {
-  int32 code = 1;
+  uint32 code = 1;
   string message = 2;
   Data data = 3;
 
@@ -122,16 +130,36 @@ message CreatePagesRequest {
 }
 
 message CreatePagesResponse {
-  int32 code = 1;
+  uint32 code = 1;
   string message = 2;
+}
+
+message UpdatePageRequest {
+  uint32 id = 1;
+  uint32 book_id = 2;
+  string image_url = 3;
+  google.protobuf.BytesValue image = 4;
+  uint32 index = 5;
+}
+
+message UpdatePageResponse {
+  uint32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    Page page = 1;
+  }
 }
 
 message GetAuthorsRequest {
   repeated uint32 author_ids = 1;
+  uint32 page = 2;
+  uint32 page_size = 3;
 }
 
 message GetAuthorsResponse {
-  int32 code = 1;
+  uint32 code = 1;
   string message = 2;
   Data data = 3;
 
@@ -143,10 +171,12 @@ message GetAuthorsResponse {
 
 message GetPublishersRequest {
   repeated uint32 publisher_ids = 1;
+  uint32 page = 2;
+  uint32 page_size = 3;
 }
 
 message GetPublishersResponse {
-  int32 code = 1;
+  uint32 code = 1;
   string message = 2;
   Data data = 3;
 
@@ -171,6 +201,7 @@ message Page {
   uint32 id = 1;
   uint32 book_id = 2;
   string image_url = 3;
+  uint32 index = 4;
 }
 
 message Author {
@@ -188,6 +219,6 @@ message Publisher {
 }
 
 message Pagination {
-  int32 page = 1;
-  int32 page_size = 2;
+  uint32 page = 1;
+  uint32 page_size = 2;
 }

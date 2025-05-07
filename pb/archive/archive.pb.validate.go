@@ -442,6 +442,35 @@ func (m *UpsertBookRequest) validate(all bool) error {
 	}
 
 	if all {
+		switch v := interface{}(m.GetImageUrl()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "ImageUrl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertBookRequestValidationError{
+					field:  "ImageUrl",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetImageUrl()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertBookRequestValidationError{
+				field:  "ImageUrl",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
 		switch v := interface{}(m.GetImage()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
@@ -1279,6 +1308,280 @@ var _ interface {
 	ErrorName() string
 } = CreatePagesResponseValidationError{}
 
+// Validate checks the field values on UpdatePageRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *UpdatePageRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdatePageRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdatePageRequestMultiError, or nil if none found.
+func (m *UpdatePageRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdatePageRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for BookId
+
+	// no validation rules for ImageUrl
+
+	if all {
+		switch v := interface{}(m.GetImage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdatePageRequestValidationError{
+					field:  "Image",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdatePageRequestValidationError{
+					field:  "Image",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetImage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdatePageRequestValidationError{
+				field:  "Image",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Index
+
+	if len(errors) > 0 {
+		return UpdatePageRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdatePageRequestMultiError is an error wrapping multiple validation errors
+// returned by UpdatePageRequest.ValidateAll() if the designated constraints
+// aren't met.
+type UpdatePageRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdatePageRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdatePageRequestMultiError) AllErrors() []error { return m }
+
+// UpdatePageRequestValidationError is the validation error returned by
+// UpdatePageRequest.Validate if the designated constraints aren't met.
+type UpdatePageRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdatePageRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdatePageRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdatePageRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdatePageRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdatePageRequestValidationError) ErrorName() string {
+	return "UpdatePageRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdatePageRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdatePageRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdatePageRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdatePageRequestValidationError{}
+
+// Validate checks the field values on UpdatePageResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdatePageResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdatePageResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdatePageResponseMultiError, or nil if none found.
+func (m *UpdatePageResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdatePageResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdatePageResponseValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdatePageResponseValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdatePageResponseValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdatePageResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdatePageResponseMultiError is an error wrapping multiple validation errors
+// returned by UpdatePageResponse.ValidateAll() if the designated constraints
+// aren't met.
+type UpdatePageResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdatePageResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdatePageResponseMultiError) AllErrors() []error { return m }
+
+// UpdatePageResponseValidationError is the validation error returned by
+// UpdatePageResponse.Validate if the designated constraints aren't met.
+type UpdatePageResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdatePageResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdatePageResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdatePageResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdatePageResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdatePageResponseValidationError) ErrorName() string {
+	return "UpdatePageResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdatePageResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdatePageResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdatePageResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdatePageResponseValidationError{}
+
 // Validate checks the field values on GetAuthorsRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -1300,6 +1603,10 @@ func (m *GetAuthorsRequest) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for Page
+
+	// no validation rules for PageSize
 
 	if len(errors) > 0 {
 		return GetAuthorsRequestMultiError(errors)
@@ -1537,6 +1844,10 @@ func (m *GetPublishersRequest) validate(all bool) error {
 	}
 
 	var errors []error
+
+	// no validation rules for Page
+
+	// no validation rules for PageSize
 
 	if len(errors) > 0 {
 		return GetPublishersRequestMultiError(errors)
@@ -2055,6 +2366,8 @@ func (m *Page) validate(all bool) error {
 	// no validation rules for BookId
 
 	// no validation rules for ImageUrl
+
+	// no validation rules for Index
 
 	if len(errors) > 0 {
 		return PageMultiError(errors)
@@ -2909,6 +3222,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetPagesResponse_DataValidationError{}
+
+// Validate checks the field values on UpdatePageResponse_Data with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdatePageResponse_Data) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdatePageResponse_Data with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdatePageResponse_DataMultiError, or nil if none found.
+func (m *UpdatePageResponse_Data) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdatePageResponse_Data) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdatePageResponse_DataValidationError{
+					field:  "Page",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdatePageResponse_DataValidationError{
+					field:  "Page",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdatePageResponse_DataValidationError{
+				field:  "Page",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdatePageResponse_DataMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdatePageResponse_DataMultiError is an error wrapping multiple validation
+// errors returned by UpdatePageResponse_Data.ValidateAll() if the designated
+// constraints aren't met.
+type UpdatePageResponse_DataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdatePageResponse_DataMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdatePageResponse_DataMultiError) AllErrors() []error { return m }
+
+// UpdatePageResponse_DataValidationError is the validation error returned by
+// UpdatePageResponse_Data.Validate if the designated constraints aren't met.
+type UpdatePageResponse_DataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdatePageResponse_DataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdatePageResponse_DataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdatePageResponse_DataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdatePageResponse_DataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdatePageResponse_DataValidationError) ErrorName() string {
+	return "UpdatePageResponse_DataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdatePageResponse_DataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdatePageResponse_Data.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdatePageResponse_DataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdatePageResponse_DataValidationError{}
 
 // Validate checks the field values on GetAuthorsResponse_Data with the rules
 // defined in the proto definition for this message. If any rules are

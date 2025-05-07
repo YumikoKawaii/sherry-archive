@@ -33,6 +33,33 @@ func convertBookRecordToProto(book *repository.Book) *pb.Book {
 	}
 }
 
+func convertPageRecordToProto(page *repository.Page) *pb.Page {
+	return &pb.Page{
+		Id:       page.ID,
+		BookId:   page.BookID,
+		ImageUrl: page.ImageUrl,
+		Index:    page.Index,
+	}
+}
+
+func convertAuthorRecordToProto(author *repository.Author) *pb.Author {
+	return &pb.Author{
+		Id:          author.ID,
+		Name:        author.Name,
+		Description: author.Description,
+		ImageUrl:    author.ImageUrl,
+	}
+}
+
+func convertPublisherRecordToProto(publisher *repository.Publisher) *pb.Publisher {
+	return &pb.Publisher{
+		Id:          publisher.ID,
+		Name:        publisher.Name,
+		Description: publisher.Description,
+		ImageUrl:    publisher.ImageUrl,
+	}
+}
+
 func uint64ValueToTime(value *types.UInt64Value) *time.Time {
 	secs := proto_values.UInt64ValueToPointer(value)
 	if secs != nil {
