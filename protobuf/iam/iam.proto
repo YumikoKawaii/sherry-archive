@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+package sherry.archive.iam.api.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
+
+option go_package = "sherry-archive/iam/api;api";
+
+service IdentityService {
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/register"
+      body: "*"
+    };
+  }
+
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/login"
+      body: "*"
+    };
+  }
+
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/update-profile"
+      body: "*"
+    };
+  }
+
+  rpc RequestChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/request-change-password"
+      body: "*"
+    };
+  }
+
+  rpc ConfirmChangePassword(ConfirmChangePasswordRequest) returns (ConfirmChangePasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/confirm-change-password"
+      body: "*"
+    };
+  }
+
+  rpc UpsertPermission(UpsertPermissionRequest) returns (UpsertPermissionResponse) {
+
+  }
+
+  rpc Verify(VerifyRequest) returns (VerifyResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/verify"
+      body: "*"
+    };
+  }
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+  uint32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    string token = 1;
+  }
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  uint32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    string token = 1;
+  }
+}
+
+message UpdateProfileRequest {
+  uint32 id = 1;
+  string username = 2;
+  string image_url = 3;
+  google.protobuf.BytesValue image = 4;
+  string email = 5;
+}
+
+message UpdateProfileResponse {
+  uint32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    Profile profile = 1;
+  }
+}
+
+message Profile {
+  uint32 id = 1;
+  string username = 2;
+  string image_url = 3;
+  string email = 4;
+  string role = 5;
+}
+
+message ChangePasswordRequest {
+  string password = 1;
+}
+
+message ChangePasswordResponse {
+  uint32 code = 1;
+  string message = 2;
+}
+
+message ConfirmChangePasswordRequest {
+  string otp = 1;
+}
+
+message ConfirmChangePasswordResponse {
+  uint32 code = 1;
+  string message = 2;
+}
