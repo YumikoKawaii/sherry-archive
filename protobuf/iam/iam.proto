@@ -23,29 +23,17 @@ service IdentityService {
     };
   }
 
-  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse) {
+  rpc GetUserDetail(GetUserDetailRequest) returns (GetUserDetailResponse) {
     option (google.api.http) = {
-      post: "/api/v1/update-profile"
-      body: "*"
+      get: "/api/v1/users"
     };
   }
 
-  rpc RequestChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+  rpc UpsertUser(UpsertUserRequest) returns (UpsertUserResponse) {
     option (google.api.http) = {
-      post: "/api/v1/request-change-password"
+      post: "/api/v1/users"
       body: "*"
     };
-  }
-
-  rpc ConfirmChangePassword(ConfirmChangePasswordRequest) returns (ConfirmChangePasswordResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/confirm-change-password"
-      body: "*"
-    };
-  }
-
-  rpc UpsertPermission(UpsertPermissionRequest) returns (UpsertPermissionResponse) {
-
   }
 
   rpc Verify(VerifyRequest) returns (VerifyResponse) {
@@ -86,46 +74,48 @@ message LoginResponse {
   }
 }
 
-message UpdateProfileRequest {
-  uint32 id = 1;
-  string username = 2;
-  string image_url = 3;
-  google.protobuf.BytesValue image = 4;
-  string email = 5;
-}
+message GetUserDetailRequest {}
 
-message UpdateProfileResponse {
+message GetUserDetailResponse {
   uint32 code = 1;
   string message = 2;
   Data data = 3;
 
   message Data {
-    Profile profile = 1;
+    User user = 1;
   }
 }
 
-message Profile {
-  uint32 id = 1;
-  string username = 2;
-  string image_url = 3;
-  string email = 4;
-  string role = 5;
+message UpsertUserRequest {
+  string username = 1;
+  string email = 2;
 }
 
-message ChangePasswordRequest {
-  string password = 1;
-}
-
-message ChangePasswordResponse {
+message UpsertUserResponse {
   uint32 code = 1;
   string message = 2;
+  Data data = 3;
+
+  message Data {
+    User user = 1;
+  }
 }
 
-message ConfirmChangePasswordRequest {
-  string otp = 1;
+message User {
+  uint32 id = 1;
+  string uuid = 2;
+  string username = 3;
+  string email = 4;
+  string department = 5;
+  string status = 6;
 }
 
-message ConfirmChangePasswordResponse {
+message VerifyRequest {
+  string path = 1;
+  string action = 2;
+}
+
+message VerifyResponse {
   uint32 code = 1;
   string message = 2;
 }
