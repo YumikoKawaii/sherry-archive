@@ -54,7 +54,9 @@ create table permission_resources
     resource_id   int         not null,
     action        varchar(50) not null, # GET - POST - PUT - DELETE
     created_at    timestamp default current_timestamp,
-    updated_at    timestamp default current_timestamp on update current_timestamp
+    updated_at    timestamp default current_timestamp on update current_timestamp,
+    constraint fk_resources foreign key (resource_id) references resources (id),
+    constraint fk_permissions foreign key (permission_id) references permissions (id)
 );
 
 create table `roles`
@@ -94,5 +96,6 @@ create table `policies`
     principal_id   int         not null,
     permission_id  int         not null,
     created_at     timestamp default current_timestamp,
-    updated_at     timestamp default current_timestamp on update current_timestamp
+    updated_at     timestamp default current_timestamp on update current_timestamp,
+    constraint fk_permissions foreign key (permission_id) references permissions (id)
 );
