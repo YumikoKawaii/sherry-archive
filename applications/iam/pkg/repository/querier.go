@@ -4,23 +4,18 @@ import (
 	"context"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"sherry.archive.com/applications/iam/pkg/constants"
 )
 
 type Querier interface {
-	GetUsers(context.Context) ([]User, error)
+	GetUsers(ctx context.Context, filter *GetUsersFilter) ([]User, error)
 	UpsertUser(ctx context.Context, user *User) error
-	GetGroups(ctx context.Context) ([]Group, error)
-	UpsertGroup(ctx context.Context, group *Group) error
-	UpsertUserGroup(ctx context.Context, relation *UserGroup) error
+	InitialUser(ctx context.Context, user *User) error
 	GetResources(ctx context.Context) ([]Resource, error)
 	UpsertResource(ctx context.Context, resource *Resource) error
-	GetPermissions(ctx context.Context) ([]Permission, error)
-	UpsertPermission(ctx context.Context, permission *Permission) error
-	UpsertPermissionResource(ctx context.Context, relation *PermissionResource) error
 	GetRoles(ctx context.Context) ([]Role, error)
 	UpsertRole(ctx context.Context, role *Role) error
 	UpsertUserRole(ctx context.Context, relation *UserRole) error
-	UpsertGroupRole(ctx context.Context, relation *GroupRole) error
 	GetPolicies(ctx context.Context) ([]Policy, error)
 	UpsertPolicy(ctx context.Context, policy *Policy) error
 }
@@ -33,10 +28,27 @@ func NewQuerier(db *gorm.DB) Querier {
 	return &querierImpl{db: db}
 }
 
-func (q *querierImpl) GetUsers(ctx context.Context) ([]User, error) {
-	var users []User
-	err := q.db.WithContext(ctx).Find(&users).Error
-	return users, err
+func (q *querierImpl) GetUsers(ctx context.Context, filter *GetUsersFilter) ([]User, error) {
+	accounts := make([]User, 0)
+	query := q.db.Model(&User{})
+	if filter != nil {
+		if len(filter.Ids) != 0 {
+			query = query.Where("id in (?)", filter.Ids)
+		}
+
+		if filter.Status != nil {
+			query = query.Where("status = ?", filter.Status)
+		}
+
+		if filter.Email != nil {
+			query = query.Where("email = ?", filter.Email)
+		}
+
+		if filter.HashedPassword != nil {
+			query = query.Where("hashed_password = ?", filter.HashedPassword)
+		}
+	}
+	return accounts, query.WithContext(ctx).Find(&accounts).Error
 }
 
 func (q *querierImpl) UpsertUser(ctx context.Context, user *User) error {
@@ -45,23 +57,19 @@ func (q *querierImpl) UpsertUser(ctx context.Context, user *User) error {
 	}).Create(user).Error
 }
 
-func (q *querierImpl) GetGroups(ctx context.Context) ([]Group, error) {
-	var groups []Group
-	err := q.db.WithContext(ctx).Find(&groups).Error
-	return groups, err
-}
+func (q *querierImpl) InitialUser(ctx context.Context, user *User) error {
+	return q.db.Transaction(func(tx *gorm.DB) error {
+		// create user
+		// create default role assign to user
+		if err := tx.Model(&User{}).WithContext(ctx).Create(user).Error; err != nil {
+			return err
+		}
 
-func (q *querierImpl) UpsertGroup(ctx context.Context, group *Group) error {
-	return q.db.WithContext(ctx).Clauses(clause.OnConflict{
-		UpdateAll: true,
-	}).Create(group).Error
-}
-
-func (q *querierImpl) UpsertUserGroup(ctx context.Context, relation *UserGroup) error {
-	return q.db.WithContext(ctx).Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "user_id"}, {Name: "group_id"}},
-		UpdateAll: true,
-	}).Create(relation).Error
+		return tx.Model(&UserRole{}).WithContext(ctx).Create(&UserRole{
+			UserId: user.Id,
+			Role:   constants.ReaderRole,
+		}).Error
+	})
 }
 
 func (q *querierImpl) GetResources(ctx context.Context) ([]Resource, error) {
@@ -74,25 +82,6 @@ func (q *querierImpl) UpsertResource(ctx context.Context, resource *Resource) er
 	return q.db.WithContext(ctx).Clauses(clause.OnConflict{
 		UpdateAll: true,
 	}).Create(resource).Error
-}
-
-func (q *querierImpl) GetPermissions(ctx context.Context) ([]Permission, error) {
-	var permissions []Permission
-	err := q.db.WithContext(ctx).Find(&permissions).Error
-	return permissions, err
-}
-
-func (q *querierImpl) UpsertPermission(ctx context.Context, permission *Permission) error {
-	return q.db.WithContext(ctx).Clauses(clause.OnConflict{
-		UpdateAll: true,
-	}).Create(permission).Error
-}
-
-func (q *querierImpl) UpsertPermissionResource(ctx context.Context, relation *PermissionResource) error {
-	return q.db.WithContext(ctx).Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "permission_id"}, {Name: "resource_id"}, {Name: "action"}},
-		UpdateAll: true,
-	}).Create(relation).Error
 }
 
 func (q *querierImpl) GetRoles(ctx context.Context) ([]Role, error) {
@@ -110,13 +99,6 @@ func (q *querierImpl) UpsertRole(ctx context.Context, role *Role) error {
 func (q *querierImpl) UpsertUserRole(ctx context.Context, relation *UserRole) error {
 	return q.db.WithContext(ctx).Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "user_id"}, {Name: "role_id"}},
-		UpdateAll: true,
-	}).Create(relation).Error
-}
-
-func (q *querierImpl) UpsertGroupRole(ctx context.Context, relation *GroupRole) error {
-	return q.db.WithContext(ctx).Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "group_id"}, {Name: "role_id"}},
 		UpdateAll: true,
 	}).Create(relation).Error
 }

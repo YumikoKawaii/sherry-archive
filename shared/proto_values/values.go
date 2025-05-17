@@ -49,3 +49,7 @@ func UInt64PointerToValue(value *uint64) *types.UInt64Value {
 		Value: *value,
 	}
 }
+
+func StringToPointer(value string) *string {
+	return &value
+}

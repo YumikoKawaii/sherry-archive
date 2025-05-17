@@ -1120,8 +1120,6 @@ func (m *VerifyRequest) validate(all bool) error {
 
 	// no validation rules for Path
 
-	// no validation rules for Action
-
 	if len(errors) > 0 {
 		return VerifyRequestMultiError(errors)
 	}

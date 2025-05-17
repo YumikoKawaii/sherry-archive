@@ -112,7 +112,6 @@ message User {
 
 message VerifyRequest {
   string path = 1;
-  string action = 2;
 }
 
 message VerifyResponse {

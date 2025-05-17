@@ -1,6 +1,8 @@
 package servers
 
 import (
+	"encoding/hex"
+	"github.com/go-redis/redis/v8"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
@@ -8,6 +10,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"sherry.archive.com/applications/iam/config"
+	"sherry.archive.com/applications/iam/pkg/jwt"
 	"sherry.archive.com/applications/iam/pkg/repository"
 	"sherry.archive.com/applications/iam/servers/apis"
 	"sherry.archive.com/applications/iam/services"
@@ -23,9 +26,16 @@ func Serve(cfg *config.Application) {
 	zapLogger := zapSugaredLogger.Desugar()
 	mysqlGorm := database.NewMysqlGormDatabase(cfg.MysqlConfig.DSN())
 	grpc_zap.ReplaceGrpcLoggerV2(zapLogger)
-
+	hashKey, _ := hex.DecodeString(cfg.HashKey)
+	serviceCfg := &apis.Config{
+		HashKey: hashKey,
+	}
 	querier := repository.NewQuerier(mysqlGorm)
-	service := apis.NewService(querier)
+	jwtResolver := jwt.NewResolver(cfg.JwtKey, cfg.JwtTTLInSec)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: cfg.RedisAddress,
+	})
+	service := apis.NewService(serviceCfg, querier, jwtResolver, redisClient)
 
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	sv := services.NewServer(

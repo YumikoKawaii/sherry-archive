@@ -25,8 +25,12 @@ type Application struct {
 
 	MysqlConfig     configs.MysqlConfig `kong:"embed"`
 	MigrationFolder string              `env:"MIGRATION_FOLDER" default:"/applications/archive/migrations"`
-	
+
 	RedisAddress string `env:"REDIS_ADDRESS" default:"localhost:6379"`
+
+	HashKey     string `env:"HASH_KEY" default:"Yumiko1@"`
+	JwtKey      string `env:"JWT_KEY" default:"Celty1@"`
+	JwtTTLInSec int64  `env:"JWT_TTL_IN_SEC" default:"3600"`
 }
 
 func Initialize() (*Application, *kong.Context) {
