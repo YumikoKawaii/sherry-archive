@@ -31,6 +31,8 @@ type Application struct {
 	RedisAddress string              `env:"REDIS_ADDRESS" default:"localhost:6379"`
 
 	CloudinaryConfig multimedia.CloudinaryConfig `kong:"embed"`
+
+	IamHost string `env:"IAM_HOST" default:"localhost:9090"`
 }
 
 func Initialize() (*Application, *kong.Context) {

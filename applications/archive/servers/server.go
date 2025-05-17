@@ -8,8 +8,10 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"sherry.archive.com/applications/archive/adapters/iam"
 	"sherry.archive.com/applications/archive/adapters/multimedia"
 	"sherry.archive.com/applications/archive/config"
+	"sherry.archive.com/applications/archive/interceptors"
 	"sherry.archive.com/applications/archive/pkg/repository"
 	"sherry.archive.com/applications/archive/servers/apis"
 	"sherry.archive.com/applications/archive/servers/file_processors/extractor"
@@ -35,6 +37,8 @@ func Serve(cfg *config.Application) {
 	service := apis.NewService(querier, multimediaStorage, publisher)
 
 	grpc_prometheus.EnableHandlingTimeHistogram()
+	iamClient := iam.NewClient(cfg.IamHost)
+	iamInterceptor := interceptors.NewIamInterceptor(iamClient)
 	sv := services.NewServer(
 		services.NewConfig(cfg.GRPCPort, cfg.HTTPPort),
 		grpc.MaxRecvMsgSize(10*1024*1024),
@@ -45,6 +49,7 @@ func Serve(cfg *config.Application) {
 			grpc_validator.UnaryServerInterceptor(),
 			grpc_error.UnaryServerInterceptor(cfg.AppMode),
 			grpc_recovery.UnaryServerInterceptor(),
+			iamInterceptor.Unary,
 		),
 	)
 
