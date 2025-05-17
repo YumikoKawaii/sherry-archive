@@ -28,15 +28,15 @@ func NewService(querier repository.Querier, multimediaClient multimedia.StorageC
 	}
 }
 
-func (s *Service) GetBooks(ctx context.Context, request *pb.GetBookRequest) (*pb.GetBookResponse, error) {
-	return &pb.GetBookResponse{
+func (s *Service) GetDocuments(ctx context.Context, request *pb.GetDocumentsRequest) (*pb.GetDocumentsResponse, error) {
+	return &pb.GetDocumentsResponse{
 		Code:    uint32(http.StatusOK),
 		Message: "Success",
 		Data:    nil,
 	}, nil
 }
 
-func (s *Service) UpsertBook(ctx context.Context, request *pb.UpsertBookRequest) (*pb.UpsertBookResponse, error) {
+func (s *Service) UpsertDocument(ctx context.Context, request *pb.UpsertDocumentRequest) (*pb.UpsertDocumentResponse, error) {
 	imageUrl := &request.ImageUrl.Value
 	if request.Image != nil {
 		url, err := s.multimediaStorage.Save(ctx, request.Image.Value)
@@ -47,24 +47,24 @@ func (s *Service) UpsertBook(ctx context.Context, request *pb.UpsertBookRequest)
 
 		imageUrl = &url
 	}
-	record := enrichBookRecordFromUpsertBookRequest(request, imageUrl)
-	err := s.querier.UpsertBook(ctx, record)
+	record := enrichDocumentRecordFromUpsertDocumentRequest(request, imageUrl)
+	err := s.querier.UpsertDocument(ctx, record)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.UpsertBookResponse{
+	return &pb.UpsertDocumentResponse{
 		Code:    uint32(http.StatusOK),
 		Message: "Success",
-		Data: &pb.UpsertBookResponse_Data{
-			Book: convertBookRecordToProto(record),
+		Data: &pb.UpsertDocumentResponse_Data{
+			Document: convertDocumentRecordToProto(record),
 		},
 	}, nil
 }
 
 func (s *Service) GetPages(ctx context.Context, request *pb.GetPagesRequest) (*pb.GetPagesResponse, error) {
 	pages, err := s.querier.GetPages(ctx, &repository.GetPagesFilter{
-		IDs:    request.Ids,
-		BookId: proto_values.UInt32ValueToPointer(request.BookId),
+		IDs:        request.Ids,
+		DocumentId: proto_values.UInt32ValueToPointer(request.DocumentId),
 		Pagination: &repository.Pagination{
 			Page:     request.Page,
 			PageSize: request.PageSize,
@@ -94,8 +94,8 @@ func (s *Service) GetPages(ctx context.Context, request *pb.GetPagesRequest) (*p
 
 func (s *Service) CreatePages(ctx context.Context, request *pb.CreatePagesRequest) (*pb.CreatePagesResponse, error) {
 	message := &messages.Pages{
-		BookId: request.BookId,
-		Data:   request.Pages,
+		DocumentId: request.DocumentId,
+		Data:       request.Pages,
 	}
 	if err := s.publisher.Publish(ctx, message, constants.MultimediaCompressionTopic, nil); err != nil {
 		return nil, err
@@ -120,10 +120,10 @@ func (s *Service) UpdatePage(ctx context.Context, request *pb.UpdatePageRequest)
 
 	// TODO: check permission with book
 	page := &repository.Page{
-		ID:       request.Id,
-		BookID:   request.BookId,
-		ImageUrl: imageUrl,
-		Index:    request.Index,
+		ID:         request.Id,
+		DocumentID: request.DocumentId,
+		ImageUrl:   imageUrl,
+		Index:      request.Index,
 	}
 	if err := s.querier.UpsertPage(ctx, page); err != nil {
 		return nil, err

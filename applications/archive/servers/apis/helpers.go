@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-func enrichBookRecordFromUpsertBookRequest(req *pb.UpsertBookRequest, imageUrl *string) *repository.Book {
-	return &repository.Book{
+func enrichDocumentRecordFromUpsertDocumentRequest(req *pb.UpsertDocumentRequest, imageUrl *string) *repository.Document {
+	return &repository.Document{
 		Title:           req.Title,
 		Description:     proto_values.StringValueToPointer(req.Description),
 		ImageUrl:        imageUrl,
@@ -20,8 +20,8 @@ func enrichBookRecordFromUpsertBookRequest(req *pb.UpsertBookRequest, imageUrl *
 	}
 }
 
-func convertBookRecordToProto(book *repository.Book) *pb.Book {
-	return &pb.Book{
+func convertDocumentRecordToProto(book *repository.Document) *pb.Document {
+	return &pb.Document{
 		Id:              book.ID,
 		Title:           book.Title,
 		Description:     proto_values.StringPointerToValue(book.Description),
@@ -35,10 +35,10 @@ func convertBookRecordToProto(book *repository.Book) *pb.Book {
 
 func convertPageRecordToProto(page *repository.Page) *pb.Page {
 	return &pb.Page{
-		Id:       page.ID,
-		BookId:   page.BookID,
-		ImageUrl: page.ImageUrl,
-		Index:    page.Index,
+		Id:         page.ID,
+		DocumentId: page.DocumentID,
+		ImageUrl:   page.ImageUrl,
+		Index:      page.Index,
 	}
 }
 

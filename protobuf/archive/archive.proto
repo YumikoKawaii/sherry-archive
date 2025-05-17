@@ -9,17 +9,17 @@ import "validate/validate.proto";
 option go_package = "sherry-archive/api;api";
 
 service ArchiveService {
-  // GetBooks
-  rpc GetBooks(GetBookRequest) returns (GetBookResponse) {
+  // GetDocuments
+  rpc GetDocuments(GetDocumentsRequest) returns (GetDocumentsResponse) {
     option (google.api.http) = {
-      post: "/api/v1/books"
+      post: "/api/v1/documents"
       body: "*"
     };
   }
 
-  rpc UpsertBook(UpsertBookRequest) returns (UpsertBookResponse) {
+  rpc UpsertDocument(UpsertDocumentRequest) returns (UpsertDocumentResponse) {
     option (google.api.http) = {
-      post: "/api/v1/upsert-book"
+      post: "/api/v1/upsert-document"
       body: "*"
     };
   }
@@ -63,8 +63,8 @@ service ArchiveService {
 
 }
 
-message GetBookRequest {
-  repeated uint32 book_ids = 1;
+message GetDocumentsRequest {
+  repeated uint32 document_ids = 1;
   google.protobuf.UInt32Value category_id = 2;
   google.protobuf.UInt32Value author_id = 3;
   google.protobuf.UInt32Value publisher_id = 4;
@@ -72,18 +72,18 @@ message GetBookRequest {
   uint32 page_size = 6;
 }
 
-message GetBookResponse {
+message GetDocumentsResponse {
   uint32 code = 1;
   string message = 2;
   Data data = 3;
 
   message Data {
-    repeated Book books = 1;
+    repeated Document documents = 1;
     Pagination pagination = 2;
   }
 }
 
-message UpsertBookRequest {
+message UpsertDocumentRequest {
   google.protobuf.UInt32Value id = 1;
   string title = 2;
   google.protobuf.StringValue description = 3;
@@ -96,18 +96,18 @@ message UpsertBookRequest {
 }
 
 
-message UpsertBookResponse {
+message UpsertDocumentResponse {
   uint32 code = 1;
   string message = 2;
   Data data = 3;
 
   message Data {
-    Book book = 1;
+    Document document = 1;
   }
 }
 
 message GetPagesRequest {
-  google.protobuf.UInt32Value book_id = 1;
+  google.protobuf.UInt32Value document_id = 1;
   repeated uint32 ids = 2;
   uint32 page = 3;
   uint32 page_size = 4;
@@ -125,7 +125,7 @@ message GetPagesResponse {
 }
 
 message CreatePagesRequest {
-  uint32 book_id = 1;
+  uint32 document_id = 1;
   bytes pages = 2;
 }
 
@@ -136,7 +136,7 @@ message CreatePagesResponse {
 
 message UpdatePageRequest {
   uint32 id = 1;
-  uint32 book_id = 2;
+  uint32 document_id = 2;
   string image_url = 3;
   google.protobuf.BytesValue image = 4;
   uint32 index = 5;
@@ -186,7 +186,7 @@ message GetPublishersResponse {
   }
 }
 
-message Book {
+message Document {
   uint32 id = 1;
   string title = 2;
   google.protobuf.StringValue description = 3;
@@ -199,7 +199,7 @@ message Book {
 
 message Page {
   uint32 id = 1;
-  uint32 book_id = 2;
+  uint32 document_id = 2;
   string image_url = 3;
   uint32 index = 4;
 }

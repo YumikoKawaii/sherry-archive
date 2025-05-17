@@ -7,8 +7,8 @@ import (
 )
 
 type Querier interface {
-	GetBooks(ctx context.Context, filter *GetBooksFilter) ([]Book, error)
-	UpsertBook(ctx context.Context, book *Book) error
+	GetDocuments(ctx context.Context, filter *GetDocumentsFilter) ([]Document, error)
+	UpsertDocument(ctx context.Context, book *Document) error
 	GetPages(ctx context.Context, filter *GetPagesFilter) ([]Page, error)
 	UpsertPage(ctx context.Context, page *Page) error
 	GetAuthors(ctx context.Context, filter *GetAuthorsFilter) ([]Author, error)
@@ -25,8 +25,8 @@ type querierImpl struct {
 	db *gorm.DB
 }
 
-func (q *querierImpl) GetBooks(ctx context.Context, filter *GetBooksFilter) ([]Book, error) {
-	queryBuilder := q.db.Model(&Book{})
+func (q *querierImpl) GetDocuments(ctx context.Context, filter *GetDocumentsFilter) ([]Document, error) {
+	queryBuilder := q.db.Model(&Document{})
 	if filter != nil {
 		if len(filter.IDs) != 0 {
 			queryBuilder = queryBuilder.Where("id in (?)", filter.IDs)
@@ -49,14 +49,14 @@ func (q *querierImpl) GetBooks(ctx context.Context, filter *GetBooksFilter) ([]B
 			queryBuilder = queryBuilder.Limit(int(filter.Pagination.PageSize)).Offset(offset)
 		}
 	}
-	books := make([]Book, 0)
-	return books, queryBuilder.Scan(books).Error
+	documents := make([]Document, 0)
+	return documents, queryBuilder.WithContext(ctx).Find(documents).Error
 }
 
-func (q *querierImpl) UpsertBook(ctx context.Context, book *Book) error {
-	return q.db.Model(&Book{}).Clauses(clause.OnConflict{
+func (q *querierImpl) UpsertDocument(ctx context.Context, document *Document) error {
+	return q.db.Model(&Document{}).Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(book).Error
+	}).Create(document).Error
 }
 
 func (q *querierImpl) GetPages(ctx context.Context, filter *GetPagesFilter) ([]Page, error) {
@@ -66,8 +66,8 @@ func (q *querierImpl) GetPages(ctx context.Context, filter *GetPagesFilter) ([]P
 			queryBuilder = queryBuilder.Where("id in (?)", filter.IDs)
 		}
 
-		if filter.BookId != nil {
-			queryBuilder = queryBuilder.Where("book_id = ?", filter.BookId)
+		if filter.DocumentId != nil {
+			queryBuilder = queryBuilder.Where("document_id = ?", filter.DocumentId)
 		}
 
 		if filter.Pagination != nil {

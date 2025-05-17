@@ -33,8 +33,8 @@ var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 var _ = metadata.Join
 
-func request_ArchiveService_GetBooks_0(ctx context.Context, marshaler runtime.Marshaler, client ArchiveServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetBookRequest
+func request_ArchiveService_GetDocuments_0(ctx context.Context, marshaler runtime.Marshaler, client ArchiveServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetDocumentsRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -45,13 +45,13 @@ func request_ArchiveService_GetBooks_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.GetBooks(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetDocuments(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ArchiveService_GetBooks_0(ctx context.Context, marshaler runtime.Marshaler, server ArchiveServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetBookRequest
+func local_request_ArchiveService_GetDocuments_0(ctx context.Context, marshaler runtime.Marshaler, server ArchiveServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetDocumentsRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -62,13 +62,13 @@ func local_request_ArchiveService_GetBooks_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.GetBooks(ctx, &protoReq)
+	msg, err := server.GetDocuments(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_ArchiveService_UpsertBook_0(ctx context.Context, marshaler runtime.Marshaler, client ArchiveServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UpsertBookRequest
+func request_ArchiveService_UpsertDocument_0(ctx context.Context, marshaler runtime.Marshaler, client ArchiveServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq UpsertDocumentRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -79,13 +79,13 @@ func request_ArchiveService_UpsertBook_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.UpsertBook(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpsertDocument(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ArchiveService_UpsertBook_0(ctx context.Context, marshaler runtime.Marshaler, server ArchiveServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UpsertBookRequest
+func local_request_ArchiveService_UpsertDocument_0(ctx context.Context, marshaler runtime.Marshaler, server ArchiveServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq UpsertDocumentRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -96,7 +96,7 @@ func local_request_ArchiveService_UpsertBook_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.UpsertBook(ctx, &protoReq)
+	msg, err := server.UpsertDocument(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -277,7 +277,7 @@ func local_request_ArchiveService_GetPublishers_0(ctx context.Context, marshaler
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterArchiveServiceHandlerFromEndpoint instead.
 func RegisterArchiveServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ArchiveServiceServer) error {
 
-	mux.Handle("POST", pattern_ArchiveService_GetBooks_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ArchiveService_GetDocuments_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -288,7 +288,7 @@ func RegisterArchiveServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ArchiveService_GetBooks_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ArchiveService_GetDocuments_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -296,11 +296,11 @@ func RegisterArchiveServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 			return
 		}
 
-		forward_ArchiveService_GetBooks_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ArchiveService_GetDocuments_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ArchiveService_UpsertBook_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ArchiveService_UpsertDocument_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -311,7 +311,7 @@ func RegisterArchiveServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ArchiveService_UpsertBook_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ArchiveService_UpsertDocument_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -319,7 +319,7 @@ func RegisterArchiveServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 			return
 		}
 
-		forward_ArchiveService_UpsertBook_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ArchiveService_UpsertDocument_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -479,7 +479,7 @@ func RegisterArchiveServiceHandler(ctx context.Context, mux *runtime.ServeMux, c
 // "ArchiveServiceClient" to call the correct interceptors.
 func RegisterArchiveServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ArchiveServiceClient) error {
 
-	mux.Handle("POST", pattern_ArchiveService_GetBooks_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ArchiveService_GetDocuments_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -488,18 +488,18 @@ func RegisterArchiveServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ArchiveService_GetBooks_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ArchiveService_GetDocuments_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ArchiveService_GetBooks_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ArchiveService_GetDocuments_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ArchiveService_UpsertBook_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ArchiveService_UpsertDocument_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -508,14 +508,14 @@ func RegisterArchiveServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ArchiveService_UpsertBook_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ArchiveService_UpsertDocument_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ArchiveService_UpsertBook_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ArchiveService_UpsertDocument_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -623,9 +623,9 @@ func RegisterArchiveServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_ArchiveService_GetBooks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "books"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ArchiveService_GetDocuments_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "documents"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ArchiveService_UpsertBook_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "upsert-book"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ArchiveService_UpsertDocument_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "upsert-document"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ArchiveService_GetPages_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "pages"}, "", runtime.AssumeColonVerbOpt(true)))
 
@@ -639,9 +639,9 @@ var (
 )
 
 var (
-	forward_ArchiveService_GetBooks_0 = runtime.ForwardResponseMessage
+	forward_ArchiveService_GetDocuments_0 = runtime.ForwardResponseMessage
 
-	forward_ArchiveService_UpsertBook_0 = runtime.ForwardResponseMessage
+	forward_ArchiveService_UpsertDocument_0 = runtime.ForwardResponseMessage
 
 	forward_ArchiveService_GetPages_0 = runtime.ForwardResponseMessage
 

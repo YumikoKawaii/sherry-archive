@@ -25,8 +25,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type GetBookRequest struct {
-	BookIds              []uint32           `protobuf:"varint,1,rep,packed,name=book_ids,json=bookIds,proto3" json:"book_ids,omitempty"`
+type GetDocumentsRequest struct {
+	DocumentIds          []uint32           `protobuf:"varint,1,rep,packed,name=document_ids,json=documentIds,proto3" json:"document_ids,omitempty"`
 	CategoryId           *types.UInt32Value `protobuf:"bytes,2,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	AuthorId             *types.UInt32Value `protobuf:"bytes,3,opt,name=author_id,json=authorId,proto3" json:"author_id,omitempty"`
 	PublisherId          *types.UInt32Value `protobuf:"bytes,4,opt,name=publisher_id,json=publisherId,proto3" json:"publisher_id,omitempty"`
@@ -37,18 +37,18 @@ type GetBookRequest struct {
 	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *GetBookRequest) Reset()         { *m = GetBookRequest{} }
-func (m *GetBookRequest) String() string { return proto.CompactTextString(m) }
-func (*GetBookRequest) ProtoMessage()    {}
-func (*GetBookRequest) Descriptor() ([]byte, []int) {
+func (m *GetDocumentsRequest) Reset()         { *m = GetDocumentsRequest{} }
+func (m *GetDocumentsRequest) String() string { return proto.CompactTextString(m) }
+func (*GetDocumentsRequest) ProtoMessage()    {}
+func (*GetDocumentsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7154b63f0525943b, []int{0}
 }
-func (m *GetBookRequest) XXX_Unmarshal(b []byte) error {
+func (m *GetDocumentsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *GetBookRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *GetDocumentsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_GetBookRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_GetDocumentsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -58,81 +58,81 @@ func (m *GetBookRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *GetBookRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetBookRequest.Merge(m, src)
+func (m *GetDocumentsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDocumentsRequest.Merge(m, src)
 }
-func (m *GetBookRequest) XXX_Size() int {
+func (m *GetDocumentsRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *GetBookRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetBookRequest.DiscardUnknown(m)
+func (m *GetDocumentsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDocumentsRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetBookRequest proto.InternalMessageInfo
+var xxx_messageInfo_GetDocumentsRequest proto.InternalMessageInfo
 
-func (m *GetBookRequest) GetBookIds() []uint32 {
+func (m *GetDocumentsRequest) GetDocumentIds() []uint32 {
 	if m != nil {
-		return m.BookIds
+		return m.DocumentIds
 	}
 	return nil
 }
 
-func (m *GetBookRequest) GetCategoryId() *types.UInt32Value {
+func (m *GetDocumentsRequest) GetCategoryId() *types.UInt32Value {
 	if m != nil {
 		return m.CategoryId
 	}
 	return nil
 }
 
-func (m *GetBookRequest) GetAuthorId() *types.UInt32Value {
+func (m *GetDocumentsRequest) GetAuthorId() *types.UInt32Value {
 	if m != nil {
 		return m.AuthorId
 	}
 	return nil
 }
 
-func (m *GetBookRequest) GetPublisherId() *types.UInt32Value {
+func (m *GetDocumentsRequest) GetPublisherId() *types.UInt32Value {
 	if m != nil {
 		return m.PublisherId
 	}
 	return nil
 }
 
-func (m *GetBookRequest) GetPage() uint32 {
+func (m *GetDocumentsRequest) GetPage() uint32 {
 	if m != nil {
 		return m.Page
 	}
 	return 0
 }
 
-func (m *GetBookRequest) GetPageSize() uint32 {
+func (m *GetDocumentsRequest) GetPageSize() uint32 {
 	if m != nil {
 		return m.PageSize
 	}
 	return 0
 }
 
-type GetBookResponse struct {
-	Code                 uint32                `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message              string                `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Data                 *GetBookResponse_Data `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+type GetDocumentsResponse struct {
+	Code                 uint32                     `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message              string                     `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data                 *GetDocumentsResponse_Data `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
+	XXX_unrecognized     []byte                     `json:"-"`
+	XXX_sizecache        int32                      `json:"-"`
 }
 
-func (m *GetBookResponse) Reset()         { *m = GetBookResponse{} }
-func (m *GetBookResponse) String() string { return proto.CompactTextString(m) }
-func (*GetBookResponse) ProtoMessage()    {}
-func (*GetBookResponse) Descriptor() ([]byte, []int) {
+func (m *GetDocumentsResponse) Reset()         { *m = GetDocumentsResponse{} }
+func (m *GetDocumentsResponse) String() string { return proto.CompactTextString(m) }
+func (*GetDocumentsResponse) ProtoMessage()    {}
+func (*GetDocumentsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7154b63f0525943b, []int{1}
 }
-func (m *GetBookResponse) XXX_Unmarshal(b []byte) error {
+func (m *GetDocumentsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *GetBookResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *GetDocumentsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_GetBookResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_GetDocumentsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -142,59 +142,59 @@ func (m *GetBookResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *GetBookResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetBookResponse.Merge(m, src)
+func (m *GetDocumentsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDocumentsResponse.Merge(m, src)
 }
-func (m *GetBookResponse) XXX_Size() int {
+func (m *GetDocumentsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *GetBookResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetBookResponse.DiscardUnknown(m)
+func (m *GetDocumentsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDocumentsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetBookResponse proto.InternalMessageInfo
+var xxx_messageInfo_GetDocumentsResponse proto.InternalMessageInfo
 
-func (m *GetBookResponse) GetCode() uint32 {
+func (m *GetDocumentsResponse) GetCode() uint32 {
 	if m != nil {
 		return m.Code
 	}
 	return 0
 }
 
-func (m *GetBookResponse) GetMessage() string {
+func (m *GetDocumentsResponse) GetMessage() string {
 	if m != nil {
 		return m.Message
 	}
 	return ""
 }
 
-func (m *GetBookResponse) GetData() *GetBookResponse_Data {
+func (m *GetDocumentsResponse) GetData() *GetDocumentsResponse_Data {
 	if m != nil {
 		return m.Data
 	}
 	return nil
 }
 
-type GetBookResponse_Data struct {
-	Books                []*Book     `protobuf:"bytes,1,rep,name=books,proto3" json:"books,omitempty"`
+type GetDocumentsResponse_Data struct {
+	Documents            []*Document `protobuf:"bytes,1,rep,name=documents,proto3" json:"documents,omitempty"`
 	Pagination           *Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
 	XXX_sizecache        int32       `json:"-"`
 }
 
-func (m *GetBookResponse_Data) Reset()         { *m = GetBookResponse_Data{} }
-func (m *GetBookResponse_Data) String() string { return proto.CompactTextString(m) }
-func (*GetBookResponse_Data) ProtoMessage()    {}
-func (*GetBookResponse_Data) Descriptor() ([]byte, []int) {
+func (m *GetDocumentsResponse_Data) Reset()         { *m = GetDocumentsResponse_Data{} }
+func (m *GetDocumentsResponse_Data) String() string { return proto.CompactTextString(m) }
+func (*GetDocumentsResponse_Data) ProtoMessage()    {}
+func (*GetDocumentsResponse_Data) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7154b63f0525943b, []int{1, 0}
 }
-func (m *GetBookResponse_Data) XXX_Unmarshal(b []byte) error {
+func (m *GetDocumentsResponse_Data) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *GetBookResponse_Data) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *GetDocumentsResponse_Data) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_GetBookResponse_Data.Marshal(b, m, deterministic)
+		return xxx_messageInfo_GetDocumentsResponse_Data.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -204,33 +204,33 @@ func (m *GetBookResponse_Data) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *GetBookResponse_Data) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetBookResponse_Data.Merge(m, src)
+func (m *GetDocumentsResponse_Data) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDocumentsResponse_Data.Merge(m, src)
 }
-func (m *GetBookResponse_Data) XXX_Size() int {
+func (m *GetDocumentsResponse_Data) XXX_Size() int {
 	return m.Size()
 }
-func (m *GetBookResponse_Data) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetBookResponse_Data.DiscardUnknown(m)
+func (m *GetDocumentsResponse_Data) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDocumentsResponse_Data.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetBookResponse_Data proto.InternalMessageInfo
+var xxx_messageInfo_GetDocumentsResponse_Data proto.InternalMessageInfo
 
-func (m *GetBookResponse_Data) GetBooks() []*Book {
+func (m *GetDocumentsResponse_Data) GetDocuments() []*Document {
 	if m != nil {
-		return m.Books
+		return m.Documents
 	}
 	return nil
 }
 
-func (m *GetBookResponse_Data) GetPagination() *Pagination {
+func (m *GetDocumentsResponse_Data) GetPagination() *Pagination {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type UpsertBookRequest struct {
+type UpsertDocumentRequest struct {
 	Id                   *types.UInt32Value `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title                string             `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Description          *types.StringValue `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
@@ -245,18 +245,18 @@ type UpsertBookRequest struct {
 	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *UpsertBookRequest) Reset()         { *m = UpsertBookRequest{} }
-func (m *UpsertBookRequest) String() string { return proto.CompactTextString(m) }
-func (*UpsertBookRequest) ProtoMessage()    {}
-func (*UpsertBookRequest) Descriptor() ([]byte, []int) {
+func (m *UpsertDocumentRequest) Reset()         { *m = UpsertDocumentRequest{} }
+func (m *UpsertDocumentRequest) String() string { return proto.CompactTextString(m) }
+func (*UpsertDocumentRequest) ProtoMessage()    {}
+func (*UpsertDocumentRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7154b63f0525943b, []int{2}
 }
-func (m *UpsertBookRequest) XXX_Unmarshal(b []byte) error {
+func (m *UpsertDocumentRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *UpsertBookRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UpsertDocumentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_UpsertBookRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UpsertDocumentRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -266,102 +266,102 @@ func (m *UpsertBookRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *UpsertBookRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpsertBookRequest.Merge(m, src)
+func (m *UpsertDocumentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpsertDocumentRequest.Merge(m, src)
 }
-func (m *UpsertBookRequest) XXX_Size() int {
+func (m *UpsertDocumentRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *UpsertBookRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpsertBookRequest.DiscardUnknown(m)
+func (m *UpsertDocumentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpsertDocumentRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UpsertBookRequest proto.InternalMessageInfo
+var xxx_messageInfo_UpsertDocumentRequest proto.InternalMessageInfo
 
-func (m *UpsertBookRequest) GetId() *types.UInt32Value {
+func (m *UpsertDocumentRequest) GetId() *types.UInt32Value {
 	if m != nil {
 		return m.Id
 	}
 	return nil
 }
 
-func (m *UpsertBookRequest) GetTitle() string {
+func (m *UpsertDocumentRequest) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *UpsertBookRequest) GetDescription() *types.StringValue {
+func (m *UpsertDocumentRequest) GetDescription() *types.StringValue {
 	if m != nil {
 		return m.Description
 	}
 	return nil
 }
 
-func (m *UpsertBookRequest) GetImageUrl() *types.StringValue {
+func (m *UpsertDocumentRequest) GetImageUrl() *types.StringValue {
 	if m != nil {
 		return m.ImageUrl
 	}
 	return nil
 }
 
-func (m *UpsertBookRequest) GetImage() *types.BytesValue {
+func (m *UpsertDocumentRequest) GetImage() *types.BytesValue {
 	if m != nil {
 		return m.Image
 	}
 	return nil
 }
 
-func (m *UpsertBookRequest) GetAuthorId() *types.UInt32Value {
+func (m *UpsertDocumentRequest) GetAuthorId() *types.UInt32Value {
 	if m != nil {
 		return m.AuthorId
 	}
 	return nil
 }
 
-func (m *UpsertBookRequest) GetPublisherId() *types.UInt32Value {
+func (m *UpsertDocumentRequest) GetPublisherId() *types.UInt32Value {
 	if m != nil {
 		return m.PublisherId
 	}
 	return nil
 }
 
-func (m *UpsertBookRequest) GetCategoryId() *types.UInt32Value {
+func (m *UpsertDocumentRequest) GetCategoryId() *types.UInt32Value {
 	if m != nil {
 		return m.CategoryId
 	}
 	return nil
 }
 
-func (m *UpsertBookRequest) GetPublicationDate() *types.UInt64Value {
+func (m *UpsertDocumentRequest) GetPublicationDate() *types.UInt64Value {
 	if m != nil {
 		return m.PublicationDate
 	}
 	return nil
 }
 
-type UpsertBookResponse struct {
-	Code                 uint32                   `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message              string                   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Data                 *UpsertBookResponse_Data `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
-	XXX_unrecognized     []byte                   `json:"-"`
-	XXX_sizecache        int32                    `json:"-"`
+type UpsertDocumentResponse struct {
+	Code                 uint32                       `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message              string                       `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data                 *UpsertDocumentResponse_Data `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_unrecognized     []byte                       `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
 }
 
-func (m *UpsertBookResponse) Reset()         { *m = UpsertBookResponse{} }
-func (m *UpsertBookResponse) String() string { return proto.CompactTextString(m) }
-func (*UpsertBookResponse) ProtoMessage()    {}
-func (*UpsertBookResponse) Descriptor() ([]byte, []int) {
+func (m *UpsertDocumentResponse) Reset()         { *m = UpsertDocumentResponse{} }
+func (m *UpsertDocumentResponse) String() string { return proto.CompactTextString(m) }
+func (*UpsertDocumentResponse) ProtoMessage()    {}
+func (*UpsertDocumentResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7154b63f0525943b, []int{3}
 }
-func (m *UpsertBookResponse) XXX_Unmarshal(b []byte) error {
+func (m *UpsertDocumentResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *UpsertBookResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UpsertDocumentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_UpsertBookResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UpsertDocumentResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -371,58 +371,58 @@ func (m *UpsertBookResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *UpsertBookResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpsertBookResponse.Merge(m, src)
+func (m *UpsertDocumentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpsertDocumentResponse.Merge(m, src)
 }
-func (m *UpsertBookResponse) XXX_Size() int {
+func (m *UpsertDocumentResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *UpsertBookResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpsertBookResponse.DiscardUnknown(m)
+func (m *UpsertDocumentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpsertDocumentResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UpsertBookResponse proto.InternalMessageInfo
+var xxx_messageInfo_UpsertDocumentResponse proto.InternalMessageInfo
 
-func (m *UpsertBookResponse) GetCode() uint32 {
+func (m *UpsertDocumentResponse) GetCode() uint32 {
 	if m != nil {
 		return m.Code
 	}
 	return 0
 }
 
-func (m *UpsertBookResponse) GetMessage() string {
+func (m *UpsertDocumentResponse) GetMessage() string {
 	if m != nil {
 		return m.Message
 	}
 	return ""
 }
 
-func (m *UpsertBookResponse) GetData() *UpsertBookResponse_Data {
+func (m *UpsertDocumentResponse) GetData() *UpsertDocumentResponse_Data {
 	if m != nil {
 		return m.Data
 	}
 	return nil
 }
 
-type UpsertBookResponse_Data struct {
-	Book                 *Book    `protobuf:"bytes,1,opt,name=book,proto3" json:"book,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+type UpsertDocumentResponse_Data struct {
+	Document             *Document `protobuf:"bytes,1,opt,name=document,proto3" json:"document,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
-func (m *UpsertBookResponse_Data) Reset()         { *m = UpsertBookResponse_Data{} }
-func (m *UpsertBookResponse_Data) String() string { return proto.CompactTextString(m) }
-func (*UpsertBookResponse_Data) ProtoMessage()    {}
-func (*UpsertBookResponse_Data) Descriptor() ([]byte, []int) {
+func (m *UpsertDocumentResponse_Data) Reset()         { *m = UpsertDocumentResponse_Data{} }
+func (m *UpsertDocumentResponse_Data) String() string { return proto.CompactTextString(m) }
+func (*UpsertDocumentResponse_Data) ProtoMessage()    {}
+func (*UpsertDocumentResponse_Data) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7154b63f0525943b, []int{3, 0}
 }
-func (m *UpsertBookResponse_Data) XXX_Unmarshal(b []byte) error {
+func (m *UpsertDocumentResponse_Data) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *UpsertBookResponse_Data) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UpsertDocumentResponse_Data) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_UpsertBookResponse_Data.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UpsertDocumentResponse_Data.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -432,27 +432,27 @@ func (m *UpsertBookResponse_Data) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *UpsertBookResponse_Data) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpsertBookResponse_Data.Merge(m, src)
+func (m *UpsertDocumentResponse_Data) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpsertDocumentResponse_Data.Merge(m, src)
 }
-func (m *UpsertBookResponse_Data) XXX_Size() int {
+func (m *UpsertDocumentResponse_Data) XXX_Size() int {
 	return m.Size()
 }
-func (m *UpsertBookResponse_Data) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpsertBookResponse_Data.DiscardUnknown(m)
+func (m *UpsertDocumentResponse_Data) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpsertDocumentResponse_Data.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UpsertBookResponse_Data proto.InternalMessageInfo
+var xxx_messageInfo_UpsertDocumentResponse_Data proto.InternalMessageInfo
 
-func (m *UpsertBookResponse_Data) GetBook() *Book {
+func (m *UpsertDocumentResponse_Data) GetDocument() *Document {
 	if m != nil {
-		return m.Book
+		return m.Document
 	}
 	return nil
 }
 
 type GetPagesRequest struct {
-	BookId               *types.UInt32Value `protobuf:"bytes,1,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	DocumentId           *types.UInt32Value `protobuf:"bytes,1,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
 	Ids                  []uint32           `protobuf:"varint,2,rep,packed,name=ids,proto3" json:"ids,omitempty"`
 	Page                 uint32             `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize             uint32             `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
@@ -494,9 +494,9 @@ func (m *GetPagesRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetPagesRequest proto.InternalMessageInfo
 
-func (m *GetPagesRequest) GetBookId() *types.UInt32Value {
+func (m *GetPagesRequest) GetDocumentId() *types.UInt32Value {
 	if m != nil {
-		return m.BookId
+		return m.DocumentId
 	}
 	return nil
 }
@@ -641,7 +641,7 @@ func (m *GetPagesResponse_Data) GetPagination() *Pagination {
 }
 
 type CreatePagesRequest struct {
-	BookId               uint32   `protobuf:"varint,1,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	DocumentId           uint32   `protobuf:"varint,1,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
 	Pages                []byte   `protobuf:"bytes,2,opt,name=pages,proto3" json:"pages,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -681,9 +681,9 @@ func (m *CreatePagesRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreatePagesRequest proto.InternalMessageInfo
 
-func (m *CreatePagesRequest) GetBookId() uint32 {
+func (m *CreatePagesRequest) GetDocumentId() uint32 {
 	if m != nil {
-		return m.BookId
+		return m.DocumentId
 	}
 	return 0
 }
@@ -752,7 +752,7 @@ func (m *CreatePagesResponse) GetMessage() string {
 
 type UpdatePageRequest struct {
 	Id                   uint32            `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	BookId               uint32            `protobuf:"varint,2,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	DocumentId           uint32            `protobuf:"varint,2,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
 	ImageUrl             string            `protobuf:"bytes,3,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	Image                *types.BytesValue `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
 	Index                uint32            `protobuf:"varint,5,opt,name=index,proto3" json:"index,omitempty"`
@@ -801,9 +801,9 @@ func (m *UpdatePageRequest) GetId() uint32 {
 	return 0
 }
 
-func (m *UpdatePageRequest) GetBookId() uint32 {
+func (m *UpdatePageRequest) GetDocumentId() uint32 {
 	if m != nil {
-		return m.BookId
+		return m.DocumentId
 	}
 	return 0
 }
@@ -1301,7 +1301,7 @@ func (m *GetPublishersResponse_Data) GetPagination() *Pagination {
 	return nil
 }
 
-type Book struct {
+type Document struct {
 	Id                   uint32             `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title                string             `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Description          *types.StringValue `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
@@ -1315,18 +1315,18 @@ type Book struct {
 	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *Book) Reset()         { *m = Book{} }
-func (m *Book) String() string { return proto.CompactTextString(m) }
-func (*Book) ProtoMessage()    {}
-func (*Book) Descriptor() ([]byte, []int) {
+func (m *Document) Reset()         { *m = Document{} }
+func (m *Document) String() string { return proto.CompactTextString(m) }
+func (*Document) ProtoMessage()    {}
+func (*Document) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7154b63f0525943b, []int{14}
 }
-func (m *Book) XXX_Unmarshal(b []byte) error {
+func (m *Document) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Book) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Document) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Book.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Document.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1336,68 +1336,68 @@ func (m *Book) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *Book) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Book.Merge(m, src)
+func (m *Document) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Document.Merge(m, src)
 }
-func (m *Book) XXX_Size() int {
+func (m *Document) XXX_Size() int {
 	return m.Size()
 }
-func (m *Book) XXX_DiscardUnknown() {
-	xxx_messageInfo_Book.DiscardUnknown(m)
+func (m *Document) XXX_DiscardUnknown() {
+	xxx_messageInfo_Document.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Book proto.InternalMessageInfo
+var xxx_messageInfo_Document proto.InternalMessageInfo
 
-func (m *Book) GetId() uint32 {
+func (m *Document) GetId() uint32 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-func (m *Book) GetTitle() string {
+func (m *Document) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *Book) GetDescription() *types.StringValue {
+func (m *Document) GetDescription() *types.StringValue {
 	if m != nil {
 		return m.Description
 	}
 	return nil
 }
 
-func (m *Book) GetImageUrl() *types.StringValue {
+func (m *Document) GetImageUrl() *types.StringValue {
 	if m != nil {
 		return m.ImageUrl
 	}
 	return nil
 }
 
-func (m *Book) GetAuthorId() *types.UInt32Value {
+func (m *Document) GetAuthorId() *types.UInt32Value {
 	if m != nil {
 		return m.AuthorId
 	}
 	return nil
 }
 
-func (m *Book) GetPublisherId() *types.UInt32Value {
+func (m *Document) GetPublisherId() *types.UInt32Value {
 	if m != nil {
 		return m.PublisherId
 	}
 	return nil
 }
 
-func (m *Book) GetCategoryId() *types.UInt32Value {
+func (m *Document) GetCategoryId() *types.UInt32Value {
 	if m != nil {
 		return m.CategoryId
 	}
 	return nil
 }
 
-func (m *Book) GetPublicationDate() *types.UInt64Value {
+func (m *Document) GetPublicationDate() *types.UInt64Value {
 	if m != nil {
 		return m.PublicationDate
 	}
@@ -1406,7 +1406,7 @@ func (m *Book) GetPublicationDate() *types.UInt64Value {
 
 type Page struct {
 	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	BookId               uint32   `protobuf:"varint,2,opt,name=book_id,json=bookId,proto3" json:"book_id,omitempty"`
+	DocumentId           uint32   `protobuf:"varint,2,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
 	ImageUrl             string   `protobuf:"bytes,3,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	Index                uint32   `protobuf:"varint,4,opt,name=index,proto3" json:"index,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -1454,9 +1454,9 @@ func (m *Page) GetId() uint32 {
 	return 0
 }
 
-func (m *Page) GetBookId() uint32 {
+func (m *Page) GetDocumentId() uint32 {
 	if m != nil {
-		return m.BookId
+		return m.DocumentId
 	}
 	return 0
 }
@@ -1673,12 +1673,12 @@ func (m *Pagination) GetPageSize() uint32 {
 }
 
 func init() {
-	proto.RegisterType((*GetBookRequest)(nil), "sherry.archive.api.v1.GetBookRequest")
-	proto.RegisterType((*GetBookResponse)(nil), "sherry.archive.api.v1.GetBookResponse")
-	proto.RegisterType((*GetBookResponse_Data)(nil), "sherry.archive.api.v1.GetBookResponse.Data")
-	proto.RegisterType((*UpsertBookRequest)(nil), "sherry.archive.api.v1.UpsertBookRequest")
-	proto.RegisterType((*UpsertBookResponse)(nil), "sherry.archive.api.v1.UpsertBookResponse")
-	proto.RegisterType((*UpsertBookResponse_Data)(nil), "sherry.archive.api.v1.UpsertBookResponse.Data")
+	proto.RegisterType((*GetDocumentsRequest)(nil), "sherry.archive.api.v1.GetDocumentsRequest")
+	proto.RegisterType((*GetDocumentsResponse)(nil), "sherry.archive.api.v1.GetDocumentsResponse")
+	proto.RegisterType((*GetDocumentsResponse_Data)(nil), "sherry.archive.api.v1.GetDocumentsResponse.Data")
+	proto.RegisterType((*UpsertDocumentRequest)(nil), "sherry.archive.api.v1.UpsertDocumentRequest")
+	proto.RegisterType((*UpsertDocumentResponse)(nil), "sherry.archive.api.v1.UpsertDocumentResponse")
+	proto.RegisterType((*UpsertDocumentResponse_Data)(nil), "sherry.archive.api.v1.UpsertDocumentResponse.Data")
 	proto.RegisterType((*GetPagesRequest)(nil), "sherry.archive.api.v1.GetPagesRequest")
 	proto.RegisterType((*GetPagesResponse)(nil), "sherry.archive.api.v1.GetPagesResponse")
 	proto.RegisterType((*GetPagesResponse_Data)(nil), "sherry.archive.api.v1.GetPagesResponse.Data")
@@ -1693,7 +1693,7 @@ func init() {
 	proto.RegisterType((*GetPublishersRequest)(nil), "sherry.archive.api.v1.GetPublishersRequest")
 	proto.RegisterType((*GetPublishersResponse)(nil), "sherry.archive.api.v1.GetPublishersResponse")
 	proto.RegisterType((*GetPublishersResponse_Data)(nil), "sherry.archive.api.v1.GetPublishersResponse.Data")
-	proto.RegisterType((*Book)(nil), "sherry.archive.api.v1.Book")
+	proto.RegisterType((*Document)(nil), "sherry.archive.api.v1.Document")
 	proto.RegisterType((*Page)(nil), "sherry.archive.api.v1.Page")
 	proto.RegisterType((*Author)(nil), "sherry.archive.api.v1.Author")
 	proto.RegisterType((*Publisher)(nil), "sherry.archive.api.v1.Publisher")
@@ -1703,87 +1703,89 @@ func init() {
 func init() { proto.RegisterFile("archive/archive.proto", fileDescriptor_7154b63f0525943b) }
 
 var fileDescriptor_7154b63f0525943b = []byte{
-	// 1217 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0x4d, 0x6f, 0xe3, 0x44,
-	0x18, 0xc6, 0x8e, 0x9b, 0x8f, 0x37, 0x4d, 0x3f, 0x66, 0xd3, 0xdd, 0x6c, 0xda, 0x0d, 0xc5, 0x88,
-	0xa5, 0xec, 0xb6, 0x89, 0xda, 0x05, 0x56, 0x80, 0x96, 0xdd, 0xb6, 0x8b, 0xaa, 0xde, 0x56, 0xae,
-	0xca, 0x81, 0x4b, 0x35, 0x8d, 0x87, 0x74, 0xd4, 0xd4, 0x36, 0xb6, 0x53, 0xe8, 0x0a, 0x24, 0xa8,
-	0x84, 0x04, 0xea, 0x91, 0xc3, 0x22, 0x8e, 0x5c, 0xf9, 0x11, 0x5c, 0x39, 0x22, 0xf1, 0x07, 0x50,
-	0xe1, 0x77, 0x20, 0x34, 0x33, 0x1e, 0xc7, 0x76, 0xea, 0xd4, 0x4d, 0xb3, 0x88, 0x53, 0x67, 0xe2,
-	0xf7, 0xe3, 0x99, 0xf7, 0xe3, 0x99, 0x77, 0x0a, 0x73, 0xd8, 0x6d, 0x1f, 0xd0, 0x63, 0xd2, 0x0a,
-	0xfe, 0x36, 0x1d, 0xd7, 0xf6, 0x6d, 0x34, 0xe7, 0x1d, 0x10, 0xd7, 0x3d, 0x69, 0xca, 0x5f, 0xb1,
-	0x43, 0x9b, 0xc7, 0xab, 0xf5, 0x85, 0x8e, 0x6d, 0x77, 0xba, 0xa4, 0x85, 0x1d, 0xda, 0xc2, 0x96,
-	0x65, 0xfb, 0xd8, 0xa7, 0xb6, 0xe5, 0x09, 0xa5, 0x7a, 0x23, 0xf8, 0xca, 0x77, 0xfb, 0xbd, 0x4f,
-	0x5b, 0x9f, 0xbb, 0xd8, 0x71, 0x88, 0x2b, 0xbf, 0xdf, 0x3a, 0xc6, 0x5d, 0x6a, 0x62, 0x9f, 0xb4,
-	0xe4, 0x42, 0x7c, 0xd0, 0x5f, 0xa8, 0x30, 0xb5, 0x45, 0xfc, 0x0d, 0xdb, 0x3e, 0x34, 0xc8, 0x67,
-	0x3d, 0xe2, 0xf9, 0xe8, 0x36, 0x14, 0xf7, 0x6d, 0xfb, 0x70, 0x8f, 0x9a, 0x5e, 0x4d, 0x59, 0xcc,
-	0x2d, 0x55, 0x8c, 0x02, 0xdb, 0x6f, 0x9b, 0x1e, 0x7a, 0x04, 0xe5, 0x36, 0xf6, 0x49, 0xc7, 0x76,
-	0x4f, 0xf6, 0xa8, 0x59, 0x53, 0x17, 0x95, 0xa5, 0xf2, 0xda, 0x42, 0x53, 0x38, 0x6f, 0x4a, 0xe7,
-	0xcd, 0xdd, 0x6d, 0xcb, 0x7f, 0xb0, 0xf6, 0x31, 0xee, 0xf6, 0x88, 0x01, 0x52, 0x61, 0xdb, 0x44,
-	0xef, 0x41, 0x09, 0xf7, 0xfc, 0x03, 0xdb, 0x65, 0xca, 0xb9, 0x0c, 0xca, 0x45, 0x21, 0xbe, 0x6d,
-	0xa2, 0xc7, 0x30, 0xe9, 0xf4, 0xf6, 0xbb, 0x94, 0x05, 0x87, 0x69, 0x6b, 0x19, 0xb4, 0xcb, 0xa1,
-	0xc6, 0xb6, 0x89, 0x10, 0x68, 0x0e, 0xee, 0x90, 0xda, 0xc4, 0xa2, 0xb2, 0x54, 0x31, 0xf8, 0x1a,
-	0xcd, 0x43, 0x89, 0xfd, 0xdd, 0xf3, 0xe8, 0x73, 0x52, 0xcb, 0xf3, 0x0f, 0x45, 0xf6, 0xc3, 0x0e,
-	0x7d, 0x4e, 0xf4, 0x7f, 0x14, 0x98, 0x0e, 0x23, 0xe3, 0x39, 0xb6, 0xe5, 0x11, 0x66, 0xa4, 0x6d,
-	0x9b, 0xa4, 0xa6, 0x08, 0x23, 0x6c, 0x8d, 0x6a, 0x50, 0x38, 0x22, 0x9e, 0xc7, 0x6c, 0xb3, 0x78,
-	0x94, 0x0c, 0xb9, 0x45, 0x8f, 0x41, 0x33, 0xb1, 0x8f, 0x83, 0x93, 0xde, 0x6f, 0x5e, 0x98, 0xd8,
-	0x66, 0xc2, 0x47, 0xf3, 0x29, 0xf6, 0xb1, 0xc1, 0x15, 0xeb, 0x5f, 0x82, 0xc6, 0x76, 0x68, 0x15,
-	0x26, 0x58, 0x06, 0x44, 0x3a, 0xca, 0x6b, 0xf3, 0x29, 0x96, 0xb8, 0x19, 0x21, 0x89, 0xd6, 0x01,
-	0x1c, 0xdc, 0xa1, 0x16, 0xaf, 0x92, 0x20, 0x51, 0xaf, 0xa5, 0xe8, 0x3d, 0x0b, 0x05, 0x8d, 0x88,
-	0x92, 0xfe, 0xbd, 0x06, 0xb3, 0xbb, 0x8e, 0x47, 0xdc, 0x58, 0x75, 0x2c, 0x83, 0x4a, 0x4d, 0x1e,
-	0x80, 0xcb, 0xc2, 0xaf, 0x52, 0x13, 0x55, 0x61, 0xc2, 0xa7, 0x7e, 0x57, 0x86, 0x46, 0x6c, 0xd0,
-	0x87, 0x50, 0x36, 0x89, 0xd7, 0x76, 0xa9, 0xc3, 0xd1, 0xa5, 0x55, 0xc2, 0x8e, 0xef, 0x52, 0xab,
-	0x13, 0xe4, 0x32, 0xa2, 0xc0, 0xea, 0x88, 0x1e, 0xb1, 0xc4, 0xf5, 0xdc, 0x6e, 0x6a, 0x25, 0x44,
-	0xb5, 0x8b, 0x5c, 0x7c, 0xd7, 0xed, 0xb2, 0x50, 0xf2, 0x35, 0xaf, 0x03, 0x16, 0xca, 0xa4, 0xda,
-	0xc6, 0x89, 0x4f, 0x3c, 0xa1, 0x25, 0x24, 0xe3, 0x55, 0x9b, 0xbf, 0x56, 0xd5, 0x16, 0xae, 0x5a,
-	0xb5, 0x89, 0x86, 0x2b, 0x5e, 0xb1, 0xe1, 0xb6, 0x60, 0x86, 0x5b, 0x6b, 0xf3, 0x8c, 0xee, 0xb1,
-	0xbe, 0xaf, 0x95, 0x86, 0xd8, 0x78, 0xf7, 0x6d, 0x61, 0x63, 0x3a, 0xa2, 0xf5, 0x14, 0xfb, 0x44,
-	0xff, 0x55, 0x01, 0x14, 0xad, 0x85, 0x91, 0xfa, 0x61, 0x23, 0xd6, 0x0f, 0xcd, 0x94, 0x6a, 0x1c,
-	0x74, 0x13, 0x6d, 0x89, 0x87, 0x41, 0x4b, 0xb4, 0x40, 0x63, 0x85, 0x1e, 0x14, 0xe2, 0xd0, 0x8e,
-	0xe0, 0x82, 0xfa, 0x99, 0x68, 0xe7, 0x67, 0xb8, 0x43, 0x3c, 0x59, 0xcb, 0xef, 0x40, 0x21, 0x60,
-	0xba, 0x4c, 0x05, 0x9d, 0x17, 0x34, 0x88, 0x66, 0x20, 0xc7, 0xb8, 0x51, 0xe5, 0xdc, 0xc8, 0x96,
-	0x21, 0xb9, 0xe4, 0xd2, 0xc8, 0x45, 0x4b, 0x90, 0xcb, 0xd7, 0x2a, 0xcc, 0xf4, 0xd1, 0x8c, 0x14,
-	0xcd, 0x27, 0xb1, 0x68, 0x2e, 0xa7, 0xb3, 0x4b, 0xcc, 0x49, 0x0a, 0xbd, 0x30, 0x60, 0x97, 0xd1,
-	0x0b, 0xb3, 0x63, 0x08, 0xc9, 0x71, 0xd0, 0xcb, 0x26, 0xa0, 0x4d, 0x97, 0x60, 0x9f, 0xc4, 0x52,
-	0x72, 0x2b, 0x9e, 0x92, 0x4a, 0x18, 0xf4, 0xaa, 0x04, 0xc9, 0x9c, 0x4d, 0x06, 0x38, 0xf4, 0x4d,
-	0xb8, 0x11, 0x33, 0x32, 0x4a, 0x24, 0xf5, 0x9f, 0x15, 0x46, 0x74, 0x66, 0x60, 0x45, 0x22, 0x99,
-	0x0a, 0x89, 0xae, 0xc2, 0xa9, 0x2c, 0x82, 0x4c, 0x8d, 0x21, 0x9b, 0x8f, 0xb2, 0x51, 0x8e, 0x9b,
-	0xbe, 0x80, 0x6f, 0xb4, 0xcc, 0x7c, 0x53, 0x85, 0x09, 0x6a, 0x99, 0xe4, 0x8b, 0xe0, 0xaa, 0x12,
-	0x9b, 0xa0, 0x03, 0xfb, 0x20, 0x5f, 0x6a, 0x07, 0x26, 0xdd, 0xa4, 0x74, 0x20, 0xaf, 0xf9, 0xe1,
-	0x1d, 0xc8, 0xad, 0x70, 0x41, 0xbd, 0x0d, 0xb3, 0x5b, 0xc4, 0x5f, 0xe7, 0xdc, 0x18, 0xe6, 0xfb,
-	0x0e, 0x40, 0x48, 0xae, 0x72, 0xdc, 0x28, 0x49, 0xfe, 0xec, 0x37, 0x96, 0x9a, 0xd6, 0x58, 0xb9,
-	0x44, 0x63, 0x9d, 0xa9, 0x80, 0xa2, 0x5e, 0x5e, 0x62, 0x98, 0x06, 0xdd, 0x44, 0xc3, 0x74, 0xaa,
-	0x04, 0x71, 0x7a, 0x08, 0x05, 0x71, 0x1e, 0xd9, 0x5f, 0x77, 0x52, 0xec, 0x09, 0x63, 0x86, 0x94,
-	0x1e, 0x47, 0x8f, 0x75, 0xa1, 0xca, 0x08, 0x40, 0x5e, 0x28, 0x61, 0xd4, 0x5f, 0x87, 0x4a, 0xf4,
-	0x5e, 0x92, 0x81, 0x9f, 0x8c, 0x5c, 0x3d, 0x23, 0xc4, 0xfe, 0x27, 0x15, 0xe6, 0x12, 0xee, 0x46,
-	0x0a, 0xff, 0x47, 0xb1, 0xf0, 0xaf, 0x0e, 0x61, 0xb6, 0x01, 0x4f, 0xd1, 0x0c, 0x9c, 0xc9, 0x0c,
-	0x3c, 0x01, 0x08, 0x0f, 0x26, 0x93, 0xb0, 0x98, 0x16, 0x48, 0x29, 0x68, 0x44, 0x74, 0xc6, 0x91,
-	0x8a, 0x5f, 0x72, 0xa0, 0xb1, 0xeb, 0x68, 0x80, 0x57, 0xfe, 0x77, 0x23, 0x52, 0x6c, 0xde, 0x99,
-	0xb8, 0xd6, 0xbc, 0x93, 0xbf, 0xe6, 0xbc, 0x53, 0x18, 0xc3, 0xbc, 0x53, 0x1c, 0x65, 0xde, 0xd9,
-	0x07, 0x8d, 0x31, 0xd7, 0x98, 0x2e, 0x81, 0x90, 0xd1, 0xb5, 0x28, 0xa3, 0x1f, 0x42, 0x5e, 0xb4,
-	0xfc, 0x80, 0x17, 0x04, 0x9a, 0x85, 0x8f, 0x64, 0x45, 0xf0, 0x35, 0x5a, 0x1c, 0x2c, 0x88, 0x52,
-	0x3c, 0xe5, 0xf3, 0xc9, 0x94, 0x47, 0x20, 0xe8, 0x16, 0x94, 0xc2, 0xd2, 0xfe, 0x2f, 0xfc, 0x3d,
-	0x02, 0xe8, 0x37, 0x42, 0x48, 0x25, 0x4a, 0x1a, 0x95, 0xa8, 0x71, 0x2a, 0x59, 0x7b, 0x51, 0x80,
-	0xa9, 0x75, 0xd1, 0x57, 0x3b, 0xc4, 0x3d, 0xa6, 0x6d, 0x82, 0x3c, 0x28, 0x06, 0x4f, 0x25, 0x0f,
-	0xbd, 0x71, 0xd9, 0x5b, 0x8a, 0xd3, 0x5c, 0xfd, 0x6e, 0xb6, 0x27, 0x97, 0x5e, 0x3b, 0xfd, 0xe3,
-	0xef, 0x1f, 0x54, 0xf4, 0xbe, 0x72, 0x4f, 0xaf, 0xf0, 0x07, 0xf6, 0xf1, 0x6a, 0x4b, 0x3c, 0xa3,
-	0xbe, 0x51, 0x00, 0xfa, 0x03, 0x29, 0x5a, 0xca, 0x30, 0xb3, 0x0a, 0xd7, 0x6f, 0x65, 0x9e, 0x6e,
-	0xf5, 0x06, 0xf7, 0x5e, 0x63, 0xde, 0x6f, 0x48, 0xef, 0x3d, 0x2e, 0xb6, 0xc2, 0x40, 0xa0, 0x1e,
-	0x3f, 0x38, 0x1f, 0x70, 0xd0, 0xdd, 0x4b, 0xc7, 0x3c, 0xe1, 0xfe, 0xcd, 0x8c, 0xe3, 0xe0, 0x85,
-	0x47, 0x17, 0x23, 0xde, 0xb7, 0x0a, 0x94, 0x23, 0xb3, 0x15, 0x4a, 0x3b, 0xd1, 0xe0, 0x10, 0x57,
-	0xbf, 0x97, 0x45, 0x34, 0x00, 0xf0, 0x2a, 0x07, 0x70, 0x9b, 0x01, 0xa8, 0x4a, 0x00, 0x6d, 0x2e,
-	0xb7, 0x22, 0x70, 0x9c, 0xf2, 0x14, 0xc8, 0x89, 0x64, 0x48, 0x0a, 0x12, 0x03, 0xdc, 0x90, 0x14,
-	0x24, 0xc7, 0x9b, 0x0b, 0x41, 0xf4, 0xb8, 0x58, 0x00, 0xe2, 0x2b, 0x80, 0xfe, 0x75, 0x9f, 0x8a,
-	0x61, 0x60, 0xbc, 0x49, 0xc5, 0x30, 0x38, 0x3b, 0xe8, 0x75, 0x8e, 0xa1, 0xca, 0x30, 0x4c, 0x4b,
-	0x0c, 0x72, 0x14, 0xf8, 0x4e, 0x81, 0x4a, 0xec, 0xbe, 0x43, 0xf7, 0xb3, 0xdd, 0x8a, 0x02, 0xc5,
-	0xf2, 0x55, 0xae, 0x50, 0x7d, 0x81, 0x03, 0xb9, 0xc9, 0x80, 0xcc, 0x86, 0x25, 0x21, 0xc5, 0x36,
-	0x96, 0x7e, 0x3b, 0x6f, 0x28, 0xbf, 0x9f, 0x37, 0x94, 0x3f, 0xcf, 0x1b, 0xca, 0x8f, 0x7f, 0x35,
-	0x5e, 0xf9, 0xe4, 0xa6, 0x30, 0xbe, 0x12, 0xfe, 0x3b, 0xcb, 0xa1, 0x1f, 0x60, 0x87, 0xee, 0xe7,
-	0x39, 0xd5, 0x3e, 0xf8, 0x37, 0x00, 0x00, 0xff, 0xff, 0x94, 0x24, 0x69, 0xdb, 0xe8, 0x12, 0x00,
-	0x00,
+	// 1259 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0xcd, 0x6f, 0xe3, 0xc4,
+	0x1b, 0xfe, 0xd9, 0x49, 0xda, 0xe4, 0x4d, 0xd3, 0x8f, 0xd9, 0xb4, 0x9b, 0x5f, 0xda, 0x6d, 0xbb,
+	0x46, 0x82, 0x6e, 0xb7, 0x4d, 0x68, 0x16, 0xb1, 0x82, 0x55, 0x61, 0xfb, 0x01, 0x55, 0xc5, 0xa5,
+	0x72, 0x55, 0x0e, 0x5c, 0xaa, 0x69, 0x3c, 0xa4, 0x03, 0xa9, 0x6d, 0x6c, 0xa7, 0xd0, 0x15, 0x48,
+	0xa8, 0xd2, 0x4a, 0x2b, 0xad, 0x38, 0xa0, 0x15, 0x12, 0xe2, 0xcc, 0x89, 0x0b, 0x77, 0x2e, 0x5c,
+	0x39, 0x22, 0xed, 0x3f, 0x80, 0x0a, 0x7f, 0x08, 0x9a, 0x19, 0x8f, 0x63, 0xc7, 0x71, 0xeb, 0xa6,
+	0x01, 0x71, 0xca, 0xd8, 0x9e, 0xf7, 0x7d, 0x1f, 0xbf, 0x1f, 0xcf, 0x3c, 0x0e, 0x4c, 0x63, 0xa7,
+	0x79, 0x4c, 0x4f, 0x49, 0xdd, 0xff, 0xad, 0xd9, 0x8e, 0xe5, 0x59, 0x68, 0xda, 0x3d, 0x26, 0x8e,
+	0x73, 0x56, 0x93, 0x77, 0xb1, 0x4d, 0x6b, 0xa7, 0x6b, 0xd5, 0xb9, 0x96, 0x65, 0xb5, 0xda, 0xa4,
+	0x8e, 0x6d, 0x5a, 0xc7, 0xa6, 0x69, 0x79, 0xd8, 0xa3, 0x96, 0xe9, 0x0a, 0xa3, 0xea, 0xbc, 0xff,
+	0x94, 0x5f, 0x1d, 0x75, 0x3e, 0xae, 0x7f, 0xee, 0x60, 0xdb, 0x26, 0x8e, 0x7c, 0x7e, 0xfb, 0x14,
+	0xb7, 0xa9, 0x81, 0x3d, 0x52, 0x97, 0x0b, 0xf1, 0x40, 0xfb, 0x51, 0x85, 0x5b, 0x3b, 0xc4, 0xdb,
+	0xb6, 0x9a, 0x9d, 0x13, 0x62, 0x7a, 0xae, 0x4e, 0x3e, 0xeb, 0x10, 0xd7, 0x43, 0x77, 0x61, 0xcc,
+	0xf0, 0xef, 0x1d, 0x52, 0xc3, 0xad, 0x28, 0x8b, 0x99, 0xa5, 0x92, 0x5e, 0x94, 0xf7, 0x76, 0x0d,
+	0x17, 0xad, 0x43, 0xb1, 0x89, 0x3d, 0xd2, 0xb2, 0x9c, 0xb3, 0x43, 0x6a, 0x54, 0xd4, 0x45, 0x65,
+	0xa9, 0xd8, 0x98, 0xab, 0x09, 0x24, 0x35, 0x89, 0xa4, 0x76, 0xb0, 0x6b, 0x7a, 0x0f, 0x1a, 0x1f,
+	0xe2, 0x76, 0x87, 0xe8, 0x20, 0x0d, 0x76, 0x0d, 0xf4, 0x16, 0x14, 0x70, 0xc7, 0x3b, 0xb6, 0x1c,
+	0x66, 0x9c, 0x49, 0x61, 0x9c, 0x17, 0xdb, 0x77, 0x0d, 0xf4, 0x2e, 0x8c, 0xd9, 0x9d, 0xa3, 0x36,
+	0x65, 0x99, 0x62, 0xd6, 0xd9, 0x14, 0xd6, 0xc5, 0xc0, 0x62, 0xd7, 0x40, 0x08, 0xb2, 0x36, 0x6e,
+	0x91, 0x4a, 0x6e, 0x51, 0x59, 0x2a, 0xe9, 0x7c, 0x8d, 0x66, 0xa1, 0xc0, 0x7e, 0x0f, 0x5d, 0xfa,
+	0x84, 0x54, 0x46, 0xf8, 0x83, 0x3c, 0xbb, 0xb1, 0x4f, 0x9f, 0x10, 0xed, 0x3b, 0x15, 0xca, 0xd1,
+	0x34, 0xb9, 0xb6, 0x65, 0xba, 0x84, 0x79, 0x6a, 0x5a, 0x06, 0xa9, 0x28, 0xc2, 0x13, 0x5b, 0xa3,
+	0x0a, 0x8c, 0x9e, 0x10, 0xd7, 0x65, 0x01, 0x58, 0x52, 0x0a, 0xba, 0xbc, 0x44, 0xdb, 0x90, 0x35,
+	0xb0, 0x87, 0xfd, 0xd7, 0x7d, 0xbd, 0xd6, 0xb7, 0xd4, 0xb5, 0x7e, 0x81, 0x6a, 0xdb, 0xd8, 0xc3,
+	0x3a, 0xb7, 0xae, 0x3e, 0x53, 0x20, 0xcb, 0x2e, 0xd1, 0x3a, 0x14, 0x64, 0x41, 0x44, 0x85, 0x8a,
+	0x8d, 0x85, 0x04, 0x9f, 0xd2, 0xa1, 0xde, 0xb5, 0x40, 0x1b, 0x00, 0x36, 0x6e, 0x51, 0x93, 0x77,
+	0x92, 0x5f, 0xbf, 0xbb, 0x09, 0xf6, 0x7b, 0xc1, 0x46, 0x3d, 0x64, 0xa4, 0x7d, 0x93, 0x85, 0xe9,
+	0x03, 0xdb, 0x25, 0x4e, 0x80, 0x58, 0x36, 0xd0, 0x0a, 0xa8, 0xd4, 0xe0, 0x69, 0xb9, 0xaa, 0x32,
+	0x2a, 0x35, 0x50, 0x19, 0x72, 0x1e, 0xf5, 0xda, 0x32, 0x61, 0xe2, 0x02, 0xbd, 0x03, 0x45, 0x83,
+	0xb8, 0x4d, 0x87, 0xda, 0x1c, 0x61, 0x52, 0x93, 0xec, 0x7b, 0x0e, 0x35, 0x5b, 0x7e, 0x99, 0x43,
+	0x06, 0xac, 0xc5, 0xe8, 0x09, 0xab, 0x69, 0xc7, 0x69, 0x27, 0x36, 0x49, 0xd8, 0x3a, 0xcf, 0xb7,
+	0x1f, 0x38, 0x6d, 0xb4, 0x06, 0x39, 0xbe, 0xe6, 0x2d, 0x52, 0x6c, 0xcc, 0xc6, 0xcc, 0x36, 0xcf,
+	0x3c, 0xe2, 0x0a, 0x2b, 0xb1, 0x33, 0xda, 0xd0, 0x23, 0x37, 0x6a, 0xe8, 0xd1, 0xeb, 0x36, 0x74,
+	0xcf, 0x2c, 0xe6, 0xaf, 0x39, 0x8b, 0x3b, 0x30, 0xc9, 0xbd, 0x35, 0x79, 0x55, 0x0f, 0x19, 0x3f,
+	0x54, 0x0a, 0x97, 0xf8, 0x78, 0xf3, 0x0d, 0xe1, 0x63, 0x22, 0x64, 0xb5, 0x8d, 0x3d, 0xa2, 0xbd,
+	0x54, 0x60, 0xa6, 0xb7, 0x1f, 0x06, 0x9a, 0x94, 0xf7, 0x23, 0x93, 0xd2, 0x48, 0xe8, 0xca, 0xfe,
+	0xa1, 0xc2, 0xb3, 0xb2, 0xe5, 0x8f, 0xca, 0x23, 0xc8, 0xcb, 0xc6, 0xf7, 0x9b, 0xf2, 0xca, 0x49,
+	0x09, 0x0c, 0xb4, 0x17, 0x0a, 0x4c, 0xec, 0x10, 0x6f, 0x0f, 0xb7, 0x48, 0x40, 0x90, 0xeb, 0x50,
+	0x0c, 0x11, 0x64, 0xaa, 0x46, 0x87, 0x2e, 0x7b, 0xa2, 0x49, 0xc8, 0x30, 0x5a, 0x55, 0x39, 0xad,
+	0xb2, 0x65, 0xc0, 0x49, 0x99, 0x24, 0x4e, 0xca, 0xf6, 0x70, 0xd2, 0xd7, 0x2a, 0x4c, 0x76, 0x51,
+	0x0d, 0x94, 0xe5, 0xc7, 0x91, 0x2c, 0xaf, 0x24, 0xf3, 0x51, 0x24, 0x48, 0x38, 0xbf, 0x5f, 0xfa,
+	0xf9, 0x5d, 0x83, 0x1c, 0x03, 0x26, 0x69, 0x68, 0x36, 0x99, 0x46, 0x88, 0x2e, 0x76, 0x0e, 0x83,
+	0x7e, 0x3e, 0x00, 0xb4, 0xe5, 0x10, 0xec, 0x91, 0x48, 0x69, 0x16, 0xe2, 0xa5, 0x29, 0x45, 0x92,
+	0x5f, 0x96, 0x60, 0x59, 0xd0, 0x31, 0x1f, 0x8f, 0xb6, 0x05, 0xb7, 0x22, 0xce, 0x06, 0xc9, 0xa8,
+	0xf6, 0x93, 0x02, 0x53, 0x07, 0xb6, 0xe1, 0x7b, 0x91, 0x88, 0xc6, 0x03, 0x32, 0x2c, 0x71, 0xba,
+	0xeb, 0x41, 0xa8, 0xc6, 0x10, 0xce, 0x86, 0x99, 0x2b, 0xc3, 0x43, 0xf4, 0xe1, 0xa6, 0x6c, 0x6a,
+	0x6e, 0x2a, 0x43, 0x8e, 0x9a, 0x06, 0xf9, 0xc2, 0x3f, 0xf1, 0xc4, 0x85, 0xf6, 0xab, 0x02, 0x28,
+	0x0c, 0x76, 0xa0, 0x1e, 0xda, 0x8c, 0xf4, 0x50, 0x2d, 0x71, 0x52, 0x7b, 0xc3, 0x84, 0xbb, 0xe8,
+	0xa1, 0xdf, 0x45, 0x75, 0x7f, 0x06, 0x14, 0xff, 0xc5, 0x2e, 0x69, 0x22, 0xbe, 0x51, 0x6b, 0xc2,
+	0xd4, 0x0e, 0xf1, 0x36, 0x38, 0x8f, 0x06, 0xf5, 0xbf, 0x03, 0x10, 0x10, 0xb1, 0x54, 0x2e, 0x05,
+	0xc9, 0xb5, 0xdd, 0x41, 0x53, 0x93, 0x06, 0x2d, 0xd3, 0x33, 0x68, 0xcf, 0x55, 0x40, 0xe1, 0x28,
+	0xff, 0x60, 0x9a, 0xe2, 0x61, 0xc2, 0x69, 0x3a, 0x97, 0x07, 0xff, 0x43, 0x18, 0x15, 0xef, 0x23,
+	0xe7, 0xed, 0x4e, 0x82, 0x3f, 0xe1, 0x4c, 0x97, 0xbb, 0x87, 0x31, 0x73, 0x6d, 0xae, 0x84, 0xf6,
+	0xe4, 0xe1, 0x13, 0x64, 0xfd, 0x15, 0x28, 0x85, 0xcf, 0x30, 0x99, 0xf8, 0xb1, 0xd0, 0x31, 0x35,
+	0x40, 0xee, 0x7f, 0x50, 0x61, 0xba, 0x27, 0xdc, 0x40, 0xe9, 0x7f, 0x2f, 0x92, 0xfe, 0xb5, 0x4b,
+	0x98, 0x2e, 0x16, 0x29, 0x5c, 0x81, 0xe7, 0xb2, 0x02, 0x8f, 0x01, 0x82, 0x17, 0x93, 0x45, 0x58,
+	0x4c, 0x4a, 0xa4, 0xdc, 0xa8, 0x87, 0x6c, 0x86, 0x51, 0x8a, 0x9f, 0x33, 0x90, 0x97, 0xc7, 0x55,
+	0x8c, 0x63, 0xfe, 0x73, 0x92, 0x2a, 0xa2, 0x8f, 0x72, 0x37, 0xd2, 0x47, 0x23, 0x37, 0xd4, 0x47,
+	0xa3, 0x43, 0xd0, 0x47, 0xf9, 0x41, 0xf4, 0xd1, 0x27, 0x90, 0x65, 0xec, 0x35, 0xe4, 0x03, 0x21,
+	0x60, 0xf7, 0x6c, 0x98, 0xdd, 0x3f, 0x85, 0x11, 0x31, 0xfe, 0xb1, 0x68, 0x08, 0xb2, 0x26, 0x3e,
+	0x91, 0x9d, 0xc1, 0xd7, 0x68, 0x31, 0xde, 0x18, 0x85, 0x68, 0xe9, 0x67, 0x7b, 0x4b, 0x1f, 0x82,
+	0xa0, 0x99, 0x50, 0x08, 0xda, 0xfc, 0xdf, 0x88, 0xb7, 0x0e, 0xd0, 0x1d, 0x8a, 0x80, 0x56, 0x94,
+	0x24, 0x5a, 0x51, 0xa3, 0xb4, 0xd2, 0xf8, 0x65, 0x14, 0xc6, 0x37, 0xc4, 0x8c, 0xed, 0x13, 0xe7,
+	0x94, 0x36, 0x09, 0x7a, 0xaa, 0xc0, 0x58, 0xf8, 0xcb, 0x0b, 0x2d, 0xa7, 0xfa, 0x3c, 0xe3, 0xe4,
+	0x57, 0xbd, 0x7f, 0x8d, 0x4f, 0x39, 0x6d, 0xee, 0xfc, 0xe5, 0x5f, 0x2f, 0xd4, 0x99, 0xb7, 0x95,
+	0x65, 0x6d, 0x8a, 0x7f, 0xcf, 0x9f, 0xae, 0xd5, 0xbb, 0x5f, 0x65, 0xdf, 0x2a, 0x30, 0x1e, 0xd5,
+	0xb5, 0x68, 0x25, 0xa5, 0xfc, 0x15, 0x58, 0x56, 0xaf, 0x25, 0x96, 0x35, 0x8d, 0xa3, 0x99, 0x63,
+	0x68, 0x6e, 0x4b, 0x34, 0x1d, 0xbe, 0x75, 0x55, 0x82, 0x42, 0x1d, 0xc8, 0x4b, 0x11, 0x88, 0x5e,
+	0xbd, 0x52, 0x25, 0x0a, 0x18, 0xaf, 0xa5, 0x54, 0x93, 0x5a, 0x85, 0x03, 0x40, 0x0c, 0x40, 0x49,
+	0x02, 0x10, 0x0a, 0xf1, 0xa9, 0x02, 0xc5, 0x90, 0x24, 0x43, 0xf7, 0x12, 0x5c, 0xc6, 0x35, 0x60,
+	0x75, 0x39, 0xcd, 0x56, 0x1f, 0xc0, 0x02, 0x07, 0xf0, 0x7f, 0x06, 0xa0, 0x2c, 0x01, 0x34, 0xf9,
+	0xbe, 0x55, 0x81, 0xe3, 0x5c, 0x01, 0xe8, 0x0a, 0x18, 0xb4, 0x94, 0x42, 0xe3, 0x08, 0x14, 0xf7,
+	0x52, 0xab, 0xa1, 0xbe, 0x20, 0x3a, 0x7c, 0x9b, 0x0f, 0xe2, 0x2b, 0x80, 0xae, 0x3a, 0x48, 0xc4,
+	0x10, 0x53, 0x43, 0x89, 0x18, 0xe2, 0x52, 0x43, 0xab, 0x72, 0x0c, 0x65, 0x86, 0x61, 0x42, 0x62,
+	0x90, 0xca, 0xe1, 0x99, 0x02, 0xa5, 0xc8, 0xf1, 0x88, 0xee, 0xa7, 0x3b, 0x44, 0x05, 0x8a, 0x95,
+	0xeb, 0x9c, 0xb8, 0x7d, 0x27, 0x24, 0xa0, 0xf3, 0xcd, 0xa5, 0xdf, 0x2e, 0xe6, 0x95, 0xdf, 0x2f,
+	0xe6, 0x95, 0x3f, 0x2e, 0xe6, 0x95, 0xef, 0xff, 0x9c, 0xff, 0xdf, 0x47, 0x33, 0xc2, 0xf9, 0x6a,
+	0xf0, 0x8f, 0x9a, 0x4d, 0x1f, 0x61, 0x9b, 0x1e, 0x8d, 0x70, 0x56, 0x7e, 0xf0, 0x77, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0xcb, 0x95, 0x96, 0xe4, 0x6b, 0x13, 0x00, 0x00,
 }
 
-func (m *GetBookRequest) Marshal() (dAtA []byte, err error) {
+func (m *GetDocumentsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1793,12 +1795,12 @@ func (m *GetBookRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GetBookRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *GetDocumentsRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *GetBookRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *GetDocumentsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1853,10 +1855,10 @@ func (m *GetBookRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.BookIds) > 0 {
-		dAtA5 := make([]byte, len(m.BookIds)*10)
+	if len(m.DocumentIds) > 0 {
+		dAtA5 := make([]byte, len(m.DocumentIds)*10)
 		var j4 int
-		for _, num := range m.BookIds {
+		for _, num := range m.DocumentIds {
 			for num >= 1<<7 {
 				dAtA5[j4] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
@@ -1874,7 +1876,7 @@ func (m *GetBookRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *GetBookResponse) Marshal() (dAtA []byte, err error) {
+func (m *GetDocumentsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1884,12 +1886,12 @@ func (m *GetBookResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GetBookResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *GetDocumentsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *GetBookResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *GetDocumentsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1925,7 +1927,7 @@ func (m *GetBookResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *GetBookResponse_Data) Marshal() (dAtA []byte, err error) {
+func (m *GetDocumentsResponse_Data) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1935,12 +1937,12 @@ func (m *GetBookResponse_Data) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GetBookResponse_Data) MarshalTo(dAtA []byte) (int, error) {
+func (m *GetDocumentsResponse_Data) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *GetBookResponse_Data) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *GetDocumentsResponse_Data) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1961,10 +1963,10 @@ func (m *GetBookResponse_Data) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Books) > 0 {
-		for iNdEx := len(m.Books) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Documents) > 0 {
+		for iNdEx := len(m.Documents) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Books[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Documents[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1978,7 +1980,7 @@ func (m *GetBookResponse_Data) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *UpsertBookRequest) Marshal() (dAtA []byte, err error) {
+func (m *UpsertDocumentRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1988,12 +1990,12 @@ func (m *UpsertBookRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *UpsertBookRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *UpsertDocumentRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *UpsertBookRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UpsertDocumentRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -2108,7 +2110,7 @@ func (m *UpsertBookRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *UpsertBookResponse) Marshal() (dAtA []byte, err error) {
+func (m *UpsertDocumentResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2118,12 +2120,12 @@ func (m *UpsertBookResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *UpsertBookResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *UpsertDocumentResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *UpsertBookResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UpsertDocumentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -2159,7 +2161,7 @@ func (m *UpsertBookResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *UpsertBookResponse_Data) Marshal() (dAtA []byte, err error) {
+func (m *UpsertDocumentResponse_Data) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2169,12 +2171,12 @@ func (m *UpsertBookResponse_Data) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *UpsertBookResponse_Data) MarshalTo(dAtA []byte) (int, error) {
+func (m *UpsertDocumentResponse_Data) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *UpsertBookResponse_Data) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UpsertDocumentResponse_Data) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -2183,9 +2185,9 @@ func (m *UpsertBookResponse_Data) MarshalToSizedBuffer(dAtA []byte) (int, error)
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if m.Book != nil {
+	if m.Document != nil {
 		{
-			size, err := m.Book.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Document.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2250,9 +2252,9 @@ func (m *GetPagesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.BookId != nil {
+	if m.DocumentId != nil {
 		{
-			size, err := m.BookId.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.DocumentId.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -2400,8 +2402,8 @@ func (m *CreatePagesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.BookId != 0 {
-		i = encodeVarintArchive(dAtA, i, uint64(m.BookId))
+	if m.DocumentId != 0 {
+		i = encodeVarintArchive(dAtA, i, uint64(m.DocumentId))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -2495,8 +2497,8 @@ func (m *UpdatePageRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.BookId != 0 {
-		i = encodeVarintArchive(dAtA, i, uint64(m.BookId))
+	if m.DocumentId != 0 {
+		i = encodeVarintArchive(dAtA, i, uint64(m.DocumentId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -2916,7 +2918,7 @@ func (m *GetPublishersResponse_Data) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *Book) Marshal() (dAtA []byte, err error) {
+func (m *Document) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2926,12 +2928,12 @@ func (m *Book) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Book) MarshalTo(dAtA []byte) (int, error) {
+func (m *Document) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *Book) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Document) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3063,8 +3065,8 @@ func (m *Page) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.BookId != 0 {
-		i = encodeVarintArchive(dAtA, i, uint64(m.BookId))
+	if m.DocumentId != 0 {
+		i = encodeVarintArchive(dAtA, i, uint64(m.DocumentId))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -3230,15 +3232,15 @@ func encodeVarintArchive(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *GetBookRequest) Size() (n int) {
+func (m *GetDocumentsRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.BookIds) > 0 {
+	if len(m.DocumentIds) > 0 {
 		l = 0
-		for _, e := range m.BookIds {
+		for _, e := range m.DocumentIds {
 			l += sovArchive(uint64(e))
 		}
 		n += 1 + sovArchive(uint64(l)) + l
@@ -3267,7 +3269,7 @@ func (m *GetBookRequest) Size() (n int) {
 	return n
 }
 
-func (m *GetBookResponse) Size() (n int) {
+func (m *GetDocumentsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3290,14 +3292,14 @@ func (m *GetBookResponse) Size() (n int) {
 	return n
 }
 
-func (m *GetBookResponse_Data) Size() (n int) {
+func (m *GetDocumentsResponse_Data) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.Books) > 0 {
-		for _, e := range m.Books {
+	if len(m.Documents) > 0 {
+		for _, e := range m.Documents {
 			l = e.Size()
 			n += 1 + l + sovArchive(uint64(l))
 		}
@@ -3312,7 +3314,7 @@ func (m *GetBookResponse_Data) Size() (n int) {
 	return n
 }
 
-func (m *UpsertBookRequest) Size() (n int) {
+func (m *UpsertDocumentRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3360,7 +3362,7 @@ func (m *UpsertBookRequest) Size() (n int) {
 	return n
 }
 
-func (m *UpsertBookResponse) Size() (n int) {
+func (m *UpsertDocumentResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3383,14 +3385,14 @@ func (m *UpsertBookResponse) Size() (n int) {
 	return n
 }
 
-func (m *UpsertBookResponse_Data) Size() (n int) {
+func (m *UpsertDocumentResponse_Data) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Book != nil {
-		l = m.Book.Size()
+	if m.Document != nil {
+		l = m.Document.Size()
 		n += 1 + l + sovArchive(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
@@ -3405,8 +3407,8 @@ func (m *GetPagesRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.BookId != nil {
-		l = m.BookId.Size()
+	if m.DocumentId != nil {
+		l = m.DocumentId.Size()
 		n += 1 + l + sovArchive(uint64(l))
 	}
 	if len(m.Ids) > 0 {
@@ -3479,8 +3481,8 @@ func (m *CreatePagesRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.BookId != 0 {
-		n += 1 + sovArchive(uint64(m.BookId))
+	if m.DocumentId != 0 {
+		n += 1 + sovArchive(uint64(m.DocumentId))
 	}
 	l = len(m.Pages)
 	if l > 0 {
@@ -3520,8 +3522,8 @@ func (m *UpdatePageRequest) Size() (n int) {
 	if m.Id != 0 {
 		n += 1 + sovArchive(uint64(m.Id))
 	}
-	if m.BookId != 0 {
-		n += 1 + sovArchive(uint64(m.BookId))
+	if m.DocumentId != 0 {
+		n += 1 + sovArchive(uint64(m.DocumentId))
 	}
 	l = len(m.ImageUrl)
 	if l > 0 {
@@ -3719,7 +3721,7 @@ func (m *GetPublishersResponse_Data) Size() (n int) {
 	return n
 }
 
-func (m *Book) Size() (n int) {
+func (m *Document) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3771,8 +3773,8 @@ func (m *Page) Size() (n int) {
 	if m.Id != 0 {
 		n += 1 + sovArchive(uint64(m.Id))
 	}
-	if m.BookId != 0 {
-		n += 1 + sovArchive(uint64(m.BookId))
+	if m.DocumentId != 0 {
+		n += 1 + sovArchive(uint64(m.DocumentId))
 	}
 	l = len(m.ImageUrl)
 	if l > 0 {
@@ -3865,7 +3867,7 @@ func sovArchive(x uint64) (n int) {
 func sozArchive(x uint64) (n int) {
 	return sovArchive(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *GetBookRequest) Unmarshal(dAtA []byte) error {
+func (m *GetDocumentsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3888,10 +3890,10 @@ func (m *GetBookRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GetBookRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: GetDocumentsRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetBookRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GetDocumentsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3911,7 +3913,7 @@ func (m *GetBookRequest) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				m.BookIds = append(m.BookIds, v)
+				m.DocumentIds = append(m.DocumentIds, v)
 			} else if wireType == 2 {
 				var packedLen int
 				for shift := uint(0); ; shift += 7 {
@@ -3946,8 +3948,8 @@ func (m *GetBookRequest) Unmarshal(dAtA []byte) error {
 					}
 				}
 				elementCount = count
-				if elementCount != 0 && len(m.BookIds) == 0 {
-					m.BookIds = make([]uint32, 0, elementCount)
+				if elementCount != 0 && len(m.DocumentIds) == 0 {
+					m.DocumentIds = make([]uint32, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v uint32
@@ -3965,10 +3967,10 @@ func (m *GetBookRequest) Unmarshal(dAtA []byte) error {
 							break
 						}
 					}
-					m.BookIds = append(m.BookIds, v)
+					m.DocumentIds = append(m.DocumentIds, v)
 				}
 			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field BookIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DocumentIds", wireType)
 			}
 		case 2:
 			if wireType != 2 {
@@ -4138,7 +4140,7 @@ func (m *GetBookRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GetBookResponse) Unmarshal(dAtA []byte) error {
+func (m *GetDocumentsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4161,10 +4163,10 @@ func (m *GetBookResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GetBookResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: GetDocumentsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetBookResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GetDocumentsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4248,7 +4250,7 @@ func (m *GetBookResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Data == nil {
-				m.Data = &GetBookResponse_Data{}
+				m.Data = &GetDocumentsResponse_Data{}
 			}
 			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -4276,7 +4278,7 @@ func (m *GetBookResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GetBookResponse_Data) Unmarshal(dAtA []byte) error {
+func (m *GetDocumentsResponse_Data) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4307,7 +4309,7 @@ func (m *GetBookResponse_Data) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Books", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Documents", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4334,8 +4336,8 @@ func (m *GetBookResponse_Data) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Books = append(m.Books, &Book{})
-			if err := m.Books[len(m.Books)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.Documents = append(m.Documents, &Document{})
+			if err := m.Documents[len(m.Documents)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4397,7 +4399,7 @@ func (m *GetBookResponse_Data) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *UpsertBookRequest) Unmarshal(dAtA []byte) error {
+func (m *UpsertDocumentRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4420,10 +4422,10 @@ func (m *UpsertBookRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: UpsertBookRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: UpsertDocumentRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpsertBookRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UpsertDocumentRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4768,7 +4770,7 @@ func (m *UpsertBookRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *UpsertBookResponse) Unmarshal(dAtA []byte) error {
+func (m *UpsertDocumentResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4791,10 +4793,10 @@ func (m *UpsertBookResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: UpsertBookResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: UpsertDocumentResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpsertBookResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UpsertDocumentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4878,7 +4880,7 @@ func (m *UpsertBookResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Data == nil {
-				m.Data = &UpsertBookResponse_Data{}
+				m.Data = &UpsertDocumentResponse_Data{}
 			}
 			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -4906,7 +4908,7 @@ func (m *UpsertBookResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *UpsertBookResponse_Data) Unmarshal(dAtA []byte) error {
+func (m *UpsertDocumentResponse_Data) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4937,7 +4939,7 @@ func (m *UpsertBookResponse_Data) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Book", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Document", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4964,10 +4966,10 @@ func (m *UpsertBookResponse_Data) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Book == nil {
-				m.Book = &Book{}
+			if m.Document == nil {
+				m.Document = &Document{}
 			}
-			if err := m.Book.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Document.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5024,7 +5026,7 @@ func (m *GetPagesRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BookId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DocumentId", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5051,10 +5053,10 @@ func (m *GetPagesRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.BookId == nil {
-				m.BookId = &types.UInt32Value{}
+			if m.DocumentId == nil {
+				m.DocumentId = &types.UInt32Value{}
 			}
-			if err := m.BookId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.DocumentId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5484,9 +5486,9 @@ func (m *CreatePagesRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BookId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DocumentId", wireType)
 			}
-			m.BookId = 0
+			m.DocumentId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowArchive
@@ -5496,7 +5498,7 @@ func (m *CreatePagesRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BookId |= uint32(b&0x7F) << shift
+				m.DocumentId |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -5709,9 +5711,9 @@ func (m *UpdatePageRequest) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BookId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DocumentId", wireType)
 			}
-			m.BookId = 0
+			m.DocumentId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowArchive
@@ -5721,7 +5723,7 @@ func (m *UpdatePageRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BookId |= uint32(b&0x7F) << shift
+				m.DocumentId |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -6908,7 +6910,7 @@ func (m *GetPublishersResponse_Data) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Book) Unmarshal(dAtA []byte) error {
+func (m *Document) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -6931,10 +6933,10 @@ func (m *Book) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Book: wiretype end group for non-group")
+			return fmt.Errorf("proto: Document: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Book: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Document: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -7276,9 +7278,9 @@ func (m *Page) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BookId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DocumentId", wireType)
 			}
-			m.BookId = 0
+			m.DocumentId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowArchive
@@ -7288,7 +7290,7 @@ func (m *Page) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BookId |= uint32(b&0x7F) << shift
+				m.DocumentId |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

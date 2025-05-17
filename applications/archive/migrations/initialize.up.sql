@@ -1,4 +1,4 @@
-create table books
+create table documents
 (
     `id`               int auto_increment primary key,
     `title`            varchar(255),
@@ -15,13 +15,13 @@ create table books
 
 create table pages
 (
-    `id`         int auto_increment primary key,
-    `book_id`    int,
-    `image_url`  varchar(255) default null,
-    `index`      int          default null,
-    `created_at` timestamp    default current_timestamp,
-    `updated_at` timestamp    default current_timestamp on update current_timestamp,
-    `deleted_at` timestamp    default null
+    `id`          int auto_increment primary key,
+    `document_id` int not null,
+    `image_url`   varchar(255) default null,
+    `index`       int          default null,
+    `created_at`  timestamp    default current_timestamp,
+    `updated_at`  timestamp    default current_timestamp on update current_timestamp,
+    `deleted_at`  timestamp    default null
 );
 
 create table authors

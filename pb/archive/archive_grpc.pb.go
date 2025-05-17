@@ -19,22 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ArchiveService_GetBooks_FullMethodName      = "/sherry.archive.api.v1.ArchiveService/GetBooks"
-	ArchiveService_UpsertBook_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/UpsertBook"
-	ArchiveService_GetPages_FullMethodName      = "/sherry.archive.api.v1.ArchiveService/GetPages"
-	ArchiveService_CreatePages_FullMethodName   = "/sherry.archive.api.v1.ArchiveService/CreatePages"
-	ArchiveService_UpdatePage_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/UpdatePage"
-	ArchiveService_GetAuthors_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/GetAuthors"
-	ArchiveService_GetPublishers_FullMethodName = "/sherry.archive.api.v1.ArchiveService/GetPublishers"
+	ArchiveService_GetDocuments_FullMethodName   = "/sherry.archive.api.v1.ArchiveService/GetDocuments"
+	ArchiveService_UpsertDocument_FullMethodName = "/sherry.archive.api.v1.ArchiveService/UpsertDocument"
+	ArchiveService_GetPages_FullMethodName       = "/sherry.archive.api.v1.ArchiveService/GetPages"
+	ArchiveService_CreatePages_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/CreatePages"
+	ArchiveService_UpdatePage_FullMethodName     = "/sherry.archive.api.v1.ArchiveService/UpdatePage"
+	ArchiveService_GetAuthors_FullMethodName     = "/sherry.archive.api.v1.ArchiveService/GetAuthors"
+	ArchiveService_GetPublishers_FullMethodName  = "/sherry.archive.api.v1.ArchiveService/GetPublishers"
 )
 
 // ArchiveServiceClient is the client API for ArchiveService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ArchiveServiceClient interface {
-	// GetBooks
-	GetBooks(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
-	UpsertBook(ctx context.Context, in *UpsertBookRequest, opts ...grpc.CallOption) (*UpsertBookResponse, error)
+	// GetDocuments
+	GetDocuments(ctx context.Context, in *GetDocumentsRequest, opts ...grpc.CallOption) (*GetDocumentsResponse, error)
+	UpsertDocument(ctx context.Context, in *UpsertDocumentRequest, opts ...grpc.CallOption) (*UpsertDocumentResponse, error)
 	GetPages(ctx context.Context, in *GetPagesRequest, opts ...grpc.CallOption) (*GetPagesResponse, error)
 	CreatePages(ctx context.Context, in *CreatePagesRequest, opts ...grpc.CallOption) (*CreatePagesResponse, error)
 	UpdatePage(ctx context.Context, in *UpdatePageRequest, opts ...grpc.CallOption) (*UpdatePageResponse, error)
@@ -52,20 +52,20 @@ func NewArchiveServiceClient(cc grpc.ClientConnInterface) ArchiveServiceClient {
 	return &archiveServiceClient{cc}
 }
 
-func (c *archiveServiceClient) GetBooks(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error) {
+func (c *archiveServiceClient) GetDocuments(ctx context.Context, in *GetDocumentsRequest, opts ...grpc.CallOption) (*GetDocumentsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetBookResponse)
-	err := c.cc.Invoke(ctx, ArchiveService_GetBooks_FullMethodName, in, out, cOpts...)
+	out := new(GetDocumentsResponse)
+	err := c.cc.Invoke(ctx, ArchiveService_GetDocuments_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *archiveServiceClient) UpsertBook(ctx context.Context, in *UpsertBookRequest, opts ...grpc.CallOption) (*UpsertBookResponse, error) {
+func (c *archiveServiceClient) UpsertDocument(ctx context.Context, in *UpsertDocumentRequest, opts ...grpc.CallOption) (*UpsertDocumentResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpsertBookResponse)
-	err := c.cc.Invoke(ctx, ArchiveService_UpsertBook_FullMethodName, in, out, cOpts...)
+	out := new(UpsertDocumentResponse)
+	err := c.cc.Invoke(ctx, ArchiveService_UpsertDocument_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,9 +126,9 @@ func (c *archiveServiceClient) GetPublishers(ctx context.Context, in *GetPublish
 // All implementations must embed UnimplementedArchiveServiceServer
 // for forward compatibility.
 type ArchiveServiceServer interface {
-	// GetBooks
-	GetBooks(context.Context, *GetBookRequest) (*GetBookResponse, error)
-	UpsertBook(context.Context, *UpsertBookRequest) (*UpsertBookResponse, error)
+	// GetDocuments
+	GetDocuments(context.Context, *GetDocumentsRequest) (*GetDocumentsResponse, error)
+	UpsertDocument(context.Context, *UpsertDocumentRequest) (*UpsertDocumentResponse, error)
 	GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error)
 	CreatePages(context.Context, *CreatePagesRequest) (*CreatePagesResponse, error)
 	UpdatePage(context.Context, *UpdatePageRequest) (*UpdatePageResponse, error)
@@ -146,11 +146,11 @@ type ArchiveServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedArchiveServiceServer struct{}
 
-func (UnimplementedArchiveServiceServer) GetBooks(context.Context, *GetBookRequest) (*GetBookResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBooks not implemented")
+func (UnimplementedArchiveServiceServer) GetDocuments(context.Context, *GetDocumentsRequest) (*GetDocumentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDocuments not implemented")
 }
-func (UnimplementedArchiveServiceServer) UpsertBook(context.Context, *UpsertBookRequest) (*UpsertBookResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpsertBook not implemented")
+func (UnimplementedArchiveServiceServer) UpsertDocument(context.Context, *UpsertDocumentRequest) (*UpsertDocumentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertDocument not implemented")
 }
 func (UnimplementedArchiveServiceServer) GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPages not implemented")
@@ -188,38 +188,38 @@ func RegisterArchiveServiceServer(s grpc.ServiceRegistrar, srv ArchiveServiceSer
 	s.RegisterService(&ArchiveService_ServiceDesc, srv)
 }
 
-func _ArchiveService_GetBooks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBookRequest)
+func _ArchiveService_GetDocuments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDocumentsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArchiveServiceServer).GetBooks(ctx, in)
+		return srv.(ArchiveServiceServer).GetDocuments(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ArchiveService_GetBooks_FullMethodName,
+		FullMethod: ArchiveService_GetDocuments_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArchiveServiceServer).GetBooks(ctx, req.(*GetBookRequest))
+		return srv.(ArchiveServiceServer).GetDocuments(ctx, req.(*GetDocumentsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ArchiveService_UpsertBook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpsertBookRequest)
+func _ArchiveService_UpsertDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertDocumentRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArchiveServiceServer).UpsertBook(ctx, in)
+		return srv.(ArchiveServiceServer).UpsertDocument(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ArchiveService_UpsertBook_FullMethodName,
+		FullMethod: ArchiveService_UpsertDocument_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArchiveServiceServer).UpsertBook(ctx, req.(*UpsertBookRequest))
+		return srv.(ArchiveServiceServer).UpsertDocument(ctx, req.(*UpsertDocumentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -322,12 +322,12 @@ var ArchiveService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ArchiveServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetBooks",
-			Handler:    _ArchiveService_GetBooks_Handler,
+			MethodName: "GetDocuments",
+			Handler:    _ArchiveService_GetDocuments_Handler,
 		},
 		{
-			MethodName: "UpsertBook",
-			Handler:    _ArchiveService_UpsertBook_Handler,
+			MethodName: "UpsertDocument",
+			Handler:    _ArchiveService_UpsertDocument_Handler,
 		},
 		{
 			MethodName: "GetPages",

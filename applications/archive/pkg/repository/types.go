@@ -2,7 +2,7 @@ package repository
 
 import "time"
 
-type Book struct {
+type Document struct {
 	ID              uint32     `gorm:"id"`
 	Title           string     `gorm:"title"`
 	Description     *string    `gorm:"description"`
@@ -16,7 +16,7 @@ type Book struct {
 	DeletedAt       *time.Time `gorm:"deleted_at"`
 }
 
-type GetBooksFilter struct {
+type GetDocumentsFilter struct {
 	IDs         []uint32
 	AuthorId    *uint32
 	PublisherId *uint32
@@ -25,18 +25,18 @@ type GetBooksFilter struct {
 }
 
 type Page struct {
-	ID        uint32     `gorm:"id"`
-	BookID    uint32     `gorm:"book_id"`
-	ImageUrl  string     `gorm:"image_url"`
-	Index     uint32     `gorm:"index"`
-	CreatedAt time.Time  `gorm:"created_at"`
-	UpdatedAt time.Time  `gorm:"updated_at"`
-	DeletedAt *time.Time `gorm:"deleted_at"`
+	ID         uint32     `gorm:"id"`
+	DocumentID uint32     `gorm:"document_id"`
+	ImageUrl   string     `gorm:"image_url"`
+	Index      uint32     `gorm:"index"`
+	CreatedAt  time.Time  `gorm:"created_at"`
+	UpdatedAt  time.Time  `gorm:"updated_at"`
+	DeletedAt  *time.Time `gorm:"deleted_at"`
 }
 
 type GetPagesFilter struct {
 	IDs        []uint32
-	BookId     *uint32
+	DocumentId *uint32
 	Pagination *Pagination
 }
 

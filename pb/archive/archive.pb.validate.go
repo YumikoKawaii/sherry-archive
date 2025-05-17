@@ -35,22 +35,22 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on GetBookRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *GetBookRequest) Validate() error {
+// Validate checks the field values on GetDocumentsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDocumentsRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GetBookRequest with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetBookRequestMultiError,
-// or nil if none found.
-func (m *GetBookRequest) ValidateAll() error {
+// ValidateAll checks the field values on GetDocumentsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetDocumentsRequestMultiError, or nil if none found.
+func (m *GetDocumentsRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GetBookRequest) validate(all bool) error {
+func (m *GetDocumentsRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -61,7 +61,7 @@ func (m *GetBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetCategoryId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBookRequestValidationError{
+				errors = append(errors, GetDocumentsRequestValidationError{
 					field:  "CategoryId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -69,7 +69,7 @@ func (m *GetBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBookRequestValidationError{
+				errors = append(errors, GetDocumentsRequestValidationError{
 					field:  "CategoryId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -78,7 +78,7 @@ func (m *GetBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetCategoryId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GetBookRequestValidationError{
+			return GetDocumentsRequestValidationError{
 				field:  "CategoryId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -90,7 +90,7 @@ func (m *GetBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetAuthorId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBookRequestValidationError{
+				errors = append(errors, GetDocumentsRequestValidationError{
 					field:  "AuthorId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -98,7 +98,7 @@ func (m *GetBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBookRequestValidationError{
+				errors = append(errors, GetDocumentsRequestValidationError{
 					field:  "AuthorId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -107,7 +107,7 @@ func (m *GetBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetAuthorId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GetBookRequestValidationError{
+			return GetDocumentsRequestValidationError{
 				field:  "AuthorId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -119,7 +119,7 @@ func (m *GetBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetPublisherId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBookRequestValidationError{
+				errors = append(errors, GetDocumentsRequestValidationError{
 					field:  "PublisherId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -127,7 +127,7 @@ func (m *GetBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBookRequestValidationError{
+				errors = append(errors, GetDocumentsRequestValidationError{
 					field:  "PublisherId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -136,7 +136,7 @@ func (m *GetBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPublisherId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GetBookRequestValidationError{
+			return GetDocumentsRequestValidationError{
 				field:  "PublisherId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -149,19 +149,19 @@ func (m *GetBookRequest) validate(all bool) error {
 	// no validation rules for PageSize
 
 	if len(errors) > 0 {
-		return GetBookRequestMultiError(errors)
+		return GetDocumentsRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// GetBookRequestMultiError is an error wrapping multiple validation errors
-// returned by GetBookRequest.ValidateAll() if the designated constraints
-// aren't met.
-type GetBookRequestMultiError []error
+// GetDocumentsRequestMultiError is an error wrapping multiple validation
+// errors returned by GetDocumentsRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetDocumentsRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetBookRequestMultiError) Error() string {
+func (m GetDocumentsRequestMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -170,11 +170,11 @@ func (m GetBookRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetBookRequestMultiError) AllErrors() []error { return m }
+func (m GetDocumentsRequestMultiError) AllErrors() []error { return m }
 
-// GetBookRequestValidationError is the validation error returned by
-// GetBookRequest.Validate if the designated constraints aren't met.
-type GetBookRequestValidationError struct {
+// GetDocumentsRequestValidationError is the validation error returned by
+// GetDocumentsRequest.Validate if the designated constraints aren't met.
+type GetDocumentsRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -182,22 +182,24 @@ type GetBookRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetBookRequestValidationError) Field() string { return e.field }
+func (e GetDocumentsRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetBookRequestValidationError) Reason() string { return e.reason }
+func (e GetDocumentsRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetBookRequestValidationError) Cause() error { return e.cause }
+func (e GetDocumentsRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetBookRequestValidationError) Key() bool { return e.key }
+func (e GetDocumentsRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetBookRequestValidationError) ErrorName() string { return "GetBookRequestValidationError" }
+func (e GetDocumentsRequestValidationError) ErrorName() string {
+	return "GetDocumentsRequestValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e GetBookRequestValidationError) Error() string {
+func (e GetDocumentsRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -209,14 +211,14 @@ func (e GetBookRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetBookRequest.%s: %s%s",
+		"invalid %sGetDocumentsRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetBookRequestValidationError{}
+var _ error = GetDocumentsRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -224,24 +226,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetBookRequestValidationError{}
+} = GetDocumentsRequestValidationError{}
 
-// Validate checks the field values on GetBookResponse with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *GetBookResponse) Validate() error {
+// Validate checks the field values on GetDocumentsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetDocumentsResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GetBookResponse with the rules
+// ValidateAll checks the field values on GetDocumentsResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// GetBookResponseMultiError, or nil if none found.
-func (m *GetBookResponse) ValidateAll() error {
+// GetDocumentsResponseMultiError, or nil if none found.
+func (m *GetDocumentsResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GetBookResponse) validate(all bool) error {
+func (m *GetDocumentsResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -256,7 +258,7 @@ func (m *GetBookResponse) validate(all bool) error {
 		switch v := interface{}(m.GetData()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBookResponseValidationError{
+				errors = append(errors, GetDocumentsResponseValidationError{
 					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -264,7 +266,7 @@ func (m *GetBookResponse) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBookResponseValidationError{
+				errors = append(errors, GetDocumentsResponseValidationError{
 					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -273,7 +275,7 @@ func (m *GetBookResponse) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GetBookResponseValidationError{
+			return GetDocumentsResponseValidationError{
 				field:  "Data",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -282,19 +284,19 @@ func (m *GetBookResponse) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return GetBookResponseMultiError(errors)
+		return GetDocumentsResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// GetBookResponseMultiError is an error wrapping multiple validation errors
-// returned by GetBookResponse.ValidateAll() if the designated constraints
-// aren't met.
-type GetBookResponseMultiError []error
+// GetDocumentsResponseMultiError is an error wrapping multiple validation
+// errors returned by GetDocumentsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetDocumentsResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetBookResponseMultiError) Error() string {
+func (m GetDocumentsResponseMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -303,11 +305,11 @@ func (m GetBookResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetBookResponseMultiError) AllErrors() []error { return m }
+func (m GetDocumentsResponseMultiError) AllErrors() []error { return m }
 
-// GetBookResponseValidationError is the validation error returned by
-// GetBookResponse.Validate if the designated constraints aren't met.
-type GetBookResponseValidationError struct {
+// GetDocumentsResponseValidationError is the validation error returned by
+// GetDocumentsResponse.Validate if the designated constraints aren't met.
+type GetDocumentsResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -315,22 +317,24 @@ type GetBookResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetBookResponseValidationError) Field() string { return e.field }
+func (e GetDocumentsResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetBookResponseValidationError) Reason() string { return e.reason }
+func (e GetDocumentsResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetBookResponseValidationError) Cause() error { return e.cause }
+func (e GetDocumentsResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetBookResponseValidationError) Key() bool { return e.key }
+func (e GetDocumentsResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetBookResponseValidationError) ErrorName() string { return "GetBookResponseValidationError" }
+func (e GetDocumentsResponseValidationError) ErrorName() string {
+	return "GetDocumentsResponseValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e GetBookResponseValidationError) Error() string {
+func (e GetDocumentsResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -342,14 +346,14 @@ func (e GetBookResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetBookResponse.%s: %s%s",
+		"invalid %sGetDocumentsResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetBookResponseValidationError{}
+var _ error = GetDocumentsResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -357,24 +361,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetBookResponseValidationError{}
+} = GetDocumentsResponseValidationError{}
 
-// Validate checks the field values on UpsertBookRequest with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *UpsertBookRequest) Validate() error {
+// Validate checks the field values on UpsertDocumentRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpsertDocumentRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UpsertBookRequest with the rules
+// ValidateAll checks the field values on UpsertDocumentRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// UpsertBookRequestMultiError, or nil if none found.
-func (m *UpsertBookRequest) ValidateAll() error {
+// UpsertDocumentRequestMultiError, or nil if none found.
+func (m *UpsertDocumentRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UpsertBookRequest) validate(all bool) error {
+func (m *UpsertDocumentRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -385,7 +389,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "Id",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -393,7 +397,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "Id",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -402,7 +406,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookRequestValidationError{
+			return UpsertDocumentRequestValidationError{
 				field:  "Id",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -416,7 +420,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetDescription()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "Description",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -424,7 +428,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "Description",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -433,7 +437,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetDescription()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookRequestValidationError{
+			return UpsertDocumentRequestValidationError{
 				field:  "Description",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -445,7 +449,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetImageUrl()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "ImageUrl",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -453,7 +457,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "ImageUrl",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -462,7 +466,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetImageUrl()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookRequestValidationError{
+			return UpsertDocumentRequestValidationError{
 				field:  "ImageUrl",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -474,7 +478,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetImage()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "Image",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -482,7 +486,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "Image",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -491,7 +495,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetImage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookRequestValidationError{
+			return UpsertDocumentRequestValidationError{
 				field:  "Image",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -503,7 +507,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetAuthorId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "AuthorId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -511,7 +515,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "AuthorId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -520,7 +524,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetAuthorId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookRequestValidationError{
+			return UpsertDocumentRequestValidationError{
 				field:  "AuthorId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -532,7 +536,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetPublisherId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "PublisherId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -540,7 +544,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "PublisherId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -549,7 +553,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPublisherId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookRequestValidationError{
+			return UpsertDocumentRequestValidationError{
 				field:  "PublisherId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -561,7 +565,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetCategoryId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "CategoryId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -569,7 +573,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "CategoryId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -578,7 +582,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetCategoryId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookRequestValidationError{
+			return UpsertDocumentRequestValidationError{
 				field:  "CategoryId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -590,7 +594,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		switch v := interface{}(m.GetPublicationDate()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "PublicationDate",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -598,7 +602,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookRequestValidationError{
+				errors = append(errors, UpsertDocumentRequestValidationError{
 					field:  "PublicationDate",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -607,7 +611,7 @@ func (m *UpsertBookRequest) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPublicationDate()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookRequestValidationError{
+			return UpsertDocumentRequestValidationError{
 				field:  "PublicationDate",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -616,19 +620,19 @@ func (m *UpsertBookRequest) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return UpsertBookRequestMultiError(errors)
+		return UpsertDocumentRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// UpsertBookRequestMultiError is an error wrapping multiple validation errors
-// returned by UpsertBookRequest.ValidateAll() if the designated constraints
-// aren't met.
-type UpsertBookRequestMultiError []error
+// UpsertDocumentRequestMultiError is an error wrapping multiple validation
+// errors returned by UpsertDocumentRequest.ValidateAll() if the designated
+// constraints aren't met.
+type UpsertDocumentRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UpsertBookRequestMultiError) Error() string {
+func (m UpsertDocumentRequestMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -637,11 +641,11 @@ func (m UpsertBookRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UpsertBookRequestMultiError) AllErrors() []error { return m }
+func (m UpsertDocumentRequestMultiError) AllErrors() []error { return m }
 
-// UpsertBookRequestValidationError is the validation error returned by
-// UpsertBookRequest.Validate if the designated constraints aren't met.
-type UpsertBookRequestValidationError struct {
+// UpsertDocumentRequestValidationError is the validation error returned by
+// UpsertDocumentRequest.Validate if the designated constraints aren't met.
+type UpsertDocumentRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -649,24 +653,24 @@ type UpsertBookRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e UpsertBookRequestValidationError) Field() string { return e.field }
+func (e UpsertDocumentRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UpsertBookRequestValidationError) Reason() string { return e.reason }
+func (e UpsertDocumentRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UpsertBookRequestValidationError) Cause() error { return e.cause }
+func (e UpsertDocumentRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UpsertBookRequestValidationError) Key() bool { return e.key }
+func (e UpsertDocumentRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UpsertBookRequestValidationError) ErrorName() string {
-	return "UpsertBookRequestValidationError"
+func (e UpsertDocumentRequestValidationError) ErrorName() string {
+	return "UpsertDocumentRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e UpsertBookRequestValidationError) Error() string {
+func (e UpsertDocumentRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -678,14 +682,14 @@ func (e UpsertBookRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUpsertBookRequest.%s: %s%s",
+		"invalid %sUpsertDocumentRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UpsertBookRequestValidationError{}
+var _ error = UpsertDocumentRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -693,24 +697,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UpsertBookRequestValidationError{}
+} = UpsertDocumentRequestValidationError{}
 
-// Validate checks the field values on UpsertBookResponse with the rules
+// Validate checks the field values on UpsertDocumentResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *UpsertBookResponse) Validate() error {
+func (m *UpsertDocumentResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UpsertBookResponse with the rules
+// ValidateAll checks the field values on UpsertDocumentResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// UpsertBookResponseMultiError, or nil if none found.
-func (m *UpsertBookResponse) ValidateAll() error {
+// UpsertDocumentResponseMultiError, or nil if none found.
+func (m *UpsertDocumentResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UpsertBookResponse) validate(all bool) error {
+func (m *UpsertDocumentResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -725,7 +729,7 @@ func (m *UpsertBookResponse) validate(all bool) error {
 		switch v := interface{}(m.GetData()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookResponseValidationError{
+				errors = append(errors, UpsertDocumentResponseValidationError{
 					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -733,7 +737,7 @@ func (m *UpsertBookResponse) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookResponseValidationError{
+				errors = append(errors, UpsertDocumentResponseValidationError{
 					field:  "Data",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -742,7 +746,7 @@ func (m *UpsertBookResponse) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookResponseValidationError{
+			return UpsertDocumentResponseValidationError{
 				field:  "Data",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -751,19 +755,19 @@ func (m *UpsertBookResponse) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return UpsertBookResponseMultiError(errors)
+		return UpsertDocumentResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-// UpsertBookResponseMultiError is an error wrapping multiple validation errors
-// returned by UpsertBookResponse.ValidateAll() if the designated constraints
-// aren't met.
-type UpsertBookResponseMultiError []error
+// UpsertDocumentResponseMultiError is an error wrapping multiple validation
+// errors returned by UpsertDocumentResponse.ValidateAll() if the designated
+// constraints aren't met.
+type UpsertDocumentResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UpsertBookResponseMultiError) Error() string {
+func (m UpsertDocumentResponseMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -772,11 +776,11 @@ func (m UpsertBookResponseMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UpsertBookResponseMultiError) AllErrors() []error { return m }
+func (m UpsertDocumentResponseMultiError) AllErrors() []error { return m }
 
-// UpsertBookResponseValidationError is the validation error returned by
-// UpsertBookResponse.Validate if the designated constraints aren't met.
-type UpsertBookResponseValidationError struct {
+// UpsertDocumentResponseValidationError is the validation error returned by
+// UpsertDocumentResponse.Validate if the designated constraints aren't met.
+type UpsertDocumentResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -784,24 +788,24 @@ type UpsertBookResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e UpsertBookResponseValidationError) Field() string { return e.field }
+func (e UpsertDocumentResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UpsertBookResponseValidationError) Reason() string { return e.reason }
+func (e UpsertDocumentResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UpsertBookResponseValidationError) Cause() error { return e.cause }
+func (e UpsertDocumentResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UpsertBookResponseValidationError) Key() bool { return e.key }
+func (e UpsertDocumentResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UpsertBookResponseValidationError) ErrorName() string {
-	return "UpsertBookResponseValidationError"
+func (e UpsertDocumentResponseValidationError) ErrorName() string {
+	return "UpsertDocumentResponseValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e UpsertBookResponseValidationError) Error() string {
+func (e UpsertDocumentResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -813,14 +817,14 @@ func (e UpsertBookResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUpsertBookResponse.%s: %s%s",
+		"invalid %sUpsertDocumentResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UpsertBookResponseValidationError{}
+var _ error = UpsertDocumentResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -828,7 +832,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UpsertBookResponseValidationError{}
+} = UpsertDocumentResponseValidationError{}
 
 // Validate checks the field values on GetPagesRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -853,11 +857,11 @@ func (m *GetPagesRequest) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetBookId()).(type) {
+		switch v := interface{}(m.GetDocumentId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, GetPagesRequestValidationError{
-					field:  "BookId",
+					field:  "DocumentId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -865,16 +869,16 @@ func (m *GetPagesRequest) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, GetPagesRequestValidationError{
-					field:  "BookId",
+					field:  "DocumentId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetBookId()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetDocumentId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GetPagesRequestValidationError{
-				field:  "BookId",
+				field:  "DocumentId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1118,7 +1122,7 @@ func (m *CreatePagesRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for BookId
+	// no validation rules for DocumentId
 
 	// no validation rules for Pages
 
@@ -1332,7 +1336,7 @@ func (m *UpdatePageRequest) validate(all bool) error {
 
 	// no validation rules for Id
 
-	// no validation rules for BookId
+	// no validation rules for DocumentId
 
 	// no validation rules for ImageUrl
 
@@ -2064,21 +2068,22 @@ var _ interface {
 	ErrorName() string
 } = GetPublishersResponseValidationError{}
 
-// Validate checks the field values on Book with the rules defined in the proto
-// definition for this message. If any rules are violated, the first error
-// encountered is returned, or nil if there are no violations.
-func (m *Book) Validate() error {
+// Validate checks the field values on Document with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Document) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Book with the rules defined in the
-// proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in BookMultiError, or nil if none found.
-func (m *Book) ValidateAll() error {
+// ValidateAll checks the field values on Document with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DocumentMultiError, or nil
+// if none found.
+func (m *Document) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Book) validate(all bool) error {
+func (m *Document) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -2093,7 +2098,7 @@ func (m *Book) validate(all bool) error {
 		switch v := interface{}(m.GetDescription()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "Description",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2101,7 +2106,7 @@ func (m *Book) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "Description",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2110,7 +2115,7 @@ func (m *Book) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetDescription()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return BookValidationError{
+			return DocumentValidationError{
 				field:  "Description",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2122,7 +2127,7 @@ func (m *Book) validate(all bool) error {
 		switch v := interface{}(m.GetImageUrl()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "ImageUrl",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2130,7 +2135,7 @@ func (m *Book) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "ImageUrl",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2139,7 +2144,7 @@ func (m *Book) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetImageUrl()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return BookValidationError{
+			return DocumentValidationError{
 				field:  "ImageUrl",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2151,7 +2156,7 @@ func (m *Book) validate(all bool) error {
 		switch v := interface{}(m.GetAuthorId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "AuthorId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2159,7 +2164,7 @@ func (m *Book) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "AuthorId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2168,7 +2173,7 @@ func (m *Book) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetAuthorId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return BookValidationError{
+			return DocumentValidationError{
 				field:  "AuthorId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2180,7 +2185,7 @@ func (m *Book) validate(all bool) error {
 		switch v := interface{}(m.GetPublisherId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "PublisherId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2188,7 +2193,7 @@ func (m *Book) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "PublisherId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2197,7 +2202,7 @@ func (m *Book) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPublisherId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return BookValidationError{
+			return DocumentValidationError{
 				field:  "PublisherId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2209,7 +2214,7 @@ func (m *Book) validate(all bool) error {
 		switch v := interface{}(m.GetCategoryId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "CategoryId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2217,7 +2222,7 @@ func (m *Book) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "CategoryId",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2226,7 +2231,7 @@ func (m *Book) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetCategoryId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return BookValidationError{
+			return DocumentValidationError{
 				field:  "CategoryId",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2238,7 +2243,7 @@ func (m *Book) validate(all bool) error {
 		switch v := interface{}(m.GetPublicationDate()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "PublicationDate",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2246,7 +2251,7 @@ func (m *Book) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, BookValidationError{
+				errors = append(errors, DocumentValidationError{
 					field:  "PublicationDate",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2255,7 +2260,7 @@ func (m *Book) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPublicationDate()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return BookValidationError{
+			return DocumentValidationError{
 				field:  "PublicationDate",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2264,18 +2269,18 @@ func (m *Book) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return BookMultiError(errors)
+		return DocumentMultiError(errors)
 	}
 
 	return nil
 }
 
-// BookMultiError is an error wrapping multiple validation errors returned by
-// Book.ValidateAll() if the designated constraints aren't met.
-type BookMultiError []error
+// DocumentMultiError is an error wrapping multiple validation errors returned
+// by Document.ValidateAll() if the designated constraints aren't met.
+type DocumentMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m BookMultiError) Error() string {
+func (m DocumentMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2284,11 +2289,11 @@ func (m BookMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m BookMultiError) AllErrors() []error { return m }
+func (m DocumentMultiError) AllErrors() []error { return m }
 
-// BookValidationError is the validation error returned by Book.Validate if the
-// designated constraints aren't met.
-type BookValidationError struct {
+// DocumentValidationError is the validation error returned by
+// Document.Validate if the designated constraints aren't met.
+type DocumentValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2296,22 +2301,22 @@ type BookValidationError struct {
 }
 
 // Field function returns field value.
-func (e BookValidationError) Field() string { return e.field }
+func (e DocumentValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e BookValidationError) Reason() string { return e.reason }
+func (e DocumentValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e BookValidationError) Cause() error { return e.cause }
+func (e DocumentValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e BookValidationError) Key() bool { return e.key }
+func (e DocumentValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e BookValidationError) ErrorName() string { return "BookValidationError" }
+func (e DocumentValidationError) ErrorName() string { return "DocumentValidationError" }
 
 // Error satisfies the builtin error interface
-func (e BookValidationError) Error() string {
+func (e DocumentValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2323,14 +2328,14 @@ func (e BookValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sBook.%s: %s%s",
+		"invalid %sDocument.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = BookValidationError{}
+var _ error = DocumentValidationError{}
 
 var _ interface {
 	Field() string
@@ -2338,7 +2343,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = BookValidationError{}
+} = DocumentValidationError{}
 
 // Validate checks the field values on Page with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
@@ -2363,7 +2368,7 @@ func (m *Page) validate(all bool) error {
 
 	// no validation rules for Id
 
-	// no validation rules for BookId
+	// no validation rules for DocumentId
 
 	// no validation rules for ImageUrl
 
@@ -2762,45 +2767,45 @@ var _ interface {
 	ErrorName() string
 } = PaginationValidationError{}
 
-// Validate checks the field values on GetBookResponse_Data with the rules
+// Validate checks the field values on GetDocumentsResponse_Data with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetBookResponse_Data) Validate() error {
+func (m *GetDocumentsResponse_Data) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GetBookResponse_Data with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on GetDocumentsResponse_Data with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// GetBookResponse_DataMultiError, or nil if none found.
-func (m *GetBookResponse_Data) ValidateAll() error {
+// GetDocumentsResponse_DataMultiError, or nil if none found.
+func (m *GetDocumentsResponse_Data) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GetBookResponse_Data) validate(all bool) error {
+func (m *GetDocumentsResponse_Data) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	for idx, item := range m.GetBooks() {
+	for idx, item := range m.GetDocuments() {
 		_, _ = idx, item
 
 		if all {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, GetBookResponse_DataValidationError{
-						field:  fmt.Sprintf("Books[%v]", idx),
+					errors = append(errors, GetDocumentsResponse_DataValidationError{
+						field:  fmt.Sprintf("Documents[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, GetBookResponse_DataValidationError{
-						field:  fmt.Sprintf("Books[%v]", idx),
+					errors = append(errors, GetDocumentsResponse_DataValidationError{
+						field:  fmt.Sprintf("Documents[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -2808,8 +2813,8 @@ func (m *GetBookResponse_Data) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return GetBookResponse_DataValidationError{
-					field:  fmt.Sprintf("Books[%v]", idx),
+				return GetDocumentsResponse_DataValidationError{
+					field:  fmt.Sprintf("Documents[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2822,7 +2827,7 @@ func (m *GetBookResponse_Data) validate(all bool) error {
 		switch v := interface{}(m.GetPagination()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GetBookResponse_DataValidationError{
+				errors = append(errors, GetDocumentsResponse_DataValidationError{
 					field:  "Pagination",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2830,7 +2835,7 @@ func (m *GetBookResponse_Data) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GetBookResponse_DataValidationError{
+				errors = append(errors, GetDocumentsResponse_DataValidationError{
 					field:  "Pagination",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -2839,7 +2844,7 @@ func (m *GetBookResponse_Data) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetPagination()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GetBookResponse_DataValidationError{
+			return GetDocumentsResponse_DataValidationError{
 				field:  "Pagination",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -2848,19 +2853,19 @@ func (m *GetBookResponse_Data) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return GetBookResponse_DataMultiError(errors)
+		return GetDocumentsResponse_DataMultiError(errors)
 	}
 
 	return nil
 }
 
-// GetBookResponse_DataMultiError is an error wrapping multiple validation
-// errors returned by GetBookResponse_Data.ValidateAll() if the designated
-// constraints aren't met.
-type GetBookResponse_DataMultiError []error
+// GetDocumentsResponse_DataMultiError is an error wrapping multiple validation
+// errors returned by GetDocumentsResponse_Data.ValidateAll() if the
+// designated constraints aren't met.
+type GetDocumentsResponse_DataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetBookResponse_DataMultiError) Error() string {
+func (m GetDocumentsResponse_DataMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -2869,11 +2874,11 @@ func (m GetBookResponse_DataMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetBookResponse_DataMultiError) AllErrors() []error { return m }
+func (m GetDocumentsResponse_DataMultiError) AllErrors() []error { return m }
 
-// GetBookResponse_DataValidationError is the validation error returned by
-// GetBookResponse_Data.Validate if the designated constraints aren't met.
-type GetBookResponse_DataValidationError struct {
+// GetDocumentsResponse_DataValidationError is the validation error returned by
+// GetDocumentsResponse_Data.Validate if the designated constraints aren't met.
+type GetDocumentsResponse_DataValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -2881,24 +2886,24 @@ type GetBookResponse_DataValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetBookResponse_DataValidationError) Field() string { return e.field }
+func (e GetDocumentsResponse_DataValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetBookResponse_DataValidationError) Reason() string { return e.reason }
+func (e GetDocumentsResponse_DataValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetBookResponse_DataValidationError) Cause() error { return e.cause }
+func (e GetDocumentsResponse_DataValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetBookResponse_DataValidationError) Key() bool { return e.key }
+func (e GetDocumentsResponse_DataValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetBookResponse_DataValidationError) ErrorName() string {
-	return "GetBookResponse_DataValidationError"
+func (e GetDocumentsResponse_DataValidationError) ErrorName() string {
+	return "GetDocumentsResponse_DataValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e GetBookResponse_DataValidationError) Error() string {
+func (e GetDocumentsResponse_DataValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -2910,14 +2915,14 @@ func (e GetBookResponse_DataValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetBookResponse_Data.%s: %s%s",
+		"invalid %sGetDocumentsResponse_Data.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetBookResponse_DataValidationError{}
+var _ error = GetDocumentsResponse_DataValidationError{}
 
 var _ interface {
 	Field() string
@@ -2925,24 +2930,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetBookResponse_DataValidationError{}
+} = GetDocumentsResponse_DataValidationError{}
 
-// Validate checks the field values on UpsertBookResponse_Data with the rules
-// defined in the proto definition for this message. If any rules are
+// Validate checks the field values on UpsertDocumentResponse_Data with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *UpsertBookResponse_Data) Validate() error {
+func (m *UpsertDocumentResponse_Data) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UpsertBookResponse_Data with the
+// ValidateAll checks the field values on UpsertDocumentResponse_Data with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// UpsertBookResponse_DataMultiError, or nil if none found.
-func (m *UpsertBookResponse_Data) ValidateAll() error {
+// UpsertDocumentResponse_DataMultiError, or nil if none found.
+func (m *UpsertDocumentResponse_Data) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UpsertBookResponse_Data) validate(all bool) error {
+func (m *UpsertDocumentResponse_Data) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -2950,28 +2955,28 @@ func (m *UpsertBookResponse_Data) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetBook()).(type) {
+		switch v := interface{}(m.GetDocument()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UpsertBookResponse_DataValidationError{
-					field:  "Book",
+				errors = append(errors, UpsertDocumentResponse_DataValidationError{
+					field:  "Document",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, UpsertBookResponse_DataValidationError{
-					field:  "Book",
+				errors = append(errors, UpsertDocumentResponse_DataValidationError{
+					field:  "Document",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetBook()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetDocument()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return UpsertBookResponse_DataValidationError{
-				field:  "Book",
+			return UpsertDocumentResponse_DataValidationError{
+				field:  "Document",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -2979,19 +2984,19 @@ func (m *UpsertBookResponse_Data) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return UpsertBookResponse_DataMultiError(errors)
+		return UpsertDocumentResponse_DataMultiError(errors)
 	}
 
 	return nil
 }
 
-// UpsertBookResponse_DataMultiError is an error wrapping multiple validation
-// errors returned by UpsertBookResponse_Data.ValidateAll() if the designated
-// constraints aren't met.
-type UpsertBookResponse_DataMultiError []error
+// UpsertDocumentResponse_DataMultiError is an error wrapping multiple
+// validation errors returned by UpsertDocumentResponse_Data.ValidateAll() if
+// the designated constraints aren't met.
+type UpsertDocumentResponse_DataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UpsertBookResponse_DataMultiError) Error() string {
+func (m UpsertDocumentResponse_DataMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -3000,11 +3005,12 @@ func (m UpsertBookResponse_DataMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UpsertBookResponse_DataMultiError) AllErrors() []error { return m }
+func (m UpsertDocumentResponse_DataMultiError) AllErrors() []error { return m }
 
-// UpsertBookResponse_DataValidationError is the validation error returned by
-// UpsertBookResponse_Data.Validate if the designated constraints aren't met.
-type UpsertBookResponse_DataValidationError struct {
+// UpsertDocumentResponse_DataValidationError is the validation error returned
+// by UpsertDocumentResponse_Data.Validate if the designated constraints
+// aren't met.
+type UpsertDocumentResponse_DataValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -3012,24 +3018,24 @@ type UpsertBookResponse_DataValidationError struct {
 }
 
 // Field function returns field value.
-func (e UpsertBookResponse_DataValidationError) Field() string { return e.field }
+func (e UpsertDocumentResponse_DataValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UpsertBookResponse_DataValidationError) Reason() string { return e.reason }
+func (e UpsertDocumentResponse_DataValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UpsertBookResponse_DataValidationError) Cause() error { return e.cause }
+func (e UpsertDocumentResponse_DataValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UpsertBookResponse_DataValidationError) Key() bool { return e.key }
+func (e UpsertDocumentResponse_DataValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UpsertBookResponse_DataValidationError) ErrorName() string {
-	return "UpsertBookResponse_DataValidationError"
+func (e UpsertDocumentResponse_DataValidationError) ErrorName() string {
+	return "UpsertDocumentResponse_DataValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e UpsertBookResponse_DataValidationError) Error() string {
+func (e UpsertDocumentResponse_DataValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -3041,14 +3047,14 @@ func (e UpsertBookResponse_DataValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUpsertBookResponse_Data.%s: %s%s",
+		"invalid %sUpsertDocumentResponse_Data.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UpsertBookResponse_DataValidationError{}
+var _ error = UpsertDocumentResponse_DataValidationError{}
 
 var _ interface {
 	Field() string
@@ -3056,7 +3062,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UpsertBookResponse_DataValidationError{}
+} = UpsertDocumentResponse_DataValidationError{}
 
 // Validate checks the field values on GetPagesResponse_Data with the rules
 // defined in the proto definition for this message. If any rules are
