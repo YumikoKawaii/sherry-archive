@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package sherry.archive.tracking.api.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
+
+option go_package = "sherry-archive/tracking/api;api";
+
+service TrackingService {
+  rpc LogEntry(LogEntryRequest) returns (LogEntryResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/log-entry"
+      body: "*"
+    };
+  }
+}
+
+message LogEntryRequest {
+  string schema = 1;
+  bytes data = 2;
+}
+
+message LogEntryResponse {
+  uint32 code = 1;
+  string message = 2;
+}
