@@ -10,8 +10,12 @@ import (
 	"time"
 )
 
+type HandleMessageFunc func(message *sarama.ConsumerMessage) error
+type HandleBatchMessageFunc func(messages []*sarama.ConsumerMessage) error
+
 type Consumer interface {
-	Consume(ctx context.Context, topic string, handler func(message *sarama.ConsumerMessage) error) error
+	Consume(ctx context.Context, topic string, handler HandleMessageFunc) error
+	ConsumeInBatch(ctx context.Context, topic string, handler HandleBatchMessageFunc) error
 	Close() error
 }
 
@@ -48,7 +52,7 @@ type kafkaConsumer struct {
 	//groupId  string
 }
 
-func (c *kafkaConsumer) Consume(ctx context.Context, topic string, handler func(message *sarama.ConsumerMessage) error) error {
+func (c *kafkaConsumer) Consume(ctx context.Context, topic string, handler HandleMessageFunc) error {
 	partitions, err := c.consumer.Partitions(topic)
 	if err != nil {
 		return err
@@ -103,10 +107,10 @@ func (c *kafkaConsumer) Consume(ctx context.Context, topic string, handler func(
 	}
 }
 
-func (c *kafkaConsumer) Close() error {
-	if err := c.consumer.Close(); err != nil {
-		return err
-	}
+func (c *kafkaConsumer) ConsumeInBatch(ctx context.Context, topic string, handler HandleBatchMessageFunc) error {
+	return errors.New("unsupported")
+}
 
+func (c *kafkaConsumer) Close() error {
 	return c.client.Close()
 }

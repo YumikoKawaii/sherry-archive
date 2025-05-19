@@ -10,6 +10,12 @@ type Querier interface {
 	GetTrackingIds(ctx context.Context, filter *GetTrackingIdsFilter) ([]TrackingId, error)
 }
 
+func NewQuerier(db *gorm.DB) Querier {
+	return &querierImpl{
+		db: db,
+	}
+}
+
 type querierImpl struct {
 	db *gorm.DB
 }

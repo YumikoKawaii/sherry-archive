@@ -1,6 +1,8 @@
 package servers
 
 import (
+	"context"
+	"github.com/go-redis/redis/v8"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
@@ -8,8 +10,11 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"sherry.archive.com/applications/tracking/config"
+	"sherry.archive.com/applications/tracking/pkg/repository"
 	"sherry.archive.com/applications/tracking/servers/apis"
+	"sherry.archive.com/applications/tracking/servers/extractor"
 	"sherry.archive.com/applications/tracking/services"
+	"sherry.archive.com/shared/database"
 	"sherry.archive.com/shared/logger"
 	"sherry.archive.com/shared/middleware/grpc_error"
 	"sherry.archive.com/shared/middleware/grpc_recovery"
@@ -45,4 +50,20 @@ func Serve(cfg *config.Application) {
 	if err := sv.Serve(); err != nil {
 		logger.Fatalf("failed to serve: %s", err.Error())
 	}
+}
+
+func Extract(cfg *config.Application) {
+	zapSugaredLogger := logger.GetDelegate().(*zap.SugaredLogger)
+	zapLogger := zapSugaredLogger.Desugar()
+	mysqlGorm := database.NewMysqlGormDatabase(cfg.MysqlConfig.DSN())
+	grpc_zap.ReplaceGrpcLoggerV2(zapLogger)
+
+	querier := repository.NewQuerier(mysqlGorm)
+	consumer := topics.NewKafkaConsumerGroup(cfg.KafkaConfig)
+	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig, topics.AsyncKafka)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: cfg.RedisAddress,
+	})
+	ext := extractor.NewExtractor(consumer, publisher, querier, redisClient, cfg.CacheTTLInSec)
+	ext.Extract(context.Background())
 }

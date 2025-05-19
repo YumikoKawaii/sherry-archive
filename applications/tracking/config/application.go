@@ -10,6 +10,7 @@ import (
 
 type Application struct {
 	Serve   struct{} `kong:"cmd"`
+	Extract struct{} `kong:"extract"`
 	Migrate struct {
 		Command string `kong:"arg,name:'command',enum:'up,create'"`
 		Option  string `kong:"arg,optional,name:'option'"`
@@ -26,6 +27,8 @@ type Application struct {
 
 	KafkaConfig  configs.KafkaConfig `kong:"embed"`
 	RedisAddress string              `env:"REDIS_ADDRESS" default:"localhost:6379"`
+
+	CacheTTLInSec int `env:"CACHE_TTL_IN_SEC" default:"300"`
 }
 
 func Initialize() (*Application, *kong.Context) {
