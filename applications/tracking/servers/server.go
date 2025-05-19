@@ -13,21 +13,21 @@ import (
 	"sherry.archive.com/shared/logger"
 	"sherry.archive.com/shared/middleware/grpc_error"
 	"sherry.archive.com/shared/middleware/grpc_recovery"
+	"sherry.archive.com/shared/topics"
 )
 
 func Serve(cfg *config.Application) {
 	prometheus := grpc_prometheus.NewServerMetrics()
 	zapSugaredLogger := logger.GetDelegate().(*zap.SugaredLogger)
 	zapLogger := zapSugaredLogger.Desugar()
-	//mysqlGorm := database.NewMysqlGormDatabase(cfg.MysqlConfig.DSN())
 	grpc_zap.ReplaceGrpcLoggerV2(zapLogger)
-	
-	service := apis.NewService()
+
+	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig, topics.AsyncKafka)
+	service := apis.NewService(publisher)
 
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	sv := services.NewServer(
 		services.NewConfig(cfg.GRPCPort, cfg.HTTPPort),
-		grpc.MaxRecvMsgSize(10*1024*1024),
 		grpc.ChainUnaryInterceptor(
 			prometheus.UnaryServerInterceptor(),
 			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),

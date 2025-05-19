@@ -33,7 +33,7 @@ func Serve(cfg *config.Application) {
 
 	querier := repository.NewQuerier(mysqlGorm)
 	multimediaStorage := multimedia.NewCloudinaryClient(cfg.CloudinaryConfig)
-	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig)
+	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig, topics.SyncKafka)
 	service := apis.NewService(querier, multimediaStorage, publisher)
 
 	grpc_prometheus.EnableHandlingTimeHistogram()
@@ -64,7 +64,7 @@ func Serve(cfg *config.Application) {
 
 func Extract(cfg *config.Application) {
 	consumer := topics.NewKafkaConsumer(cfg.KafkaConfig)
-	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig)
+	publisher := topics.NewKafkaSyncPublisher(cfg.KafkaConfig, topics.SyncKafka)
 	ext := extractor.NewExtractor(consumer, publisher)
 	ext.Extract(context.Background())
 }

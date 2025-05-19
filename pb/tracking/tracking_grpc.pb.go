@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TrackingService_LogEntry_FullMethodName = "/sherry.archive.tracking.api.v1.TrackingService/LogEntry"
+	TrackingService_LogEntry_FullMethodName   = "/sherry.archive.tracking.api.v1.TrackingService/LogEntry"
+	TrackingService_LogEntries_FullMethodName = "/sherry.archive.tracking.api.v1.TrackingService/LogEntries"
 )
 
 // TrackingServiceClient is the client API for TrackingService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TrackingServiceClient interface {
 	LogEntry(ctx context.Context, in *LogEntryRequest, opts ...grpc.CallOption) (*LogEntryResponse, error)
+	LogEntries(ctx context.Context, in *LogEntriesRequest, opts ...grpc.CallOption) (*LogEntriesRequest, error)
 }
 
 type trackingServiceClient struct {
@@ -47,11 +49,22 @@ func (c *trackingServiceClient) LogEntry(ctx context.Context, in *LogEntryReques
 	return out, nil
 }
 
+func (c *trackingServiceClient) LogEntries(ctx context.Context, in *LogEntriesRequest, opts ...grpc.CallOption) (*LogEntriesRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LogEntriesRequest)
+	err := c.cc.Invoke(ctx, TrackingService_LogEntries_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TrackingServiceServer is the server API for TrackingService service.
 // All implementations must embed UnimplementedTrackingServiceServer
 // for forward compatibility.
 type TrackingServiceServer interface {
 	LogEntry(context.Context, *LogEntryRequest) (*LogEntryResponse, error)
+	LogEntries(context.Context, *LogEntriesRequest) (*LogEntriesRequest, error)
 	mustEmbedUnimplementedTrackingServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedTrackingServiceServer struct{}
 
 func (UnimplementedTrackingServiceServer) LogEntry(context.Context, *LogEntryRequest) (*LogEntryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogEntry not implemented")
+}
+func (UnimplementedTrackingServiceServer) LogEntries(context.Context, *LogEntriesRequest) (*LogEntriesRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogEntries not implemented")
 }
 func (UnimplementedTrackingServiceServer) mustEmbedUnimplementedTrackingServiceServer() {}
 func (UnimplementedTrackingServiceServer) testEmbeddedByValue()                         {}
@@ -104,6 +120,24 @@ func _TrackingService_LogEntry_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TrackingService_LogEntries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogEntriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TrackingServiceServer).LogEntries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TrackingService_LogEntries_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TrackingServiceServer).LogEntries(ctx, req.(*LogEntriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TrackingService_ServiceDesc is the grpc.ServiceDesc for TrackingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var TrackingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LogEntry",
 			Handler:    _TrackingService_LogEntry_Handler,
+		},
+		{
+			MethodName: "LogEntries",
+			Handler:    _TrackingService_LogEntries_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

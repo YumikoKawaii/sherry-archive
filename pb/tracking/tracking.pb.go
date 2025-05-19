@@ -26,11 +26,10 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type LogEntryRequest struct {
-	Schema               string   `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
-	Data                 []byte   `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	LogEntry             *LogEntry `protobuf:"bytes,1,opt,name=log_entry,json=logEntry,proto3" json:"log_entry,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *LogEntryRequest) Reset()         { *m = LogEntryRequest{} }
@@ -66,16 +65,9 @@ func (m *LogEntryRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_LogEntryRequest proto.InternalMessageInfo
 
-func (m *LogEntryRequest) GetSchema() string {
+func (m *LogEntryRequest) GetLogEntry() *LogEntry {
 	if m != nil {
-		return m.Schema
-	}
-	return ""
-}
-
-func (m *LogEntryRequest) GetData() []byte {
-	if m != nil {
-		return m.Data
+		return m.LogEntry
 	}
 	return nil
 }
@@ -135,36 +127,144 @@ func (m *LogEntryResponse) GetMessage() string {
 	return ""
 }
 
+type LogEntriesRequest struct {
+	LogEntries           []*LogEntry `protobuf:"bytes,1,rep,name=log_entries,json=logEntries,proto3" json:"log_entries,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
+}
+
+func (m *LogEntriesRequest) Reset()         { *m = LogEntriesRequest{} }
+func (m *LogEntriesRequest) String() string { return proto.CompactTextString(m) }
+func (*LogEntriesRequest) ProtoMessage()    {}
+func (*LogEntriesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ef03cdca4d8d01dd, []int{2}
+}
+func (m *LogEntriesRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *LogEntriesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_LogEntriesRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *LogEntriesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LogEntriesRequest.Merge(m, src)
+}
+func (m *LogEntriesRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *LogEntriesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_LogEntriesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LogEntriesRequest proto.InternalMessageInfo
+
+func (m *LogEntriesRequest) GetLogEntries() []*LogEntry {
+	if m != nil {
+		return m.LogEntries
+	}
+	return nil
+}
+
+type LogEntriesResponse struct {
+	Code                 uint32   `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message              string   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *LogEntriesResponse) Reset()         { *m = LogEntriesResponse{} }
+func (m *LogEntriesResponse) String() string { return proto.CompactTextString(m) }
+func (*LogEntriesResponse) ProtoMessage()    {}
+func (*LogEntriesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ef03cdca4d8d01dd, []int{3}
+}
+func (m *LogEntriesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *LogEntriesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_LogEntriesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *LogEntriesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LogEntriesResponse.Merge(m, src)
+}
+func (m *LogEntriesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *LogEntriesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_LogEntriesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LogEntriesResponse proto.InternalMessageInfo
+
+func (m *LogEntriesResponse) GetCode() uint32 {
+	if m != nil {
+		return m.Code
+	}
+	return 0
+}
+
+func (m *LogEntriesResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*LogEntryRequest)(nil), "sherry.archive.tracking.api.v1.LogEntryRequest")
 	proto.RegisterType((*LogEntryResponse)(nil), "sherry.archive.tracking.api.v1.LogEntryResponse")
+	proto.RegisterType((*LogEntriesRequest)(nil), "sherry.archive.tracking.api.v1.LogEntriesRequest")
+	proto.RegisterType((*LogEntriesResponse)(nil), "sherry.archive.tracking.api.v1.LogEntriesResponse")
 }
 
 func init() { proto.RegisterFile("tracking/tracking.proto", fileDescriptor_ef03cdca4d8d01dd) }
 
 var fileDescriptor_ef03cdca4d8d01dd = []byte{
-	// 321 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0xb1, 0x4a, 0x33, 0x41,
-	0x14, 0x85, 0xff, 0x09, 0x3f, 0xd1, 0x0c, 0x4a, 0x74, 0x8a, 0x24, 0x84, 0xb0, 0x86, 0xad, 0x82,
-	0x90, 0x1d, 0xa3, 0x9d, 0x22, 0x88, 0x60, 0x67, 0xb5, 0x5a, 0xd9, 0xdd, 0x6c, 0xae, 0x9b, 0xc1,
-	0x64, 0x66, 0x9c, 0x99, 0xac, 0xa4, 0xb5, 0xb5, 0xb4, 0xb1, 0xf3, 0x75, 0x2c, 0x05, 0x5f, 0x40,
-	0xa2, 0x0f, 0x22, 0x99, 0xdd, 0x8d, 0x60, 0x21, 0x76, 0xe7, 0x70, 0xee, 0xb7, 0xf7, 0xee, 0x19,
-	0xda, 0x74, 0x06, 0x92, 0x1b, 0x21, 0x53, 0x5e, 0x8a, 0x48, 0x1b, 0xe5, 0x14, 0x0b, 0xec, 0x18,
-	0x8d, 0x99, 0x47, 0x60, 0x92, 0xb1, 0xc8, 0x30, 0x5a, 0xc5, 0xa0, 0x45, 0x94, 0x0d, 0xda, 0x9d,
-	0x54, 0xa9, 0x74, 0x82, 0x1c, 0xb4, 0xe0, 0x20, 0xa5, 0x72, 0xe0, 0x84, 0x92, 0x36, 0xa7, 0xdb,
-	0x41, 0x91, 0x7a, 0x37, 0x9c, 0x5d, 0xf3, 0x3b, 0x03, 0x5a, 0xa3, 0x29, 0xf3, 0x66, 0x06, 0x13,
-	0x31, 0x02, 0x87, 0xbc, 0x14, 0x79, 0x10, 0x1e, 0xd3, 0xfa, 0xb9, 0x4a, 0xcf, 0xa4, 0x33, 0xf3,
-	0x18, 0x6f, 0x67, 0x68, 0x1d, 0x6b, 0xd0, 0xaa, 0x4d, 0xc6, 0x38, 0x85, 0x16, 0xe9, 0x92, 0x5e,
-	0x2d, 0x2e, 0x1c, 0x63, 0xf4, 0xff, 0x08, 0x1c, 0xb4, 0x2a, 0x5d, 0xd2, 0xdb, 0x88, 0xbd, 0x0e,
-	0x4f, 0xe8, 0xd6, 0x37, 0x6e, 0xb5, 0x92, 0x16, 0x97, 0x73, 0x89, 0x1a, 0xa1, 0xa7, 0x37, 0x63,
-	0xaf, 0x59, 0x8b, 0xae, 0x4d, 0xd1, 0x5a, 0x48, 0xd1, 0xe3, 0xb5, 0xb8, 0xb4, 0xfb, 0xcf, 0x84,
-	0xd6, 0x2f, 0x8b, 0x7f, 0xbd, 0x40, 0x93, 0x89, 0x04, 0xd9, 0x03, 0xa1, 0xeb, 0xe5, 0x67, 0x19,
-	0x8f, 0x7e, 0x6f, 0x26, 0xfa, 0x71, 0x7f, 0x7b, 0xef, 0xef, 0x40, 0x7e, 0x71, 0xd8, 0xb9, 0x7f,
-	0xfb, 0x7c, 0xac, 0x34, 0xc2, 0x6d, 0xdf, 0x6e, 0x36, 0xe0, 0x13, 0x95, 0xf6, 0x71, 0x39, 0x72,
-	0x48, 0x76, 0x4f, 0x07, 0x2f, 0x8b, 0x80, 0xbc, 0x2e, 0x02, 0xf2, 0xbe, 0x08, 0xc8, 0xd3, 0x47,
-	0xf0, 0xef, 0x6a, 0x27, 0x5f, 0xd0, 0x2f, 0x16, 0xac, 0x9e, 0x72, 0x89, 0x1f, 0x81, 0x16, 0xc3,
-	0xaa, 0x2f, 0xf7, 0xe0, 0x2b, 0x00, 0x00, 0xff, 0xff, 0xce, 0x24, 0x89, 0x8e, 0xee, 0x01, 0x00,
-	0x00,
+	// 398 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0x3f, 0x4f, 0xdb, 0x40,
+	0x18, 0x87, 0x7b, 0x69, 0xd5, 0x26, 0x17, 0x55, 0x69, 0xae, 0x6a, 0x63, 0x59, 0x91, 0x1b, 0xdd,
+	0x14, 0x45, 0x8a, 0x5d, 0xa7, 0x5b, 0xba, 0xa0, 0x48, 0x19, 0x90, 0x98, 0x02, 0x03, 0x62, 0x00,
+	0x5d, 0x9c, 0x17, 0xe7, 0x84, 0xf1, 0x99, 0xbb, 0x8b, 0x51, 0x56, 0x56, 0x36, 0x58, 0xf8, 0x20,
+	0x7c, 0x08, 0x46, 0x24, 0xbe, 0x00, 0x0a, 0x7c, 0x10, 0x14, 0xff, 0x0b, 0x62, 0x40, 0x09, 0xdb,
+	0x7b, 0x7e, 0xfd, 0x3e, 0xbf, 0xe7, 0xec, 0x3b, 0xdc, 0xd0, 0x92, 0x79, 0x27, 0x3c, 0xf4, 0x9d,
+	0xbc, 0xb0, 0x23, 0x29, 0xb4, 0x20, 0x96, 0x9a, 0x82, 0x94, 0x73, 0x9b, 0x49, 0x6f, 0xca, 0x63,
+	0xb0, 0x8b, 0x36, 0x8b, 0xb8, 0x1d, 0xbb, 0x66, 0xd3, 0x17, 0xc2, 0x0f, 0xc0, 0x61, 0x11, 0x77,
+	0x58, 0x18, 0x0a, 0xcd, 0x34, 0x17, 0xa1, 0x4a, 0xa7, 0x4d, 0x2b, 0xeb, 0x26, 0xab, 0xf1, 0xec,
+	0xd8, 0x39, 0x97, 0x2c, 0x8a, 0x40, 0xe6, 0xfd, 0x46, 0xcc, 0x02, 0x3e, 0x61, 0x1a, 0x9c, 0xbc,
+	0xc8, 0x1a, 0xbf, 0x0a, 0x1f, 0x88, 0x21, 0xd4, 0xd9, 0xfb, 0x74, 0x1f, 0xd7, 0x76, 0x84, 0x3f,
+	0x0c, 0xb5, 0x9c, 0x8f, 0xe0, 0x6c, 0x06, 0x4a, 0x93, 0x21, 0xae, 0x04, 0xc2, 0x3f, 0x82, 0xe5,
+	0x33, 0x03, 0xb5, 0x50, 0xbb, 0xda, 0x6b, 0xdb, 0xef, 0x4b, 0xdb, 0x05, 0xa3, 0x1c, 0x64, 0x15,
+	0xdd, 0xc2, 0x3f, 0x56, 0x64, 0x15, 0x89, 0x50, 0x01, 0x21, 0xf8, 0x8b, 0x27, 0x26, 0x90, 0x50,
+	0xbf, 0x8f, 0x92, 0x9a, 0x18, 0xf8, 0xdb, 0x29, 0x28, 0xc5, 0x7c, 0x30, 0x4a, 0x2d, 0xd4, 0xae,
+	0x8c, 0xf2, 0x25, 0x3d, 0xc4, 0xf5, 0x8c, 0xc0, 0x41, 0xe5, 0x76, 0xdb, 0xb8, 0x9a, 0xdb, 0x71,
+	0x50, 0x06, 0x6a, 0x7d, 0xde, 0xc8, 0x0f, 0x07, 0x05, 0x91, 0x0e, 0x30, 0x79, 0xcd, 0xff, 0x88,
+	0x63, 0xef, 0xb6, 0x84, 0x6b, 0x7b, 0x59, 0xd8, 0x2e, 0xc8, 0x98, 0x7b, 0x40, 0x2e, 0x11, 0x2e,
+	0xe7, 0x81, 0xc4, 0x59, 0x5b, 0x2d, 0xdd, 0xa0, 0xf9, 0x77, 0xfd, 0x81, 0xd4, 0x98, 0x36, 0x2f,
+	0x1e, 0x9e, 0xaf, 0x4b, 0xbf, 0x69, 0x3d, 0x39, 0x33, 0xb1, 0xeb, 0x04, 0xc2, 0xef, 0x26, 0xbf,
+	0xaf, 0x8f, 0x3a, 0xe4, 0x0a, 0x61, 0xbc, 0xda, 0x26, 0x71, 0xd7, 0xc4, 0xaf, 0x3e, 0xb9, 0xb9,
+	0xf9, 0x08, 0xb5, 0x12, 0x25, 0x83, 0xfe, 0x7c, 0xab, 0xc4, 0x41, 0xf5, 0x51, 0x67, 0xe0, 0xde,
+	0x2d, 0x2c, 0x74, 0xbf, 0xb0, 0xd0, 0xe3, 0xc2, 0x42, 0x37, 0x4f, 0xd6, 0xa7, 0x83, 0x3f, 0x69,
+	0x46, 0x37, 0xcb, 0x28, 0x6e, 0xcd, 0x12, 0xf0, 0x9f, 0x45, 0x7c, 0xfc, 0x35, 0x39, 0xb0, 0xff,
+	0x5e, 0x02, 0x00, 0x00, 0xff, 0xff, 0xd1, 0xda, 0xea, 0x05, 0x59, 0x03, 0x00, 0x00,
 }
 
 func (m *LogEntryRequest) Marshal() (dAtA []byte, err error) {
@@ -191,17 +291,15 @@ func (m *LogEntryRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if len(m.Data) > 0 {
-		i -= len(m.Data)
-		copy(dAtA[i:], m.Data)
-		i = encodeVarintTracking(dAtA, i, uint64(len(m.Data)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Schema) > 0 {
-		i -= len(m.Schema)
-		copy(dAtA[i:], m.Schema)
-		i = encodeVarintTracking(dAtA, i, uint64(len(m.Schema)))
+	if m.LogEntry != nil {
+		{
+			size, err := m.LogEntry.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTracking(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -247,6 +345,86 @@ func (m *LogEntryResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *LogEntriesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *LogEntriesRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *LogEntriesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.LogEntries) > 0 {
+		for iNdEx := len(m.LogEntries) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.LogEntries[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTracking(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *LogEntriesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *LogEntriesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *LogEntriesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintTracking(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Code != 0 {
+		i = encodeVarintTracking(dAtA, i, uint64(m.Code))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTracking(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTracking(v)
 	base := offset
@@ -264,12 +442,8 @@ func (m *LogEntryRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Schema)
-	if l > 0 {
-		n += 1 + l + sovTracking(uint64(l))
-	}
-	l = len(m.Data)
-	if l > 0 {
+	if m.LogEntry != nil {
+		l = m.LogEntry.Size()
 		n += 1 + l + sovTracking(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
@@ -279,6 +453,43 @@ func (m *LogEntryRequest) Size() (n int) {
 }
 
 func (m *LogEntryResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Code != 0 {
+		n += 1 + sovTracking(uint64(m.Code))
+	}
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovTracking(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *LogEntriesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.LogEntries) > 0 {
+		for _, e := range m.LogEntries {
+			l = e.Size()
+			n += 1 + l + sovTracking(uint64(l))
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *LogEntriesResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -334,9 +545,9 @@ func (m *LogEntryRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Schema", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LogEntry", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTracking
@@ -346,56 +557,26 @@ func (m *LogEntryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTracking
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthTracking
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Schema = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
+			if m.LogEntry == nil {
+				m.LogEntry = &LogEntry{}
 			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTracking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthTracking
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTracking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
-			if m.Data == nil {
-				m.Data = []byte{}
+			if err := m.LogEntry.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		default:
@@ -447,6 +628,193 @@ func (m *LogEntryResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LogEntryResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+			}
+			m.Code = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTracking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Code |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTracking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTracking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTracking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTracking(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTracking
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *LogEntriesRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTracking
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LogEntriesRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LogEntriesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LogEntries", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTracking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTracking
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTracking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LogEntries = append(m.LogEntries, &LogEntry{})
+			if err := m.LogEntries[len(m.LogEntries)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTracking(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTracking
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *LogEntriesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTracking
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LogEntriesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LogEntriesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

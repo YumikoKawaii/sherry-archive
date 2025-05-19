@@ -4,9 +4,10 @@ import (
 	"context"
 	"github.com/golang/protobuf/proto"
 	"net/http"
+	"sherry.archive.com/applications/tracking/pkg/constants"
 	pb "sherry.archive.com/pb/tracking"
+	"sherry.archive.com/shared/logger"
 	"sherry.archive.com/shared/topics"
-	"sherry.archive.com/shared/tracking_events"
 )
 
 type Service struct {
@@ -14,22 +15,34 @@ type Service struct {
 	publisher topics.Publisher
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewService(publisher topics.Publisher) *Service {
+	return &Service{
+		publisher: publisher,
+	}
 }
 
 func (s *Service) LogEntry(ctx context.Context, request *pb.LogEntryRequest) (*pb.LogEntryResponse, error) {
-	f, found := tracking_events.Registry[request.Schema]
-	if !found {
-		return &pb.LogEntryResponse{
-			Code:    uint32(http.StatusNotFound),
-			Message: "Not found",
-		}, nil
-	}
-	event := f()
-	if err := proto.Unmarshal(request.Data, event); err != nil {
+	err := s.publisher.Publish(ctx, request.LogEntry, constants.LogEntriesTopic, nil)
+	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return &pb.LogEntryResponse{
+		Code:    uint32(http.StatusOK),
+		Message: "Success",
+	}, nil
+}
+
+func (s *Service) LogEntries(ctx context.Context, request *pb.LogEntriesRequest) (*pb.LogEntriesResponse, error) {
+	messages := make([]proto.Message, 0)
+	for _, log := range request.LogEntries {
+		messages = append(messages, log)
+	}
+	if err := s.publisher.PublishInBatch(ctx, messages, constants.LogEntriesTopic, nil); err != nil {
+		logger.Errorf("error publish batch: %s", err.Error())
+	}
+	return &pb.LogEntriesResponse{
+		Code:    uint32(http.StatusOK),
+		Message: "Success",
+	}, nil
 }

@@ -1,13 +1,18 @@
 syntax = "proto3";
 
-package sherry.archive.tracking.events.v1;
+package sherry.archive.tracking.api.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "sherry-archive/tracking/events;events";
+option go_package = "sherry-archive/tracking/api;api";
+
+message LogEntry {
+  string schema = 1;
+  bytes payload = 2;
+}
 
 message DocumentView {
   string tracking_id = 1;

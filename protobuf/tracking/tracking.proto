@@ -5,6 +5,7 @@ package sherry.archive.tracking.api.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
+import "tracking/events.proto";
 
 option go_package = "sherry-archive/tracking/api;api";
 
@@ -15,14 +16,29 @@ service TrackingService {
       body: "*"
     };
   }
+
+  rpc LogEntries(LogEntriesRequest) returns (LogEntriesRequest) {
+    option (google.api.http) = {
+      post: "/api/v1/log-entries"
+      body: "*"
+    };
+  }
 }
 
 message LogEntryRequest {
-  string schema = 1;
-  bytes data = 2;
+  LogEntry log_entry = 1;
 }
 
 message LogEntryResponse {
+  uint32 code = 1;
+  string message = 2;
+}
+
+message LogEntriesRequest {
+  repeated LogEntry log_entries = 1;
+}
+
+message LogEntriesResponse {
   uint32 code = 1;
   string message = 2;
 }
