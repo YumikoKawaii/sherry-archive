@@ -9,6 +9,8 @@ import (
 type Querier interface {
 	GetDocuments(ctx context.Context, filter *GetDocumentsFilter) ([]Document, error)
 	UpsertDocument(ctx context.Context, book *Document) error
+	GetChapters(ctx context.Context, filter *GetChaptersFilter) ([]Chapter, error)
+	UpsertChapter(ctx context.Context, chapter *Chapter) error
 	GetPages(ctx context.Context, filter *GetPagesFilter) ([]Page, error)
 	UpsertPage(ctx context.Context, page *Page) error
 	GetAuthors(ctx context.Context, filter *GetAuthorsFilter) ([]Author, error)
@@ -28,8 +30,8 @@ type querierImpl struct {
 func (q *querierImpl) GetDocuments(ctx context.Context, filter *GetDocumentsFilter) ([]Document, error) {
 	queryBuilder := q.db.Model(&Document{})
 	if filter != nil {
-		if len(filter.IDs) != 0 {
-			queryBuilder = queryBuilder.Where("id in (?)", filter.IDs)
+		if len(filter.Ids) != 0 {
+			queryBuilder = queryBuilder.Where("id in (?)", filter.Ids)
 		}
 
 		if filter.AuthorId != nil {
@@ -56,18 +58,44 @@ func (q *querierImpl) GetDocuments(ctx context.Context, filter *GetDocumentsFilt
 func (q *querierImpl) UpsertDocument(ctx context.Context, document *Document) error {
 	return q.db.Model(&Document{}).Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(document).Error
+	}).WithContext(ctx).Create(document).Error
+}
+
+func (q *querierImpl) GetChapters(ctx context.Context, filter *GetChaptersFilter) ([]Chapter, error) {
+	query := q.db.Model(&Chapter{})
+	if filter != nil {
+		if len(filter.Ids) != 0 {
+			query = query.Where("id in (?)", filter.Ids)
+		}
+
+		if filter.DocumentId != nil {
+			query = query.Where("document_id = ?", filter.DocumentId)
+		}
+
+		if filter.Pagination != nil {
+			offset := int((filter.Pagination.Page - 1) * filter.Pagination.PageSize)
+			query = query.Limit(int(filter.Pagination.PageSize)).Offset(offset)
+		}
+	}
+	chapters := make([]Chapter, 0)
+	return chapters, query.WithContext(ctx).Find(chapters).Error
+}
+
+func (q *querierImpl) UpsertChapter(ctx context.Context, chapter *Chapter) error {
+	return q.db.Model(&Chapter{}).Clauses(clause.OnConflict{
+		UpdateAll: true,
+	}).WithContext(ctx).Create(chapter).Error
 }
 
 func (q *querierImpl) GetPages(ctx context.Context, filter *GetPagesFilter) ([]Page, error) {
 	queryBuilder := q.db.Model(&Page{})
 	if filter != nil {
-		if len(filter.IDs) != 0 {
-			queryBuilder = queryBuilder.Where("id in (?)", filter.IDs)
+		if len(filter.Ids) != 0 {
+			queryBuilder = queryBuilder.Where("id in (?)", filter.Ids)
 		}
 
-		if filter.DocumentId != nil {
-			queryBuilder = queryBuilder.Where("document_id = ?", filter.DocumentId)
+		if filter.ChapterId != nil {
+			queryBuilder = queryBuilder.Where("chapter_id = ?", filter.ChapterId)
 		}
 
 		if filter.Pagination != nil {
@@ -76,20 +104,20 @@ func (q *querierImpl) GetPages(ctx context.Context, filter *GetPagesFilter) ([]P
 		}
 	}
 	pages := make([]Page, 0)
-	return pages, queryBuilder.Scan(pages).Error
+	return pages, queryBuilder.WithContext(ctx).Find(pages).Error
 }
 
 func (q *querierImpl) UpsertPage(ctx context.Context, page *Page) error {
 	return q.db.Model(&Page{}).Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create(page).Error
+	}).WithContext(ctx).Create(page).Error
 }
 
 func (q *querierImpl) GetAuthors(ctx context.Context, filter *GetAuthorsFilter) ([]Author, error) {
 	queryBuilder := q.db.Model(&Author{})
 	if filter != nil {
-		if len(filter.IDs) != 0 {
-			queryBuilder = queryBuilder.Where("id in (?)", filter.IDs)
+		if len(filter.Ids) != 0 {
+			queryBuilder = queryBuilder.Where("id in (?)", filter.Ids)
 		}
 
 		if filter.Pagination != nil {
@@ -104,8 +132,8 @@ func (q *querierImpl) GetAuthors(ctx context.Context, filter *GetAuthorsFilter) 
 func (q *querierImpl) GetPublishers(ctx context.Context, filter *GetPublishersFilter) ([]Publisher, error) {
 	queryBuilder := q.db.Model(&Publisher{})
 	if filter != nil {
-		if len(filter.IDs) != 0 {
-			queryBuilder = queryBuilder.Where("id in (?)", filter.IDs)
+		if len(filter.Ids) != 0 {
+			queryBuilder = queryBuilder.Where("id in (?)", filter.Ids)
 		}
 
 		if filter.Pagination != nil {

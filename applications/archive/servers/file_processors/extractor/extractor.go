@@ -80,9 +80,9 @@ func (e *extractorImpl) extractFile(message *sarama.ConsumerMessage) error {
 			return err
 		}
 		pages = append(pages, &messages.Page{
-			BookId: pagesMessage.BookId,
-			Index:  uint32(idx),
-			Data:   fileBytes,
+			ChapterId: pagesMessage.ChapterId,
+			Index:     uint32(idx),
+			Data:      fileBytes,
 		})
 	}
 
@@ -91,7 +91,7 @@ func (e *extractorImpl) extractFile(message *sarama.ConsumerMessage) error {
 			return err
 		}
 	}
-	logger.Infof("process pages for book_id %d", pagesMessage.BookId)
+	logger.Infof("process pages for book_id %d", pagesMessage.ChapterId)
 	return nil
 }
 

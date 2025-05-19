@@ -21,6 +21,8 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	ArchiveService_GetDocuments_FullMethodName   = "/sherry.archive.api.v1.ArchiveService/GetDocuments"
 	ArchiveService_UpsertDocument_FullMethodName = "/sherry.archive.api.v1.ArchiveService/UpsertDocument"
+	ArchiveService_GetChapters_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/GetChapters"
+	ArchiveService_UpsertChapter_FullMethodName  = "/sherry.archive.api.v1.ArchiveService/UpsertChapter"
 	ArchiveService_GetPages_FullMethodName       = "/sherry.archive.api.v1.ArchiveService/GetPages"
 	ArchiveService_CreatePages_FullMethodName    = "/sherry.archive.api.v1.ArchiveService/CreatePages"
 	ArchiveService_UpdatePage_FullMethodName     = "/sherry.archive.api.v1.ArchiveService/UpdatePage"
@@ -35,6 +37,8 @@ type ArchiveServiceClient interface {
 	// GetDocuments
 	GetDocuments(ctx context.Context, in *GetDocumentsRequest, opts ...grpc.CallOption) (*GetDocumentsResponse, error)
 	UpsertDocument(ctx context.Context, in *UpsertDocumentRequest, opts ...grpc.CallOption) (*UpsertDocumentResponse, error)
+	GetChapters(ctx context.Context, in *GetChaptersRequest, opts ...grpc.CallOption) (*GetChaptersResponse, error)
+	UpsertChapter(ctx context.Context, in *UpsertChapterRequest, opts ...grpc.CallOption) (*UpsertChapterResponse, error)
 	GetPages(ctx context.Context, in *GetPagesRequest, opts ...grpc.CallOption) (*GetPagesResponse, error)
 	CreatePages(ctx context.Context, in *CreatePagesRequest, opts ...grpc.CallOption) (*CreatePagesResponse, error)
 	UpdatePage(ctx context.Context, in *UpdatePageRequest, opts ...grpc.CallOption) (*UpdatePageResponse, error)
@@ -66,6 +70,26 @@ func (c *archiveServiceClient) UpsertDocument(ctx context.Context, in *UpsertDoc
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UpsertDocumentResponse)
 	err := c.cc.Invoke(ctx, ArchiveService_UpsertDocument_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *archiveServiceClient) GetChapters(ctx context.Context, in *GetChaptersRequest, opts ...grpc.CallOption) (*GetChaptersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetChaptersResponse)
+	err := c.cc.Invoke(ctx, ArchiveService_GetChapters_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *archiveServiceClient) UpsertChapter(ctx context.Context, in *UpsertChapterRequest, opts ...grpc.CallOption) (*UpsertChapterResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpsertChapterResponse)
+	err := c.cc.Invoke(ctx, ArchiveService_UpsertChapter_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -129,6 +153,8 @@ type ArchiveServiceServer interface {
 	// GetDocuments
 	GetDocuments(context.Context, *GetDocumentsRequest) (*GetDocumentsResponse, error)
 	UpsertDocument(context.Context, *UpsertDocumentRequest) (*UpsertDocumentResponse, error)
+	GetChapters(context.Context, *GetChaptersRequest) (*GetChaptersResponse, error)
+	UpsertChapter(context.Context, *UpsertChapterRequest) (*UpsertChapterResponse, error)
 	GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error)
 	CreatePages(context.Context, *CreatePagesRequest) (*CreatePagesResponse, error)
 	UpdatePage(context.Context, *UpdatePageRequest) (*UpdatePageResponse, error)
@@ -151,6 +177,12 @@ func (UnimplementedArchiveServiceServer) GetDocuments(context.Context, *GetDocum
 }
 func (UnimplementedArchiveServiceServer) UpsertDocument(context.Context, *UpsertDocumentRequest) (*UpsertDocumentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertDocument not implemented")
+}
+func (UnimplementedArchiveServiceServer) GetChapters(context.Context, *GetChaptersRequest) (*GetChaptersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChapters not implemented")
+}
+func (UnimplementedArchiveServiceServer) UpsertChapter(context.Context, *UpsertChapterRequest) (*UpsertChapterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertChapter not implemented")
 }
 func (UnimplementedArchiveServiceServer) GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPages not implemented")
@@ -220,6 +252,42 @@ func _ArchiveService_UpsertDocument_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArchiveServiceServer).UpsertDocument(ctx, req.(*UpsertDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArchiveService_GetChapters_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetChaptersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArchiveServiceServer).GetChapters(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArchiveService_GetChapters_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArchiveServiceServer).GetChapters(ctx, req.(*GetChaptersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArchiveService_UpsertChapter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertChapterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArchiveServiceServer).UpsertChapter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArchiveService_UpsertChapter_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArchiveServiceServer).UpsertChapter(ctx, req.(*UpsertChapterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -328,6 +396,14 @@ var ArchiveService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpsertDocument",
 			Handler:    _ArchiveService_UpsertDocument_Handler,
+		},
+		{
+			MethodName: "GetChapters",
+			Handler:    _ArchiveService_GetChapters_Handler,
+		},
+		{
+			MethodName: "UpsertChapter",
+			Handler:    _ArchiveService_UpsertChapter_Handler,
 		},
 		{
 			MethodName: "GetPages",

@@ -61,13 +61,13 @@ func (u *uploaderImpl) upload(message *sarama.ConsumerMessage) error {
 
 	// save to database
 	page := &repository.Page{
-		BookID:   pageMessage.BookId,
-		ImageUrl: url,
-		Index:    pageMessage.Index,
+		ChapterId: pageMessage.ChapterId,
+		ImageUrl:  url,
+		Index:     pageMessage.Index,
 	}
 	err = u.querier.UpsertPage(context.Background(), page)
 	if err != nil {
-		logger.Infof("process page %d, book_id %d", page.Index, page.BookID)
+		logger.Infof("process page %d, chapter_id %d", page.Index, page.ChapterId)
 	}
 	return err
 }

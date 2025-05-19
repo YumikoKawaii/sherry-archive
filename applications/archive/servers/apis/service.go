@@ -63,8 +63,8 @@ func (s *Service) UpsertDocument(ctx context.Context, request *pb.UpsertDocument
 
 func (s *Service) GetPages(ctx context.Context, request *pb.GetPagesRequest) (*pb.GetPagesResponse, error) {
 	pages, err := s.querier.GetPages(ctx, &repository.GetPagesFilter{
-		IDs:        request.Ids,
-		DocumentId: proto_values.UInt32ValueToPointer(request.DocumentId),
+		Ids:       request.Ids,
+		ChapterId: proto_values.UInt32ValueToPointer(request.ChapterId),
 		Pagination: &repository.Pagination{
 			Page:     request.Page,
 			PageSize: request.PageSize,
@@ -94,8 +94,8 @@ func (s *Service) GetPages(ctx context.Context, request *pb.GetPagesRequest) (*p
 
 func (s *Service) CreatePages(ctx context.Context, request *pb.CreatePagesRequest) (*pb.CreatePagesResponse, error) {
 	message := &messages.Pages{
-		DocumentId: request.DocumentId,
-		Data:       request.Pages,
+		ChapterId: request.ChapterId,
+		Data:      request.Pages,
 	}
 	if err := s.publisher.Publish(ctx, message, constants.MultimediaCompressionTopic, nil); err != nil {
 		return nil, err
@@ -120,10 +120,10 @@ func (s *Service) UpdatePage(ctx context.Context, request *pb.UpdatePageRequest)
 
 	// TODO: check permission with book
 	page := &repository.Page{
-		ID:         request.Id,
-		DocumentID: request.DocumentId,
-		ImageUrl:   imageUrl,
-		Index:      request.Index,
+		Id:        request.Id,
+		ChapterId: request.ChapterId,
+		ImageUrl:  imageUrl,
+		Index:     request.Index,
 	}
 	if err := s.querier.UpsertPage(ctx, page); err != nil {
 		return nil, err
@@ -140,7 +140,7 @@ func (s *Service) UpdatePage(ctx context.Context, request *pb.UpdatePageRequest)
 
 func (s *Service) GetAuthors(ctx context.Context, request *pb.GetAuthorsRequest) (*pb.GetAuthorsResponse, error) {
 	authors, err := s.querier.GetAuthors(ctx, &repository.GetAuthorsFilter{
-		IDs: request.AuthorIds,
+		Ids: request.AuthorIds,
 		Pagination: &repository.Pagination{
 			Page:     request.Page,
 			PageSize: request.PageSize,
@@ -169,7 +169,7 @@ func (s *Service) GetAuthors(ctx context.Context, request *pb.GetAuthorsRequest)
 
 func (s *Service) GetPublishers(ctx context.Context, request *pb.GetPublishersRequest) (*pb.GetPublishersResponse, error) {
 	publishers, err := s.querier.GetPublishers(ctx, &repository.GetPublishersFilter{
-		IDs: request.PublisherIds,
+		Ids: request.PublisherIds,
 		Pagination: &repository.Pagination{
 			Page:     request.Page,
 			PageSize: request.PageSize,

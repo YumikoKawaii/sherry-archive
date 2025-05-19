@@ -13,15 +13,26 @@ create table documents
     `deleted_at`       timestamp    default null
 );
 
-create table pages
+create table chapters
 (
     `id`          int auto_increment primary key,
+    `title`       varchar(255),
+    `index`       int       default null,
     `document_id` int not null,
-    `image_url`   varchar(255) default null,
-    `index`       int          default null,
-    `created_at`  timestamp    default current_timestamp,
-    `updated_at`  timestamp    default current_timestamp on update current_timestamp,
-    `deleted_at`  timestamp    default null
+    `created_at`  timestamp default current_timestamp,
+    `updated_at`  timestamp default current_timestamp on update current_timestamp,
+    `deleted_at`  timestamp default null
+);
+
+create table pages
+(
+    `id`         int auto_increment primary key,
+    `chapter_id` int not null,
+    `image_url`  varchar(255) default null,
+    `index`      int          default null,
+    `created_at` timestamp    default current_timestamp,
+    `updated_at` timestamp    default current_timestamp on update current_timestamp,
+    `deleted_at` timestamp    default null
 );
 
 create table authors

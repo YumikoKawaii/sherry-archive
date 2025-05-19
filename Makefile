@@ -1,5 +1,5 @@
 PROTOC_VERSION = 30.2
-PROTOC_ZIP = protoc-$(PROTOC_VERSION)-osx-x86_64.zip
+PROTOC_ZIP = protoc-$(PROTOC_VERSION)-linux-x86_64.zip
 BUF_VERSION=1.53.0
 BUF_BINARY_NAME=buf
 
@@ -12,11 +12,11 @@ install-protoc:
 	rm -f $(PROTOC_ZIP)
 
 install-protoc-go:
-	go install github.com/golang/protobuf/protoc-gen-go@v1.5.4
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31.0
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 	go install github.com/envoyproxy/protoc-gen-validate@v1.2.1
 	go install github.com/gogo/protobuf/protoc-gen-gofast@v1.3.2
-	go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v1.16.0
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.16.0
 
 install-buf:
 	sudo curl -sSL "https://github.com/bufbuild/buf/releases/download/v$(BUF_VERSION)/$(BUF_BINARY_NAME)-$(shell uname -s)-$(shell uname -m)"  -o "/usr/local/bin/$(BUF_BINARY_NAME)" && sudo chmod +x "/usr/local/bin/$(BUF_BINARY_NAME)"

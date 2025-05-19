@@ -56,7 +56,7 @@ func (m *Pages) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for DocumentId
+	// no validation rules for ChapterId
 
 	// no validation rules for Data
 
@@ -158,7 +158,7 @@ func (m *Page) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for DocumentId
+	// no validation rules for ChapterId
 
 	// no validation rules for Index
 

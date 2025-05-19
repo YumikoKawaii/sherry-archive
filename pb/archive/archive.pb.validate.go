@@ -834,6 +834,548 @@ var _ interface {
 	ErrorName() string
 } = UpsertDocumentResponseValidationError{}
 
+// Validate checks the field values on GetChaptersRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetChaptersRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetChaptersRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetChaptersRequestMultiError, or nil if none found.
+func (m *GetChaptersRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetChaptersRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for DocumentId
+
+	// no validation rules for Page
+
+	// no validation rules for PageSize
+
+	if len(errors) > 0 {
+		return GetChaptersRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetChaptersRequestMultiError is an error wrapping multiple validation errors
+// returned by GetChaptersRequest.ValidateAll() if the designated constraints
+// aren't met.
+type GetChaptersRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetChaptersRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetChaptersRequestMultiError) AllErrors() []error { return m }
+
+// GetChaptersRequestValidationError is the validation error returned by
+// GetChaptersRequest.Validate if the designated constraints aren't met.
+type GetChaptersRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetChaptersRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetChaptersRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetChaptersRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetChaptersRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetChaptersRequestValidationError) ErrorName() string {
+	return "GetChaptersRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetChaptersRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetChaptersRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetChaptersRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetChaptersRequestValidationError{}
+
+// Validate checks the field values on GetChaptersResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetChaptersResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetChaptersResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetChaptersResponseMultiError, or nil if none found.
+func (m *GetChaptersResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetChaptersResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetChaptersResponseValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetChaptersResponseValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetChaptersResponseValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetChaptersResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetChaptersResponseMultiError is an error wrapping multiple validation
+// errors returned by GetChaptersResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetChaptersResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetChaptersResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetChaptersResponseMultiError) AllErrors() []error { return m }
+
+// GetChaptersResponseValidationError is the validation error returned by
+// GetChaptersResponse.Validate if the designated constraints aren't met.
+type GetChaptersResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetChaptersResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetChaptersResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetChaptersResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetChaptersResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetChaptersResponseValidationError) ErrorName() string {
+	return "GetChaptersResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetChaptersResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetChaptersResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetChaptersResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetChaptersResponseValidationError{}
+
+// Validate checks the field values on UpsertChapterRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpsertChapterRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpsertChapterRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpsertChapterRequestMultiError, or nil if none found.
+func (m *UpsertChapterRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpsertChapterRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetId()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertChapterRequestValidationError{
+					field:  "Id",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertChapterRequestValidationError{
+					field:  "Id",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertChapterRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Title
+
+	if all {
+		switch v := interface{}(m.GetIndex()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertChapterRequestValidationError{
+					field:  "Index",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertChapterRequestValidationError{
+					field:  "Index",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIndex()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertChapterRequestValidationError{
+				field:  "Index",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DocumentId
+
+	if len(errors) > 0 {
+		return UpsertChapterRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpsertChapterRequestMultiError is an error wrapping multiple validation
+// errors returned by UpsertChapterRequest.ValidateAll() if the designated
+// constraints aren't met.
+type UpsertChapterRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpsertChapterRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpsertChapterRequestMultiError) AllErrors() []error { return m }
+
+// UpsertChapterRequestValidationError is the validation error returned by
+// UpsertChapterRequest.Validate if the designated constraints aren't met.
+type UpsertChapterRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertChapterRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertChapterRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertChapterRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertChapterRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertChapterRequestValidationError) ErrorName() string {
+	return "UpsertChapterRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertChapterRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertChapterRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertChapterRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertChapterRequestValidationError{}
+
+// Validate checks the field values on UpsertChapterResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpsertChapterResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpsertChapterResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpsertChapterResponseMultiError, or nil if none found.
+func (m *UpsertChapterResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpsertChapterResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertChapterResponseValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertChapterResponseValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertChapterResponseValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpsertChapterResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpsertChapterResponseMultiError is an error wrapping multiple validation
+// errors returned by UpsertChapterResponse.ValidateAll() if the designated
+// constraints aren't met.
+type UpsertChapterResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpsertChapterResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpsertChapterResponseMultiError) AllErrors() []error { return m }
+
+// UpsertChapterResponseValidationError is the validation error returned by
+// UpsertChapterResponse.Validate if the designated constraints aren't met.
+type UpsertChapterResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertChapterResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertChapterResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertChapterResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertChapterResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertChapterResponseValidationError) ErrorName() string {
+	return "UpsertChapterResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertChapterResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertChapterResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertChapterResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertChapterResponseValidationError{}
+
 // Validate checks the field values on GetPagesRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -857,11 +1399,11 @@ func (m *GetPagesRequest) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetDocumentId()).(type) {
+		switch v := interface{}(m.GetChapterId()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, GetPagesRequestValidationError{
-					field:  "DocumentId",
+					field:  "ChapterId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -869,16 +1411,16 @@ func (m *GetPagesRequest) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, GetPagesRequestValidationError{
-					field:  "DocumentId",
+					field:  "ChapterId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetDocumentId()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetChapterId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GetPagesRequestValidationError{
-				field:  "DocumentId",
+				field:  "ChapterId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1122,7 +1664,7 @@ func (m *CreatePagesRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for DocumentId
+	// no validation rules for ChapterId
 
 	// no validation rules for Pages
 
@@ -1336,7 +1878,7 @@ func (m *UpdatePageRequest) validate(all bool) error {
 
 	// no validation rules for Id
 
-	// no validation rules for DocumentId
+	// no validation rules for ChapterId
 
 	// no validation rules for ImageUrl
 
@@ -2345,6 +2887,112 @@ var _ interface {
 	ErrorName() string
 } = DocumentValidationError{}
 
+// Validate checks the field values on Chapter with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Chapter) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Chapter with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in ChapterMultiError, or nil if none found.
+func (m *Chapter) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Chapter) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for Title
+
+	// no validation rules for Index
+
+	// no validation rules for DocumentId
+
+	if len(errors) > 0 {
+		return ChapterMultiError(errors)
+	}
+
+	return nil
+}
+
+// ChapterMultiError is an error wrapping multiple validation errors returned
+// by Chapter.ValidateAll() if the designated constraints aren't met.
+type ChapterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ChapterMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ChapterMultiError) AllErrors() []error { return m }
+
+// ChapterValidationError is the validation error returned by Chapter.Validate
+// if the designated constraints aren't met.
+type ChapterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ChapterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ChapterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ChapterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ChapterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ChapterValidationError) ErrorName() string { return "ChapterValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ChapterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sChapter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ChapterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ChapterValidationError{}
+
 // Validate checks the field values on Page with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error
 // encountered is returned, or nil if there are no violations.
@@ -2368,7 +3016,7 @@ func (m *Page) validate(all bool) error {
 
 	// no validation rules for Id
 
-	// no validation rules for DocumentId
+	// no validation rules for ChapterId
 
 	// no validation rules for ImageUrl
 
@@ -3063,6 +3711,302 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpsertDocumentResponse_DataValidationError{}
+
+// Validate checks the field values on GetChaptersResponse_Data with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetChaptersResponse_Data) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetChaptersResponse_Data with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetChaptersResponse_DataMultiError, or nil if none found.
+func (m *GetChaptersResponse_Data) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetChaptersResponse_Data) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetChapters() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetChaptersResponse_DataValidationError{
+						field:  fmt.Sprintf("Chapters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetChaptersResponse_DataValidationError{
+						field:  fmt.Sprintf("Chapters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetChaptersResponse_DataValidationError{
+					field:  fmt.Sprintf("Chapters[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if all {
+		switch v := interface{}(m.GetPagination()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetChaptersResponse_DataValidationError{
+					field:  "Pagination",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetChaptersResponse_DataValidationError{
+					field:  "Pagination",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPagination()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetChaptersResponse_DataValidationError{
+				field:  "Pagination",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetChaptersResponse_DataMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetChaptersResponse_DataMultiError is an error wrapping multiple validation
+// errors returned by GetChaptersResponse_Data.ValidateAll() if the designated
+// constraints aren't met.
+type GetChaptersResponse_DataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetChaptersResponse_DataMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetChaptersResponse_DataMultiError) AllErrors() []error { return m }
+
+// GetChaptersResponse_DataValidationError is the validation error returned by
+// GetChaptersResponse_Data.Validate if the designated constraints aren't met.
+type GetChaptersResponse_DataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetChaptersResponse_DataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetChaptersResponse_DataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetChaptersResponse_DataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetChaptersResponse_DataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetChaptersResponse_DataValidationError) ErrorName() string {
+	return "GetChaptersResponse_DataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetChaptersResponse_DataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetChaptersResponse_Data.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetChaptersResponse_DataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetChaptersResponse_DataValidationError{}
+
+// Validate checks the field values on UpsertChapterResponse_Data with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpsertChapterResponse_Data) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpsertChapterResponse_Data with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpsertChapterResponse_DataMultiError, or nil if none found.
+func (m *UpsertChapterResponse_Data) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpsertChapterResponse_Data) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetChapter()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpsertChapterResponse_DataValidationError{
+					field:  "Chapter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpsertChapterResponse_DataValidationError{
+					field:  "Chapter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetChapter()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertChapterResponse_DataValidationError{
+				field:  "Chapter",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpsertChapterResponse_DataMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpsertChapterResponse_DataMultiError is an error wrapping multiple
+// validation errors returned by UpsertChapterResponse_Data.ValidateAll() if
+// the designated constraints aren't met.
+type UpsertChapterResponse_DataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpsertChapterResponse_DataMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpsertChapterResponse_DataMultiError) AllErrors() []error { return m }
+
+// UpsertChapterResponse_DataValidationError is the validation error returned
+// by UpsertChapterResponse_Data.Validate if the designated constraints aren't met.
+type UpsertChapterResponse_DataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertChapterResponse_DataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertChapterResponse_DataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertChapterResponse_DataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertChapterResponse_DataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertChapterResponse_DataValidationError) ErrorName() string {
+	return "UpsertChapterResponse_DataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertChapterResponse_DataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertChapterResponse_Data.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertChapterResponse_DataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertChapterResponse_DataValidationError{}
 
 // Validate checks the field values on GetPagesResponse_Data with the rules
 // defined in the proto definition for this message. If any rules are

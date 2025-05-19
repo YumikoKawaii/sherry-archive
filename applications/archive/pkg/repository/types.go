@@ -3,7 +3,7 @@ package repository
 import "time"
 
 type Document struct {
-	ID              uint32     `gorm:"id"`
+	Id              uint32     `gorm:"id"`
 	Title           string     `gorm:"title"`
 	Description     *string    `gorm:"description"`
 	ImageUrl        *string    `gorm:"image_url"`
@@ -17,31 +17,47 @@ type Document struct {
 }
 
 type GetDocumentsFilter struct {
-	IDs         []uint32
+	Ids         []uint32
 	AuthorId    *uint32
 	PublisherId *uint32
 	CategoryId  *uint32
 	Pagination  *Pagination
 }
 
-type Page struct {
-	ID         uint32     `gorm:"id"`
-	DocumentID uint32     `gorm:"document_id"`
-	ImageUrl   string     `gorm:"image_url"`
+type Chapter struct {
+	Id         uint32     `gorm:"id"`
+	Title      string     `gorm:"title"`
 	Index      uint32     `gorm:"index"`
+	DocumentId uint32     `gorm:"document_id"`
 	CreatedAt  time.Time  `gorm:"created_at"`
 	UpdatedAt  time.Time  `gorm:"updated_at"`
 	DeletedAt  *time.Time `gorm:"deleted_at"`
 }
 
-type GetPagesFilter struct {
-	IDs        []uint32
+type GetChaptersFilter struct {
+	Ids        []uint32
 	DocumentId *uint32
 	Pagination *Pagination
 }
 
+type Page struct {
+	Id        uint32     `gorm:"id"`
+	ChapterId uint32     `gorm:"chapter_id"`
+	ImageUrl  string     `gorm:"image_url"`
+	Index     uint32     `gorm:"index"`
+	CreatedAt time.Time  `gorm:"created_at"`
+	UpdatedAt time.Time  `gorm:"updated_at"`
+	DeletedAt *time.Time `gorm:"deleted_at"`
+}
+
+type GetPagesFilter struct {
+	Ids        []uint32
+	ChapterId  *uint32
+	Pagination *Pagination
+}
+
 type Author struct {
-	ID          uint32     `gorm:"id"`
+	Id          uint32     `gorm:"id"`
 	Name        string     `gorm:"name"`
 	ImageUrl    string     `gorm:"image_url"`
 	Description string     `gorm:"description"`
@@ -51,12 +67,12 @@ type Author struct {
 }
 
 type GetAuthorsFilter struct {
-	IDs        []uint32
+	Ids        []uint32
 	Pagination *Pagination
 }
 
 type Publisher struct {
-	ID          uint32     `gorm:"id"`
+	Id          uint32     `gorm:"id"`
 	Name        string     `gorm:"name"`
 	ImageUrl    string     `gorm:"image_url"`
 	Description string     `gorm:"description"`
@@ -66,7 +82,7 @@ type Publisher struct {
 }
 
 type GetPublishersFilter struct {
-	IDs        []uint32
+	Ids        []uint32
 	Pagination *Pagination
 }
 

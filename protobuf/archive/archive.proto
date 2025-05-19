@@ -24,6 +24,20 @@ service ArchiveService {
     };
   }
 
+  rpc GetChapters(GetChaptersRequest) returns (GetChaptersResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/chapters"
+      body: "*"
+    };
+  }
+
+  rpc UpsertChapter(UpsertChapterRequest) returns (UpsertChapterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/upsert-chapter"
+      body: "*"
+    };
+  }
+
   rpc GetPages(GetPagesRequest) returns (GetPagesResponse) {
     option (google.api.http) = {
       post: "/api/v1/pages"
@@ -106,8 +120,42 @@ message UpsertDocumentResponse {
   }
 }
 
+message GetChaptersRequest {
+  uint32 document_id = 1;
+  uint32 page = 2;
+  uint32 page_size = 3;
+}
+
+message GetChaptersResponse {
+  uint32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    repeated Chapter chapters = 1;
+    Pagination pagination = 2;
+  }
+}
+
+message UpsertChapterRequest {
+  google.protobuf.UInt32Value id = 1;
+  string title = 2;
+  google.protobuf.UInt32Value index = 3;
+  uint32 document_id = 4;
+}
+
+message UpsertChapterResponse {
+  uint32 code = 1;
+  string message = 2;
+  Data data = 3;
+
+  message Data {
+    Chapter chapter = 1;
+  }
+}
+
 message GetPagesRequest {
-  google.protobuf.UInt32Value document_id = 1;
+  google.protobuf.UInt32Value chapter_id = 1;
   repeated uint32 ids = 2;
   uint32 page = 3;
   uint32 page_size = 4;
@@ -125,7 +173,7 @@ message GetPagesResponse {
 }
 
 message CreatePagesRequest {
-  uint32 document_id = 1;
+  uint32 chapter_id = 1;
   bytes pages = 2;
 }
 
@@ -136,7 +184,7 @@ message CreatePagesResponse {
 
 message UpdatePageRequest {
   uint32 id = 1;
-  uint32 document_id = 2;
+  uint32 chapter_id = 2;
   string image_url = 3;
   google.protobuf.BytesValue image = 4;
   uint32 index = 5;
@@ -197,9 +245,16 @@ message Document {
   google.protobuf.UInt64Value publication_date = 8;
 }
 
+message Chapter {
+  uint32 id = 1;
+  string title = 2;
+  uint32 index = 3;
+  uint32 document_id = 4;
+}
+
 message Page {
   uint32 id = 1;
-  uint32 document_id = 2;
+  uint32 chapter_id = 2;
   string image_url = 3;
   uint32 index = 4;
 }

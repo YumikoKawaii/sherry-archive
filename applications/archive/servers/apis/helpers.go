@@ -20,31 +20,31 @@ func enrichDocumentRecordFromUpsertDocumentRequest(req *pb.UpsertDocumentRequest
 	}
 }
 
-func convertDocumentRecordToProto(book *repository.Document) *pb.Document {
+func convertDocumentRecordToProto(document *repository.Document) *pb.Document {
 	return &pb.Document{
-		Id:              book.ID,
-		Title:           book.Title,
-		Description:     proto_values.StringPointerToValue(book.Description),
-		ImageUrl:        proto_values.StringPointerToValue(book.ImageUrl),
-		AuthorId:        proto_values.UInt32PointerToValue(book.AuthorId),
-		PublisherId:     proto_values.UInt32PointerToValue(book.PublisherId),
-		CategoryId:      proto_values.UInt32PointerToValue(book.CategoryId),
-		PublicationDate: proto_values.UInt64PointerToValue(timeToUint64Value(book.PublicationDate)),
+		Id:              document.Id,
+		Title:           document.Title,
+		Description:     proto_values.StringPointerToValue(document.Description),
+		ImageUrl:        proto_values.StringPointerToValue(document.ImageUrl),
+		AuthorId:        proto_values.UInt32PointerToValue(document.AuthorId),
+		PublisherId:     proto_values.UInt32PointerToValue(document.PublisherId),
+		CategoryId:      proto_values.UInt32PointerToValue(document.CategoryId),
+		PublicationDate: proto_values.UInt64PointerToValue(timeToUint64Value(document.PublicationDate)),
 	}
 }
 
 func convertPageRecordToProto(page *repository.Page) *pb.Page {
 	return &pb.Page{
-		Id:         page.ID,
-		DocumentId: page.DocumentID,
-		ImageUrl:   page.ImageUrl,
-		Index:      page.Index,
+		Id:        page.Id,
+		ChapterId: page.ChapterId,
+		ImageUrl:  page.ImageUrl,
+		Index:     page.Index,
 	}
 }
 
 func convertAuthorRecordToProto(author *repository.Author) *pb.Author {
 	return &pb.Author{
-		Id:          author.ID,
+		Id:          author.Id,
 		Name:        author.Name,
 		Description: author.Description,
 		ImageUrl:    author.ImageUrl,
@@ -53,7 +53,7 @@ func convertAuthorRecordToProto(author *repository.Author) *pb.Author {
 
 func convertPublisherRecordToProto(publisher *repository.Publisher) *pb.Publisher {
 	return &pb.Publisher{
-		Id:          publisher.ID,
+		Id:          publisher.Id,
 		Name:        publisher.Name,
 		Description: publisher.Description,
 		ImageUrl:    publisher.ImageUrl,
