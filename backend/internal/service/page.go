@@ -19,6 +19,12 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+type OneshotUploadResult struct {
+	Chapter *model.Chapter
+	Pages   []*model.Page
+	Meta    *ZipMetadata
+}
+
 var allowedExtensions = map[string]string{
 	".jpg":  "image/jpeg",
 	".jpeg": "image/jpeg",
@@ -82,15 +88,19 @@ func (s *PageService) UploadPages(ctx context.Context, requesterID, mangaID, cha
 // UploadZip replaces all pages of a chapter from a zip archive.
 // Files inside the zip are sorted by filename to determine page order,
 // so naming them 001.jpg, 002.jpg, … gives a deterministic result.
-func (s *PageService) UploadZip(ctx context.Context, requesterID, mangaID, chapterID uuid.UUID, r io.ReaderAt, size int64) ([]*model.Page, error) {
+// An optional metadata.json at the ZIP root is parsed and returned as suggestions.
+func (s *PageService) UploadZip(ctx context.Context, requesterID, mangaID, chapterID uuid.UUID, r io.ReaderAt, size int64) ([]*model.Page, *ZipMetadata, error) {
 	if err := s.checkOwnership(ctx, requesterID, mangaID, chapterID); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	zr, err := zip.NewReader(r, size)
 	if err != nil {
-		return nil, apperror.ErrBadRequest
+		return nil, nil, apperror.ErrBadRequest
 	}
+
+	// Extract optional metadata (best-effort, errors ignored)
+	meta, _ := extractZipMetadata(r, size)
 
 	// Collect valid image entries, sort by filename
 	type zipEntry struct {
@@ -110,7 +120,7 @@ func (s *PageService) UploadZip(ctx context.Context, requesterID, mangaID, chapt
 		entries = append(entries, zipEntry{f: f, mime: mime})
 	}
 	if len(entries) == 0 {
-		return nil, apperror.ErrBadRequest
+		return nil, nil, apperror.ErrBadRequest
 	}
 	sort.Slice(entries, func(i, j int) bool {
 		return filepath.Base(entries[i].f.Name) < filepath.Base(entries[j].f.Name)
@@ -119,7 +129,7 @@ func (s *PageService) UploadZip(ctx context.Context, requesterID, mangaID, chapt
 	// Delete existing pages first (replace semantics)
 	existing, err := s.pageRepo.GetByChapter(ctx, chapterID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	for _, p := range existing {
 		_ = s.storage.DeleteObject(ctx, p.ObjectKey) // best-effort
@@ -151,17 +161,75 @@ func (s *PageService) UploadZip(ctx context.Context, requesterID, mangaID, chapt
 		})
 	}
 	if err := eg.Wait(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := s.pageRepo.CreateBatch(ctx, pages); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := s.chapterRepo.UpdatePageCount(ctx, chapterID, len(pages)); err != nil {
+		return nil, nil, err
+	}
+
+	return pages, meta, nil
+}
+
+// UploadOneshotZip creates the oneshot chapter (if not yet existing) and uploads
+// pages from the ZIP in a single operation. The chapter title is taken from
+// metadata.json inside the ZIP when present.
+func (s *PageService) UploadOneshotZip(ctx context.Context, requesterID, mangaID uuid.UUID, r io.ReaderAt, size int64) (*OneshotUploadResult, error) {
+	manga, err := s.mangaRepo.GetByID(ctx, mangaID)
+	if err != nil {
+		return nil, err
+	}
+	if manga.OwnerID != requesterID {
+		return nil, apperror.ErrForbidden
+	}
+	if manga.Type != model.TypeOneshot {
+		return nil, apperror.ErrBadRequest
+	}
+
+	existing, err := s.chapterRepo.ListByManga(ctx, mangaID)
+	if err != nil {
+		return nil, err
+	}
+	if len(existing) > 0 {
+		return nil, apperror.ErrConflict
+	}
+
+	meta, _ := extractZipMetadata(r, size)
+
+	chapterTitle := "Oneshot"
+	if meta != nil && meta.ChapterTitle != "" {
+		chapterTitle = meta.ChapterTitle
+	}
+
+	now := time.Now()
+	ch := &model.Chapter{
+		ID:        uuid.Must(uuid.NewV7()),
+		MangaID:   mangaID,
+		Number:    0,
+		Title:     chapterTitle,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	if err := s.chapterRepo.Create(ctx, ch); err != nil {
 		return nil, err
 	}
 
-	return pages, nil
+	pages, _, err := s.UploadZip(ctx, requesterID, mangaID, ch.ID, r, size)
+	if err != nil {
+		return nil, err
+	}
+
+	// Auto-set cover from the first page (best-effort — don't fail the upload if this goes wrong)
+	if len(pages) > 0 && manga.CoverKey == "" {
+		manga.CoverKey = pages[0].ObjectKey
+		manga.UpdatedAt = time.Now()
+		_ = s.mangaRepo.Update(ctx, manga)
+	}
+
+	return &OneshotUploadResult{Chapter: ch, Pages: pages, Meta: meta}, nil
 }
 
 func (s *PageService) DeletePage(ctx context.Context, requesterID, mangaID, chapterID uuid.UUID, pageNumber int) error {

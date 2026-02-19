@@ -10,8 +10,8 @@ import (
 // --- Requests ---
 
 type CreateChapterRequest struct {
-	Number float64 `json:"number" binding:"required"`
-	Title  string  `json:"title"`
+	Number *float64 `json:"number"`
+	Title  string   `json:"title"`
 }
 
 type UpdateChapterRequest struct {

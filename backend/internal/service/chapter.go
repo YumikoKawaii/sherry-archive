@@ -24,7 +24,7 @@ func NewChapterService(
 
 type CreateChapterInput struct {
 	MangaID uuid.UUID
-	Number  float64
+	Number  *float64
 	Title   string
 }
 
@@ -37,17 +37,39 @@ func (s *ChapterService) Create(ctx context.Context, requesterID uuid.UUID, in C
 		return nil, apperror.ErrForbidden
 	}
 
-	// Check duplicate chapter number
-	if existing, err := s.chapterRepo.GetByMangaAndNumber(ctx, in.MangaID, in.Number); err == nil && existing != nil {
-		return nil, apperror.ErrConflict
+	var number float64
+	title := in.Title
+
+	if manga.Type == model.TypeOneshot {
+		// Enforce max 1 chapter for oneshot
+		existing, err := s.chapterRepo.ListByManga(ctx, in.MangaID)
+		if err != nil {
+			return nil, err
+		}
+		if len(existing) > 0 {
+			return nil, apperror.ErrConflict
+		}
+		number = 0
+		if title == "" {
+			title = "Oneshot"
+		}
+	} else {
+		if in.Number == nil {
+			return nil, apperror.ErrBadRequest
+		}
+		number = *in.Number
+		// Check duplicate chapter number
+		if existing, err := s.chapterRepo.GetByMangaAndNumber(ctx, in.MangaID, number); err == nil && existing != nil {
+			return nil, apperror.ErrConflict
+		}
 	}
 
 	now := time.Now()
 	ch := &model.Chapter{
 		ID:        uuid.Must(uuid.NewV7()),
 		MangaID:   in.MangaID,
-		Number:    in.Number,
-		Title:     in.Title,
+		Number:    number,
+		Title:     title,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}

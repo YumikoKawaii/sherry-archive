@@ -63,6 +63,7 @@ export function Navbar() {
         <nav className="hidden sm:flex items-center gap-1 text-sm">
           <NavLink to="/" active={location.pathname === '/'}>Browse</NavLink>
           {user && <NavLink to="/me" active={location.pathname === '/me'}>Bookmarks</NavLink>}
+          {user && <NavLink to="/manga/new" active={location.pathname === '/manga/new'}>+ New</NavLink>}
         </nav>
 
         {/* Auth */}
@@ -112,6 +113,8 @@ export function Navbar() {
               ? <>
                   <Link to="/me" onClick={() => setMenuOpen(false)}
                     className="block text-sm py-2 text-mint-200 hover:text-jade-400 transition">Bookmarks</Link>
+                  <Link to="/manga/new" onClick={() => setMenuOpen(false)}
+                    className="block text-sm py-2 text-mint-200 hover:text-jade-400 transition">+ New Manga</Link>
                   <button onClick={() => { handleLogout(); setMenuOpen(false) }}
                     className="block text-sm py-2 text-mint-200/60 hover:text-mint-50 transition">Sign out</button>
                 </>

@@ -22,8 +22,8 @@ func NewMangaRepo(db *sqlx.DB) *MangaRepo { return &MangaRepo{db: db} }
 
 func (r *MangaRepo) Create(ctx context.Context, m *model.Manga) error {
 	const q = `
-		INSERT INTO mangas (id, owner_id, title, slug, description, cover_key, status, tags, created_at, updated_at)
-		VALUES (:id, :owner_id, :title, :slug, :description, :cover_key, :status, :tags, :created_at, :updated_at)`
+		INSERT INTO mangas (id, owner_id, title, slug, description, cover_key, status, type, tags, author, artist, category, created_at, updated_at)
+		VALUES (:id, :owner_id, :title, :slug, :description, :cover_key, :status, :type, :tags, :author, :artist, :category, :created_at, :updated_at)`
 	_, err := r.db.NamedExecContext(ctx, q, m)
 	return err
 }
@@ -81,7 +81,8 @@ func (r *MangaRepo) ListByOwner(ctx context.Context, ownerID uuid.UUID, p pagina
 func (r *MangaRepo) Update(ctx context.Context, m *model.Manga) error {
 	const q = `
 		UPDATE mangas SET title=:title, slug=:slug, description=:description, cover_key=:cover_key,
-		status=:status, tags=:tags, updated_at=:updated_at WHERE id=:id`
+		status=:status, type=:type, tags=:tags, author=:author, artist=:artist, category=:category,
+		updated_at=:updated_at WHERE id=:id`
 	_, err := r.db.NamedExecContext(ctx, q, m)
 	return err
 }
@@ -116,6 +117,21 @@ func buildMangaWhere(f repository.MangaFilter) (string, []any) {
 	if len(f.Tags) > 0 {
 		clauses = append(clauses, fmt.Sprintf(`tags @> $%d`, idx))
 		args = append(args, pq.Array(f.Tags))
+		idx++
+	}
+	if f.Author != "" {
+		clauses = append(clauses, fmt.Sprintf(`author ILIKE $%d`, idx))
+		args = append(args, "%"+f.Author+"%")
+		idx++
+	}
+	if f.Artist != "" {
+		clauses = append(clauses, fmt.Sprintf(`artist ILIKE $%d`, idx))
+		args = append(args, "%"+f.Artist+"%")
+		idx++
+	}
+	if f.Category != "" {
+		clauses = append(clauses, fmt.Sprintf(`category ILIKE $%d`, idx))
+		args = append(args, "%"+f.Category+"%")
 		idx++
 	}
 

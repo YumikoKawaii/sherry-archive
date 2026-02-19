@@ -54,10 +54,13 @@ func (h *MangaHandler) toResponseList(ctx context.Context, ms []*model.Manga) []
 func (h *MangaHandler) List(c *gin.Context) {
 	p := pagination.FromQuery(c)
 	filter := repository.MangaFilter{
-		Query:  c.Query("q"),
-		Status: c.Query("status"),
-		Tags:   c.QueryArray("tags[]"),
-		Sort:   c.Query("sort"),
+		Query:    c.Query("q"),
+		Status:   c.Query("status"),
+		Tags:     c.QueryArray("tags[]"),
+		Sort:     c.Query("sort"),
+		Author:   c.Query("author"),
+		Artist:   c.Query("artist"),
+		Category: c.Query("category"),
 	}
 	mangas, total, err := h.mangaSvc.List(c.Request.Context(), filter, p)
 	if err != nil {
@@ -97,13 +100,20 @@ func (h *MangaHandler) Create(c *gin.Context) {
 	if req.Status == "" {
 		req.Status = model.StatusOngoing
 	}
+	if req.Type == "" {
+		req.Type = model.TypeSeries
+	}
 
 	m, err := h.mangaSvc.Create(c.Request.Context(), service.CreateMangaInput{
 		OwnerID:     userID,
 		Title:       req.Title,
 		Description: req.Description,
 		Status:      req.Status,
+		Type:        req.Type,
 		Tags:        req.Tags,
+		Author:      req.Author,
+		Artist:      req.Artist,
+		Category:    req.Category,
 	})
 	if err != nil {
 		respondError(c, err)
@@ -131,7 +141,11 @@ func (h *MangaHandler) Update(c *gin.Context) {
 		Title:       req.Title,
 		Description: req.Description,
 		Status:      req.Status,
+		Type:        req.Type,
 		Tags:        req.Tags,
+		Author:      req.Author,
+		Artist:      req.Artist,
+		Category:    req.Category,
 	})
 	if err != nil {
 		respondError(c, err)

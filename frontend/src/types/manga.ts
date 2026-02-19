@@ -1,4 +1,5 @@
 export type MangaStatus = 'ongoing' | 'completed' | 'hiatus'
+export type MangaType = 'series' | 'oneshot'
 
 export interface Manga {
   id: string
@@ -8,7 +9,11 @@ export interface Manga {
   description: string
   cover_url: string
   status: MangaStatus
+  type: MangaType
   tags: string[]
+  author: string
+  artist: string
+  category: string
   created_at: string
   updated_at: string
 }

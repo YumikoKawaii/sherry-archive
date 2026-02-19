@@ -56,6 +56,9 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 		mangas.PATCH("/:mangaID/chapters/:chapterID", authMW, h.Chapter.Update)
 		mangas.DELETE("/:mangaID/chapters/:chapterID", authMW, h.Chapter.Delete)
 
+		// Oneshot direct upload
+		mangas.POST("/:mangaID/oneshot/upload", authMW, h.Page.UploadOneshotZip)
+
 		// Page routes
 		mangas.POST("/:mangaID/chapters/:chapterID/pages", authMW, h.Page.Upload)
 		mangas.POST("/:mangaID/chapters/:chapterID/pages/zip", authMW, h.Page.UploadZip)

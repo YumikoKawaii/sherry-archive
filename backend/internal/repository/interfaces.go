@@ -17,10 +17,13 @@ type UserRepository interface {
 }
 
 type MangaFilter struct {
-	Query  string
-	Status string
-	Tags   []string
-	Sort   string // "newest" | "oldest" | "title"
+	Query    string
+	Status   string
+	Tags     []string
+	Sort     string // "newest" | "oldest" | "title"
+	Author   string
+	Artist   string
+	Category string
 }
 
 type MangaRepository interface {

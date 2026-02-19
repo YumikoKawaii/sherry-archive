@@ -27,7 +27,11 @@ type CreateMangaInput struct {
 	Title       string
 	Description string
 	Status      model.MangaStatus
+	Type        model.MangaType
 	Tags        []string
+	Author      string
+	Artist      string
+	Category    string
 }
 
 func (s *MangaService) Create(ctx context.Context, in CreateMangaInput) (*model.Manga, error) {
@@ -44,7 +48,11 @@ func (s *MangaService) Create(ctx context.Context, in CreateMangaInput) (*model.
 		Slug:        slug,
 		Description: in.Description,
 		Status:      in.Status,
+		Type:        in.Type,
 		Tags:        pq.StringArray(in.Tags),
+		Author:      in.Author,
+		Artist:      in.Artist,
+		Category:    in.Category,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
@@ -58,7 +66,11 @@ type UpdateMangaInput struct {
 	Title       *string
 	Description *string
 	Status      *model.MangaStatus
+	Type        *model.MangaType
 	Tags        []string
+	Author      *string
+	Artist      *string
+	Category    *string
 }
 
 func (s *MangaService) Update(ctx context.Context, requesterID, mangaID uuid.UUID, in UpdateMangaInput) (*model.Manga, error) {
@@ -84,8 +96,20 @@ func (s *MangaService) Update(ctx context.Context, requesterID, mangaID uuid.UUI
 	if in.Status != nil {
 		m.Status = *in.Status
 	}
+	if in.Type != nil {
+		m.Type = *in.Type
+	}
 	if in.Tags != nil {
 		m.Tags = pq.StringArray(in.Tags)
+	}
+	if in.Author != nil {
+		m.Author = *in.Author
+	}
+	if in.Artist != nil {
+		m.Artist = *in.Artist
+	}
+	if in.Category != nil {
+		m.Category = *in.Category
 	}
 	m.UpdatedAt = time.Now()
 

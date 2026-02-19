@@ -31,6 +31,8 @@ export function HomePage() {
   const q = searchParams.get('q') ?? ''
   const status = searchParams.get('status') ?? ''
   const sort = searchParams.get('sort') ?? 'newest'
+  const author = searchParams.get('author') ?? ''
+  const category = searchParams.get('category') ?? ''
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -41,13 +43,15 @@ export function HomePage() {
         sort,
         page,
         limit: 24,
+        author: author || undefined,
+        category: category || undefined,
       })
       setMangas(res.items)
       setTotal(res.total)
     } finally {
       setLoading(false)
     }
-  }, [q, status, sort, page])
+  }, [q, status, sort, page, author, category])
 
   useEffect(() => { load() }, [load])
 
@@ -109,6 +113,28 @@ export function HomePage() {
               </button>
             ))}
           </div>
+
+          {/* Author filter */}
+          <input
+            type="text"
+            value={author}
+            onChange={e => setFilter('author', e.target.value)}
+            placeholder="Author…"
+            className="h-9 px-3 rounded-lg text-sm bg-forest-900 border border-forest-700
+                       text-mint-200 placeholder-mint-200/30
+                       focus:outline-none focus:border-jade-500/60 transition w-32"
+          />
+
+          {/* Category filter */}
+          <input
+            type="text"
+            value={category}
+            onChange={e => setFilter('category', e.target.value)}
+            placeholder="Category…"
+            className="h-9 px-3 rounded-lg text-sm bg-forest-900 border border-forest-700
+                       text-mint-200 placeholder-mint-200/30
+                       focus:outline-none focus:border-jade-500/60 transition w-32"
+          />
 
           {/* Sort */}
           <select

@@ -104,12 +104,74 @@ func (h *PageHandler) UploadZip(c *gin.Context) {
 	}
 	defer f.Close()
 
-	pages, err := h.pageSvc.UploadZip(c.Request.Context(), userID, mangaID, chapterID, f, fileHeader.Size)
+	pages, meta, err := h.pageSvc.UploadZip(c.Request.Context(), userID, mangaID, chapterID, f, fileHeader.Size)
 	if err != nil {
 		respondError(c, err)
 		return
 	}
-	respondCreated(c, toPageUploadResponseList(pages))
+
+	resp := dto.ZipUploadResponse{
+		Pages: toPageUploadResponseList(pages),
+	}
+	if meta != nil {
+		resp.MetadataSuggestions = &dto.ZipMetadataSuggestions{
+			ChapterNumber: meta.ChapterNumber,
+			ChapterTitle:  meta.ChapterTitle,
+			Author:        meta.Author,
+			Artist:        meta.Artist,
+			Tags:          meta.Tags,
+			Category:      meta.Category,
+			Language:      meta.Language,
+		}
+	}
+	respondCreated(c, resp)
+}
+
+// UploadOneshotZip accepts a ZIP archive for a oneshot manga, auto-creates the
+// chapter, uploads pages, and returns chapter + metadata suggestions in one call.
+func (h *PageHandler) UploadOneshotZip(c *gin.Context) {
+	userID := middleware.MustUserID(c)
+	mangaID, err := uuid.Parse(c.Param("mangaID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid manga id"})
+		return
+	}
+
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "zip file is required (field: file)"})
+		return
+	}
+
+	f, err := fileHeader.Open()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot open uploaded file"})
+		return
+	}
+	defer f.Close()
+
+	result, err := h.pageSvc.UploadOneshotZip(c.Request.Context(), userID, mangaID, f, fileHeader.Size)
+	if err != nil {
+		respondError(c, err)
+		return
+	}
+
+	resp := dto.OneshotUploadResponse{
+		Chapter: dto.NewChapterResponse(result.Chapter),
+		Pages:   toPageUploadResponseList(result.Pages),
+	}
+	if result.Meta != nil {
+		resp.MetadataSuggestions = &dto.ZipMetadataSuggestions{
+			ChapterNumber: result.Meta.ChapterNumber,
+			ChapterTitle:  result.Meta.ChapterTitle,
+			Author:        result.Meta.Author,
+			Artist:        result.Meta.Artist,
+			Tags:          result.Meta.Tags,
+			Category:      result.Meta.Category,
+			Language:      result.Meta.Language,
+		}
+	}
+	respondCreated(c, resp)
 }
 
 func (h *PageHandler) Delete(c *gin.Context) {
