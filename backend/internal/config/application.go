@@ -1,6 +1,9 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // Application holds all runtime configuration for the server.
 type Application struct {
@@ -15,12 +18,12 @@ type ServerConfig struct {
 }
 
 type DBConfig struct {
-	Host             string `json:"host"              mapstructure:"host"              yaml:"host"`
-	Port             string `json:"port"              mapstructure:"port"              yaml:"port"`
-	User             string `json:"user"              mapstructure:"user"              yaml:"user"`
-	Password         string `json:"password"          mapstructure:"password"          yaml:"password"`
-	DBName           string `json:"db_name"           mapstructure:"db_name"           yaml:"db_name"`
-	SSLMode          string `json:"ssl_mode"          mapstructure:"ssl_mode"          yaml:"ssl_mode"`
+	Host     string `json:"host"              mapstructure:"host"              yaml:"host"`
+	Port     string `json:"port"              mapstructure:"port"              yaml:"port"`
+	User     string `json:"user"              mapstructure:"user"              yaml:"user"`
+	Password string `json:"password"          mapstructure:"password"          yaml:"password"`
+	DBName   string `json:"db_name"           mapstructure:"db_name"           yaml:"db_name"`
+	SSLMode  string `json:"ssl_mode"          mapstructure:"ssl_mode"          yaml:"ssl_mode"`
 	// MigrationsSource is the golang-migrate source URL.
 	// Override via DB__MIGRATIONS_SOURCE, e.g. "file:///app/migrations" in a container
 	// or "file:///absolute/path/to/backend/migrations" locally.
@@ -68,7 +71,7 @@ func loadDefault() *Application {
 			Password:         "postgres",
 			DBName:           "sherry_archive",
 			SSLMode:          "disable",
-			MigrationsSource: "file://migrations",
+			MigrationsSource: "/backend/migrations",
 		},
 		JWT: &JWTConfig{
 			AccessSecret:       "change-me-access-secret",
@@ -85,4 +88,10 @@ func loadDefault() *Application {
 			PresignExpiry:   "1h",
 		},
 	}
+}
+
+// GetMigrationFolder returns the full path to the migration folder
+func (a *Application) GetMigrationFolder() string {
+	cwd, _ := os.Getwd()
+	return fmt.Sprintf("file://%s%s", cwd, a.DB.MigrationsSource)
 }
