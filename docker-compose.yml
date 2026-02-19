@@ -22,8 +22,8 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Web console → http://localhost:9001
     volumes:
       - minio_data:/data
     healthcheck:
@@ -31,33 +31,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  app:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      PORT: "8080"
-      DB_HOST: postgres
-      DB_PORT: "5432"
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: sherry_archive
-      DB_SSLMODE: disable
-      JWT_ACCESS_SECRET: change-me-access-secret
-      JWT_REFRESH_SECRET: change-me-refresh-secret
-      MINIO_ENDPOINT: minio:9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
-      MINIO_BUCKET: sherry-archive
-      MINIO_USE_SSL: "false"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
 
 volumes:
   postgres_data:
