@@ -18,7 +18,7 @@ func main() {
 	})
 
 	cmd.AddCommand(&cobra.Command{
-		Use:   "migrate",
+		Use:   "migrate up",
 		Short: "Apply pending database migrations",
 		Run:   migrate.Up,
 	})
