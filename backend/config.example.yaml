@@ -8,6 +8,9 @@ db:
   password: postgres
   db_name: sherry_archive
   ssl_mode: disable
+  # Override with an absolute path when running outside the backend/ directory:
+  # migrations_source: "file:///absolute/path/to/backend/migrations"
+  migrations_source: "file://migrations"
 
 jwt:
   access_secret: change-me-access-secret

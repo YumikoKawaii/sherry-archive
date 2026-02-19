@@ -24,18 +24,18 @@ func Up(cmd *cobra.Command, args []string) {
 	}
 	defer db.Close()
 
-	if err := up(db.DB); err != nil {
+	if err := up(db.DB, cfg.DB.MigrationsSource); err != nil {
 		log.Fatalf("migrate up: %v", err)
 	}
 	log.Println("migrations applied successfully")
 }
 
-func up(db *sql.DB) error {
+func up(db *sql.DB, source string) error {
 	driver, err := migratepostgres.WithInstance(db, &migratepostgres.Config{})
 	if err != nil {
 		return err
 	}
-	m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
+	m, err := migrate.NewWithDatabaseInstance(source, "postgres", driver)
 	if err != nil {
 		return err
 	}
