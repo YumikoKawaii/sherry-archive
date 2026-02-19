@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS mangas;
+DROP TYPE IF EXISTS manga_status;
