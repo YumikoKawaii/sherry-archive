@@ -13,7 +13,6 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/joho/godotenv"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 	"github.com/yumikokawaii/sherry-archive/internal/handler"
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
@@ -23,12 +22,23 @@ import (
 )
 
 func main() {
-	// Load .env (ignore error if file not found)
-	_ = godotenv.Load()
-
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("config: %v", err)
+	}
+
+	// Parse duration strings from config
+	accessExpiry, err := time.ParseDuration(cfg.JWT.AccessTokenExpiry)
+	if err != nil {
+		log.Fatalf("invalid jwt.access_token_expiry %q: %v", cfg.JWT.AccessTokenExpiry, err)
+	}
+	refreshExpiry, err := time.ParseDuration(cfg.JWT.RefreshTokenExpiry)
+	if err != nil {
+		log.Fatalf("invalid jwt.refresh_token_expiry %q: %v", cfg.JWT.RefreshTokenExpiry, err)
+	}
+	presignExpiry, err := time.ParseDuration(cfg.MinIO.PresignExpiry)
+	if err != nil {
+		log.Fatalf("invalid minio.presign_expiry %q: %v", cfg.MinIO.PresignExpiry, err)
 	}
 
 	// Database
@@ -39,7 +49,7 @@ func main() {
 	defer db.Close()
 
 	// Run migrations
-	if err := runMigrations(db.DB, cfg.DB.DSN()); err != nil {
+	if err := runMigrations(db.DB); err != nil {
 		log.Fatalf("migrations: %v", err)
 	}
 
@@ -50,7 +60,7 @@ func main() {
 		cfg.MinIO.SecretAccessKey,
 		cfg.MinIO.Bucket,
 		cfg.MinIO.UseSSL,
-		cfg.MinIO.PresignExpiry,
+		presignExpiry,
 	)
 	if err != nil {
 		log.Fatalf("minio: %v", err)
@@ -63,8 +73,8 @@ func main() {
 	tokenMgr := token.NewManager(
 		cfg.JWT.AccessSecret,
 		cfg.JWT.RefreshSecret,
-		cfg.JWT.AccessTokenExpiry,
-		cfg.JWT.RefreshTokenExpiry,
+		accessExpiry,
+		refreshExpiry,
 	)
 
 	// Repositories
@@ -120,7 +130,7 @@ func main() {
 	log.Println("server stopped")
 }
 
-func runMigrations(db *sql.DB, dsn string) error {
+func runMigrations(db *sql.DB) error {
 	driver, err := migratepostgres.WithInstance(db, &migratepostgres.Config{})
 	if err != nil {
 		return err
