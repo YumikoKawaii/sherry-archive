@@ -30,6 +30,7 @@ npm --prefix frontend run preview      # preview production build
 
 ```bash
 go run -C backend ./cmd serve          # run dev server (http://localhost:8080)
+go run -C backend ./cmd migrate        # apply pending DB migrations
 go build -C backend ./...              # build all
 go test -C backend ./...               # run all tests
 go test -C backend ./internal/handler/ # run a specific package's tests

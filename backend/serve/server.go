@@ -2,7 +2,6 @@ package serve
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -10,9 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4"
-	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/spf13/cobra"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 	"github.com/yumikokawaii/sherry-archive/internal/handler"
@@ -48,10 +44,6 @@ func Server(cmd *cobra.Command, args []string) {
 		log.Fatalf("db connect: %v", err)
 	}
 	defer db.Close()
-
-	if err := runMigrations(db.DB); err != nil {
-		log.Fatalf("migrations: %v", err)
-	}
 
 	// MinIO
 	storageClient, err := storage.NewClient(
@@ -128,19 +120,4 @@ func Server(cmd *cobra.Command, args []string) {
 		log.Fatalf("forced shutdown: %v", err)
 	}
 	log.Println("server stopped")
-}
-
-func runMigrations(db *sql.DB) error {
-	driver, err := migratepostgres.WithInstance(db, &migratepostgres.Config{})
-	if err != nil {
-		return err
-	}
-	m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
-	if err != nil {
-		return err
-	}
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		return err
-	}
-	return nil
 }

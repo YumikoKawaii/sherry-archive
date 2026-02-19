@@ -4,19 +4,26 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
+	"github.com/yumikokawaii/sherry-archive/migrate"
 	"github.com/yumikokawaii/sherry-archive/serve"
 )
 
 func main() {
-	rootCmd := &cobra.Command{Use: "sherry-archive"}
+	cmd := &cobra.Command{Use: "sherry-archive"}
 
-	rootCmd.AddCommand(&cobra.Command{
+	cmd.AddCommand(&cobra.Command{
 		Use:   "serve",
 		Short: "Start the HTTP API server",
 		Run:   serve.Server,
 	})
 
-	if err := rootCmd.Execute(); err != nil {
+	cmd.AddCommand(&cobra.Command{
+		Use:   "migrate",
+		Short: "Apply pending database migrations",
+		Run:   migrate.Up,
+	})
+
+	if err := cmd.Execute(); err != nil {
 		log.Fatal(err)
 	}
 }
