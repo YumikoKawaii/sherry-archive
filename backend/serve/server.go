@@ -1,4 +1,4 @@
-package main
+package serve
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/spf13/cobra"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 	"github.com/yumikokawaii/sherry-archive/internal/handler"
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
@@ -21,13 +22,13 @@ import (
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 )
 
-func main() {
+func Server(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
 
-	// Parse duration strings from config
+	// Parse duration strings
 	accessExpiry, err := time.ParseDuration(cfg.JWT.AccessTokenExpiry)
 	if err != nil {
 		log.Fatalf("invalid jwt.access_token_expiry %q: %v", cfg.JWT.AccessTokenExpiry, err)
@@ -48,7 +49,6 @@ func main() {
 	}
 	defer db.Close()
 
-	// Run migrations
 	if err := runMigrations(db.DB); err != nil {
 		log.Fatalf("migrations: %v", err)
 	}

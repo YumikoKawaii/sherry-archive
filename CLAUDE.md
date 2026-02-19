@@ -29,7 +29,7 @@ npm --prefix frontend run preview      # preview production build
 ### Backend (`backend/`)
 
 ```bash
-go run -C backend ./cmd/server         # run dev server (http://localhost:8080)
+go run -C backend ./cmd serve          # run dev server (http://localhost:8080)
 go build -C backend ./...              # build all
 go test -C backend ./...               # run all tests
 go test -C backend ./internal/handler/ # run a specific package's tests
@@ -50,7 +50,8 @@ go test -C backend ./internal/handler/ # run a specific package's tests
 
 ### Backend
 
-- **Entry**: `backend/cmd/server/main.go` — sets up Gin router and starts HTTP server on `:8080`
+- **Entry**: `backend/cmd/main.go` — Cobra CLI; `serve` subcommand calls `serve.Server()`
+- **Server wiring**: `backend/serve/server.go` — DI wiring, migrations, graceful shutdown
 - **Handlers**: `backend/internal/handler/` — HTTP handler functions wired to routes
 - **Services**: `backend/internal/service/` — business logic
 - **Repositories**: `backend/internal/repository/` — data access layer
