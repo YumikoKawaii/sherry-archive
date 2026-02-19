@@ -1,1 +1,58 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+
+  /* Forest green dark palette */
+  --color-forest-950: #030d06;
+  --color-forest-900: #071509;
+  --color-forest-800: #0e2118;
+  --color-forest-700: #163320;
+  --color-forest-600: #1e4a2c;
+  --color-forest-500: #276339;
+  --color-forest-400: #2d7a42;
+
+  /* Jade accent palette */
+  --color-jade-300: #86efac;
+  --color-jade-400: #4ade80;
+  --color-jade-500: #22c55e;
+  --color-jade-600: #16a34a;
+
+  /* Mint text palette */
+  --color-mint-50:  #f0fdf4;
+  --color-mint-100: #dcfce7;
+  --color-mint-200: #bbf7d0;
+  --color-mint-400: #4ade80;
+  --color-mint-600: #16a34a;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e4a2c #071509;
+}
+
+body {
+  background-color: #030d06;
+  color: #f0fdf4;
+  font-family: "Outfit", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bg-grid {
+  background-image: radial-gradient(circle, rgba(34, 197, 94, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
