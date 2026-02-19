@@ -1,12 +1,14 @@
+<div align="center">
+
 ```
-　　 ✦ ·  · ✦
-　　シェリーアーカイブ
-　 ✦ ·  · ✦
+✦ · · · ✦ · · · ✦
+  S H E R R Y  A R C H I V E
+✦ · · · ✦ · · · ✦
 ```
 
-# 本棚 · Sherry Archive
+*A self-hosted manga reading platform built for speed and simplicity.*
 
-> 「 A self-hosted manga reading platform built for speed and simplicity. 」
+</div>
 
 ---
 
@@ -18,23 +20,13 @@
 
 ---
 
-```
-╔══════════════════════════════╗
-║  Backend    Go · Gin · PostgreSQL · MinIO          ║
-║  Frontend   React · TypeScript · Tailwind · Motion ║
-╚══════════════════════════════╝
-```
-
----
-
 <div align="center">
 
 ```
-　 ＊ 　 ·  　　·  ＊  ·  　　 ＊
-  ── 読む · 保存する · また読む ──
-　 ·　　  ＊　 ·　　　·  　＊ ·
+  Backend    Go · Gin · PostgreSQL · MinIO
+  Frontend   React · TypeScript · Tailwind · Framer Motion
 ```
 
-*built with 抹茶 and late nights ⌒(ﾉ⌒ω⌒ﾉ)*
+*built with matcha and late nights*
 
 </div>
