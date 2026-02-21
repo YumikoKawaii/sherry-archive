@@ -7,3 +7,8 @@ type PagedResponse[T any] struct {
 	Page  int  `json:"page"`
 	Limit int  `json:"limit"`
 }
+
+// ErrorResponse is returned for all error responses.
+type ErrorResponse struct {
+	Error string `json:"error"`
+}

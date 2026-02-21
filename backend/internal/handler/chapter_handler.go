@@ -19,6 +19,16 @@ func NewChapterHandler(chapterSvc *service.ChapterService, pageSvc *service.Page
 	return &ChapterHandler{chapterSvc: chapterSvc, pageSvc: pageSvc}
 }
 
+// List godoc
+//
+//	@Summary	List chapters for a manga
+//	@Tags		chapter
+//	@Produce	json
+//	@Param		mangaID	path		string	true	"Manga ID"
+//	@Success	200		{array}		dto.ChapterResponse
+//	@Failure	400		{object}	dto.ErrorResponse
+//	@Failure	404		{object}	dto.ErrorResponse
+//	@Router		/mangas/{mangaID}/chapters [get]
 func (h *ChapterHandler) List(c *gin.Context) {
 	mangaID, err := uuid.Parse(c.Param("mangaID"))
 	if err != nil {
@@ -33,6 +43,17 @@ func (h *ChapterHandler) List(c *gin.Context) {
 	respondOK(c, dto.NewChapterResponseList(chapters))
 }
 
+// Get godoc
+//
+//	@Summary	Get chapter with pages
+//	@Tags		chapter
+//	@Produce	json
+//	@Param		mangaID		path		string	true	"Manga ID"
+//	@Param		chapterID	path		string	true	"Chapter ID"
+//	@Success	200			{object}	dto.ChapterWithPagesResponse
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	404			{object}	dto.ErrorResponse
+//	@Router		/mangas/{mangaID}/chapters/{chapterID} [get]
 func (h *ChapterHandler) Get(c *gin.Context) {
 	mangaID, err := uuid.Parse(c.Param("mangaID"))
 	if err != nil {
@@ -78,6 +99,21 @@ func (h *ChapterHandler) Get(c *gin.Context) {
 	})
 }
 
+// Create godoc
+//
+//	@Summary	Create chapter
+//	@Tags		chapter
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		mangaID	path		string					true	"Manga ID"
+//	@Param		body	body		dto.CreateChapterRequest	true	"Chapter data (number omitted for oneshot manga)"
+//	@Success	201		{object}	dto.ChapterResponse
+//	@Failure	400		{object}	dto.ErrorResponse
+//	@Failure	401		{object}	dto.ErrorResponse
+//	@Failure	403		{object}	dto.ErrorResponse
+//	@Failure	409		{object}	dto.ErrorResponse	"Duplicate chapter number or oneshot already has a chapter"
+//	@Router		/mangas/{mangaID}/chapters [post]
 func (h *ChapterHandler) Create(c *gin.Context) {
 	userID := middleware.MustUserID(c)
 	mangaID, err := uuid.Parse(c.Param("mangaID"))
@@ -104,6 +140,22 @@ func (h *ChapterHandler) Create(c *gin.Context) {
 	respondCreated(c, dto.NewChapterResponse(ch))
 }
 
+// Update godoc
+//
+//	@Summary	Update chapter
+//	@Tags		chapter
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		mangaID		path		string					true	"Manga ID"
+//	@Param		chapterID	path		string					true	"Chapter ID"
+//	@Param		body		body		dto.UpdateChapterRequest	true	"Fields to update"
+//	@Success	200			{object}	dto.ChapterResponse
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	401			{object}	dto.ErrorResponse
+//	@Failure	403			{object}	dto.ErrorResponse
+//	@Failure	404			{object}	dto.ErrorResponse
+//	@Router		/mangas/{mangaID}/chapters/{chapterID} [patch]
 func (h *ChapterHandler) Update(c *gin.Context) {
 	userID := middleware.MustUserID(c)
 	chapterID, err := uuid.Parse(c.Param("chapterID"))
@@ -129,6 +181,19 @@ func (h *ChapterHandler) Update(c *gin.Context) {
 	respondOK(c, dto.NewChapterResponse(ch))
 }
 
+// Delete godoc
+//
+//	@Summary	Delete chapter
+//	@Tags		chapter
+//	@Security	BearerAuth
+//	@Param		mangaID		path	string	true	"Manga ID"
+//	@Param		chapterID	path	string	true	"Chapter ID"
+//	@Success	204			"No Content"
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	401			{object}	dto.ErrorResponse
+//	@Failure	403			{object}	dto.ErrorResponse
+//	@Failure	404			{object}	dto.ErrorResponse
+//	@Router		/mangas/{mangaID}/chapters/{chapterID} [delete]
 func (h *ChapterHandler) Delete(c *gin.Context) {
 	userID := middleware.MustUserID(c)
 	chapterID, err := uuid.Parse(c.Param("chapterID"))

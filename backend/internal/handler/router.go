@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
 	"github.com/yumikokawaii/sherry-archive/internal/middleware"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 )
@@ -24,6 +26,9 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+
+	// Swagger UI — available at /swagger/index.html
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	authMW := middleware.Auth(tokenMgr)
 
@@ -49,15 +54,15 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 		mangas.DELETE("/:mangaID", authMW, h.Manga.Delete)
 		mangas.PUT("/:mangaID/cover", authMW, h.Manga.UpdateCover)
 
+		// Oneshot direct upload
+		mangas.POST("/:mangaID/oneshot/upload", authMW, h.Page.UploadOneshotZip)
+
 		// Chapter routes
 		mangas.GET("/:mangaID/chapters", h.Chapter.List)
 		mangas.POST("/:mangaID/chapters", authMW, h.Chapter.Create)
 		mangas.GET("/:mangaID/chapters/:chapterID", h.Chapter.Get)
 		mangas.PATCH("/:mangaID/chapters/:chapterID", authMW, h.Chapter.Update)
 		mangas.DELETE("/:mangaID/chapters/:chapterID", authMW, h.Chapter.Delete)
-
-		// Oneshot direct upload
-		mangas.POST("/:mangaID/oneshot/upload", authMW, h.Page.UploadOneshotZip)
 
 		// Page routes
 		mangas.POST("/:mangaID/chapters/:chapterID/pages", authMW, h.Page.Upload)

@@ -21,8 +21,21 @@ func NewPageHandler(pageSvc *service.PageService) *PageHandler {
 	return &PageHandler{pageSvc: pageSvc}
 }
 
-// Upload accepts multiple image files as multipart/form-data (field name: "pages").
-// Pages are appended to the chapter in the order the files are received.
+// Upload godoc
+//
+//	@Summary	Upload individual pages
+//	@Tags		page
+//	@Accept		mpfd
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		mangaID		path		string	true	"Manga ID"
+//	@Param		chapterID	path		string	true	"Chapter ID"
+//	@Param		pages		formData	file	true	"Image files (jpeg/png/webp), field name: pages"
+//	@Success	201			{array}		dto.PageUploadResponse
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	401			{object}	dto.ErrorResponse
+//	@Failure	403			{object}	dto.ErrorResponse
+//	@Router		/mangas/{mangaID}/chapters/{chapterID}/pages [post]
 func (h *PageHandler) Upload(c *gin.Context) {
 	userID := middleware.MustUserID(c)
 	mangaID, chapterID, ok := parseMangaChapter(c)
@@ -76,9 +89,22 @@ func (h *PageHandler) Upload(c *gin.Context) {
 	respondCreated(c, toPageUploadResponseList(pages))
 }
 
-// UploadZip accepts a single ZIP archive (field name: "file") and replaces all
-// pages in the chapter. Files inside the ZIP are sorted by filename to determine
-// page order — name them 001.jpg, 002.jpg, … for predictable results.
+// UploadZip godoc
+//
+//	@Summary	Upload pages from ZIP
+//	@Description	Replaces all pages in the chapter. Files inside the ZIP are sorted by filename. An optional metadata.json at the ZIP root is parsed and returned as suggestions.
+//	@Tags		page
+//	@Accept		mpfd
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		mangaID		path		string	true	"Manga ID"
+//	@Param		chapterID	path		string	true	"Chapter ID"
+//	@Param		file		formData	file	true	"ZIP archive"
+//	@Success	201			{object}	dto.ZipUploadResponse
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	401			{object}	dto.ErrorResponse
+//	@Failure	403			{object}	dto.ErrorResponse
+//	@Router		/mangas/{mangaID}/chapters/{chapterID}/pages/zip [post]
 func (h *PageHandler) UploadZip(c *gin.Context) {
 	userID := middleware.MustUserID(c)
 	mangaID, chapterID, ok := parseMangaChapter(c)
@@ -127,8 +153,22 @@ func (h *PageHandler) UploadZip(c *gin.Context) {
 	respondCreated(c, resp)
 }
 
-// UploadOneshotZip accepts a ZIP archive for a oneshot manga, auto-creates the
-// chapter, uploads pages, and returns chapter + metadata suggestions in one call.
+// UploadOneshotZip godoc
+//
+//	@Summary	Upload oneshot ZIP
+//	@Description	For oneshot manga only. Auto-creates the chapter (number=0), uploads pages, sets the first page as cover if none exists, and returns metadata suggestions from an optional metadata.json in the ZIP.
+//	@Tags		page
+//	@Accept		mpfd
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		mangaID	path		string	true	"Manga ID (must be type=oneshot)"
+//	@Param		file	formData	file	true	"ZIP archive"
+//	@Success	201		{object}	dto.OneshotUploadResponse
+//	@Failure	400		{object}	dto.ErrorResponse	"Not a oneshot or invalid ZIP"
+//	@Failure	401		{object}	dto.ErrorResponse
+//	@Failure	403		{object}	dto.ErrorResponse
+//	@Failure	409		{object}	dto.ErrorResponse	"Chapter already exists"
+//	@Router		/mangas/{mangaID}/oneshot/upload [post]
 func (h *PageHandler) UploadOneshotZip(c *gin.Context) {
 	userID := middleware.MustUserID(c)
 	mangaID, err := uuid.Parse(c.Param("mangaID"))
@@ -174,6 +214,20 @@ func (h *PageHandler) UploadOneshotZip(c *gin.Context) {
 	respondCreated(c, resp)
 }
 
+// Delete godoc
+//
+//	@Summary	Delete a page
+//	@Tags		page
+//	@Security	BearerAuth
+//	@Param		mangaID		path	string	true	"Manga ID"
+//	@Param		chapterID	path	string	true	"Chapter ID"
+//	@Param		pageNumber	path	int		true	"Page number"
+//	@Success	204			"No Content"
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	401			{object}	dto.ErrorResponse
+//	@Failure	403			{object}	dto.ErrorResponse
+//	@Failure	404			{object}	dto.ErrorResponse
+//	@Router		/mangas/{mangaID}/chapters/{chapterID}/pages/{pageNumber} [delete]
 func (h *PageHandler) Delete(c *gin.Context) {
 	userID := middleware.MustUserID(c)
 	mangaID, chapterID, ok := parseMangaChapter(c)
@@ -193,6 +247,20 @@ func (h *PageHandler) Delete(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// Reorder godoc
+//
+//	@Summary	Reorder pages
+//	@Tags		page
+//	@Accept		json
+//	@Security	BearerAuth
+//	@Param		mangaID		path	string					true	"Manga ID"
+//	@Param		chapterID	path	string					true	"Chapter ID"
+//	@Param		body		body	dto.ReorderPagesRequest	true	"Ordered list of page IDs"
+//	@Success	204			"No Content"
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	401			{object}	dto.ErrorResponse
+//	@Failure	403			{object}	dto.ErrorResponse
+//	@Router		/mangas/{mangaID}/chapters/{chapterID}/pages/reorder [patch]
 func (h *PageHandler) Reorder(c *gin.Context) {
 	userID := middleware.MustUserID(c)
 	mangaID, chapterID, ok := parseMangaChapter(c)
