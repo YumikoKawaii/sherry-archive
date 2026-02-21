@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	_ "github.com/yumikokawaii/sherry-archive/docs"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 	"github.com/yumikokawaii/sherry-archive/internal/handler"
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
