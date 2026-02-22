@@ -1,6 +1,7 @@
 package tracking
 
 import (
+	"context"
 	"encoding/json"
 	"net"
 	"net/http"
@@ -60,9 +61,10 @@ func (h *Handler) Ingest(c *gin.Context) {
 		})
 	}
 
-	// Fire-and-forget in the background so the client isn't blocked
+	// Fire-and-forget with a fresh context — request context is cancelled
+	// the moment this handler returns, which would abort the insert.
 	go func() {
-		_ = h.store.Insert(c.Request.Context(), rows)
+		_ = h.store.Insert(context.Background(), rows)
 	}()
 
 	c.Status(http.StatusNoContent)

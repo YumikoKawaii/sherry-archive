@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -43,16 +44,25 @@ func (s *PostgresStore) Insert(ctx context.Context, rows []EventRow) error {
 	if len(rows) == 0 {
 		return nil
 	}
-	const q = `
-		INSERT INTO events (device_id, user_id, event, properties, referrer, ip_hash, user_agent, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	for _, r := range rows {
-		if _, err := s.db.ExecContext(ctx, q,
+
+	// Build a single multi-row INSERT
+	const cols = 8
+	placeholders := make([]string, len(rows))
+	args := make([]any, 0, len(rows)*cols)
+
+	for i, r := range rows {
+		base := i * cols
+		placeholders[i] = fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d)",
+			base+1, base+2, base+3, base+4, base+5, base+6, base+7, base+8)
+		args = append(args,
 			r.DeviceID, r.UserID, r.Event, r.Properties,
 			r.Referrer, r.IPHash, r.UserAgent, r.CreatedAt,
-		); err != nil {
-			return err
-		}
+		)
 	}
-	return nil
+
+	q := `INSERT INTO events (device_id, user_id, event, properties, referrer, ip_hash, user_agent, created_at) VALUES ` +
+		strings.Join(placeholders, ",")
+
+	_, err := s.db.ExecContext(ctx, q, args...)
+	return err
 }
