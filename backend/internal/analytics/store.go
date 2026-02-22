@@ -292,6 +292,44 @@ func (s *Store) querySuggestions(
 	return mangas, err
 }
 
+// --- Similar ---
+
+// GetSimilar returns manga similar to the given manga_id by matching tags,
+// author, or category. The source manga is excluded from the results.
+func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*model.Manga, error) {
+	meta, err := s.getMangaMeta(ctx, mangaID)
+	if err != nil || meta == nil {
+		return nil, err
+	}
+	if len(meta.Tags) == 0 && meta.Author == "" && meta.Category == "" {
+		return nil, nil
+	}
+
+	srcID, err := uuid.Parse(mangaID)
+	if err != nil {
+		return nil, err
+	}
+
+	var mangas []*model.Manga
+	err = s.db.SelectContext(ctx, &mangas, `
+		SELECT * FROM mangas
+		WHERE id != $1
+		  AND (
+		        ($2::text[] != '{}' AND tags && $2::text[])
+		     OR ($3 != '' AND author = $3)
+		     OR ($4 != '' AND category = $4)
+		  )
+		ORDER BY created_at DESC
+		LIMIT $5`,
+		srcID,
+		pq.Array(meta.Tags),
+		meta.Author,
+		meta.Category,
+		limit,
+	)
+	return mangas, err
+}
+
 // --- Decay loop ---
 
 // StartDecay runs the hourly trending decay in the background.

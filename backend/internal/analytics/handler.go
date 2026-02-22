@@ -22,6 +22,7 @@ func (h *Handler) Mount(r *gin.Engine) {
 	g := r.Group("/api/analytics")
 	g.GET("/trending", h.Trending)
 	g.GET("/suggestions", h.Suggestions)
+	g.GET("/similar", h.Similar)
 }
 
 // Trending returns the top N manga ranked by recent activity score.
@@ -66,6 +67,35 @@ func (h *Handler) Suggestions(c *gin.Context) {
 	limit := parseLimit(c, 12)
 
 	mangas, err := h.store.GetSuggestions(c.Request.Context(), deviceID, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	out := make([]dto.MangaResponse, 0, len(mangas))
+	for _, m := range mangas {
+		coverURL := ""
+		if m.CoverKey != "" {
+			if u, err := h.storage.PresignedGetURL(c.Request.Context(), m.CoverKey); err == nil {
+				coverURL = u.String()
+			}
+		}
+		out = append(out, dto.NewMangaResponse(m, coverURL))
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": out})
+}
+
+// Similar returns manga similar to a given manga_id by shared tags, author, or category.
+func (h *Handler) Similar(c *gin.Context) {
+	mangaID := c.Query("manga_id")
+	if mangaID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "manga_id is required"})
+		return
+	}
+	limit := parseLimit(c, 8)
+
+	mangas, err := h.store.GetSimilar(c.Request.Context(), mangaID, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

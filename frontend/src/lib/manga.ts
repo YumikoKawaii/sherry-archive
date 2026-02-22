@@ -137,4 +137,7 @@ export const analyticsApi = {
 
   suggestions: (deviceId: string, limit = 12) =>
     api.get<{ data: Manga[] }>(`/analytics/suggestions?device_id=${encodeURIComponent(deviceId)}&limit=${limit}`),
+
+  similar: (mangaId: string, limit = 8) =>
+    api.get<{ data: Manga[] }>(`/analytics/similar?manga_id=${encodeURIComponent(mangaId)}&limit=${limit}`),
 }

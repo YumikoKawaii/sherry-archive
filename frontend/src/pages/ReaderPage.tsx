@@ -6,7 +6,7 @@ import type { ChapterWithPages, Chapter } from '../types/manga'
 import type { Manga } from '../types/manga'
 import { Spinner } from '../components/Spinner'
 import { CommentSection } from '../components/CommentSection'
-import { tracker, getDeviceId } from '../lib/tracking'
+import { tracker } from '../lib/tracking'
 import { MangaCard } from '../components/MangaCard'
 
 export function ReaderPage() {
@@ -39,18 +39,9 @@ export function ReaderPage() {
           chapter_id: chapterID!,
           chapter_number: d.chapter.number,
         })
-        // Fetch suggestions right when chapter opens; fall back to trending
-        analyticsApi.suggestions(getDeviceId(), 8)
-          .then(res => {
-            const filtered = res.data.filter(m => m.id !== mangaID)
-            if (filtered.length > 0) {
-              setSuggestions(filtered)
-            } else {
-              return analyticsApi.trending(8).then(t =>
-                setSuggestions(t.data.filter(m => m.id !== mangaID))
-              )
-            }
-          })
+        // Fetch manga similar to the one being read
+        analyticsApi.similar(mangaID!, 8)
+          .then(res => setSuggestions(res.data))
           .catch(() => {})
       })
       .catch(e => setError(e.message ?? 'Failed to load chapter'))
@@ -209,7 +200,7 @@ export function ReaderPage() {
       {/* Suggestions shelf */}
       {suggestions.length > 0 && (
         <div className="max-w-2xl mx-auto px-4 pt-2 pb-6">
-          <p className="text-xs font-semibold tracking-[0.2em] text-jade-500 uppercase mb-3">For You</p>
+          <p className="text-xs font-semibold tracking-[0.2em] text-jade-500 uppercase mb-3">More Like This</p>
           <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none snap-x">
             {suggestions.map(m => (
               <div key={m.id} className="flex-none w-28 snap-start">
