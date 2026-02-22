@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { mangaApi } from '../lib/manga'
+import { mangaApi, analyticsApi } from '../lib/manga'
 import type { ChapterWithPages, Chapter } from '../types/manga'
+import type { Manga } from '../types/manga'
 import { Spinner } from '../components/Spinner'
 import { CommentSection } from '../components/CommentSection'
-import { tracker } from '../lib/tracking'
+import { tracker, getDeviceId } from '../lib/tracking'
+import { MangaCard } from '../components/MangaCard'
 
 export function ReaderPage() {
   const { mangaID, chapterID } = useParams<{ mangaID: string; chapterID: string }>()
@@ -15,6 +17,7 @@ export function ReaderPage() {
   const [loading, setLoading] = useState(true)
   const [headerVisible, setHeaderVisible] = useState(true)
   const [error, setError] = useState('')
+  const [suggestions, setSuggestions] = useState<Manga[]>([])
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const openedAt = useRef<number>(Date.now())
 
@@ -22,6 +25,7 @@ export function ReaderPage() {
     if (!mangaID || !chapterID) return
     setLoading(true)
     setData(null)
+    setSuggestions([])
     Promise.all([
       mangaApi.getChapter(mangaID, chapterID),
       mangaApi.listChapters(mangaID),
@@ -35,6 +39,10 @@ export function ReaderPage() {
           chapter_id: chapterID!,
           chapter_number: d.chapter.number,
         })
+        // Fetch suggestions right when chapter opens
+        analyticsApi.suggestions(getDeviceId(), 8)
+          .then(res => setSuggestions(res.data.filter(m => m.id !== mangaID)))
+          .catch(() => {})
       })
       .catch(e => setError(e.message ?? 'Failed to load chapter'))
       .finally(() => setLoading(false))
@@ -188,6 +196,20 @@ export function ReaderPage() {
           </button>
         )}
       </div>
+
+      {/* Suggestions shelf */}
+      {suggestions.length > 0 && (
+        <div className="max-w-2xl mx-auto px-4 pt-2 pb-6">
+          <p className="text-xs font-semibold tracking-[0.2em] text-jade-500 uppercase mb-3">For You</p>
+          <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none snap-x">
+            {suggestions.map(m => (
+              <div key={m.id} className="flex-none w-28 snap-start">
+                <MangaCard manga={m} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Chapter comments — only for series (number > 0 means it's not an oneshot chapter) */}
       {data.chapter.number > 0 && mangaID && chapterID && (

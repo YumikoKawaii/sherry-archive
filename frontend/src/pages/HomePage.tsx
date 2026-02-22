@@ -56,6 +56,7 @@ export function HomePage() {
   const [page, setPage] = useState(1)
 
   const [trending, setTrending] = useState<TrendingItem[]>([])
+  const [trendingLoaded, setTrendingLoaded] = useState(false)
   const [suggestions, setSuggestions] = useState<Manga[]>([])
 
   const q = searchParams.get('q') ?? ''
@@ -66,7 +67,10 @@ export function HomePage() {
 
   // Load trending & suggestions once on mount
   useEffect(() => {
-    analyticsApi.trending(12).then(res => setTrending(res.data)).catch(() => {})
+    analyticsApi.trending(12)
+      .then(res => setTrending(res.data))
+      .catch(() => {})
+      .finally(() => setTrendingLoaded(true))
     const deviceId = getDeviceId()
     analyticsApi.suggestions(deviceId, 12).then(res => setSuggestions(res.data)).catch(() => {})
   }, [])
@@ -132,20 +136,24 @@ export function HomePage() {
       </section>
 
       {/* Trending & Suggestions shelves */}
-      {(trending.length > 0 || suggestions.length > 0) && (
+      {(trendingLoaded || suggestions.length > 0) && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-2 space-y-8">
-          <MangaShelf
-            title="Trending"
-            items={trending}
-            badge={m => {
-              const score = (m as TrendingItem).trending_score
-              return score > 0 ? `↑${Math.round(score)}` : undefined
-            }}
-          />
-          <MangaShelf
-            title="For You"
-            items={suggestions}
-          />
+          {trending.length > 0 ? (
+            <MangaShelf
+              title="Trending"
+              items={trending}
+              badge={m => {
+                const score = (m as TrendingItem).trending_score
+                return score > 0 ? `↑${Math.round(score)}` : undefined
+              }}
+            />
+          ) : (
+            // Fallback to newest when trending ZSET is still cold
+            !loading && mangas.length > 0 && (
+              <MangaShelf title="New Arrivals" items={mangas.slice(0, 12)} />
+            )
+          )}
+          <MangaShelf title="For You" items={suggestions} />
         </div>
       )}
 
