@@ -39,9 +39,18 @@ export function ReaderPage() {
           chapter_id: chapterID!,
           chapter_number: d.chapter.number,
         })
-        // Fetch suggestions right when chapter opens
+        // Fetch suggestions right when chapter opens; fall back to trending
         analyticsApi.suggestions(getDeviceId(), 8)
-          .then(res => setSuggestions(res.data.filter(m => m.id !== mangaID)))
+          .then(res => {
+            const filtered = res.data.filter(m => m.id !== mangaID)
+            if (filtered.length > 0) {
+              setSuggestions(filtered)
+            } else {
+              return analyticsApi.trending(8).then(t =>
+                setSuggestions(t.data.filter(m => m.id !== mangaID))
+              )
+            }
+          })
           .catch(() => {})
       })
       .catch(e => setError(e.message ?? 'Failed to load chapter'))

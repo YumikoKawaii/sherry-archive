@@ -150,7 +150,7 @@ export function HomePage() {
           ) : (
             // Fallback to newest when trending ZSET is still cold
             !loading && mangas.length > 0 && (
-              <MangaShelf title="New Arrivals" items={mangas.slice(0, 12)} />
+              <MangaShelf title="Trending" items={mangas.slice(0, 12)} />
             )
           )}
           <MangaShelf title="For You" items={suggestions} />
