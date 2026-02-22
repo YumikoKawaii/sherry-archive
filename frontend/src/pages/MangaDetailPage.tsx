@@ -11,6 +11,7 @@ import { Spinner } from '../components/Spinner'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../lib/api'
 import { CommentSection } from '../components/CommentSection'
+import { tracker } from '../lib/tracking'
 
 const STATUSES: { value: MangaStatus; label: string }[] = [
   { value: 'ongoing', label: 'Ongoing' },
@@ -53,6 +54,7 @@ export function MangaDetailPage() {
       .then(([m, chs]) => {
         setManga(m)
         setChapters([...chs].sort((a, b) => b.number - a.number))
+        tracker.mangaView({ manga_id: m.id, manga_type: m.type })
       })
       .catch(e => setError(e.message ?? 'Failed to load'))
       .finally(() => setLoading(false))

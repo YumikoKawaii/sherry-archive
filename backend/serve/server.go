@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
+	"github.com/yumikokawaii/sherry-archive/internal/tracking"
 	"github.com/yumikokawaii/sherry-archive/internal/handler"
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
 	"github.com/yumikokawaii/sherry-archive/internal/service"
@@ -99,6 +100,10 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 
 	r := handler.SetupRouter(handlers, tokenMgr)
+
+	// Tracking — mounted independently, no coupling to the main handler package
+	trackingStore := tracking.NewPostgresStore(db)
+	tracking.NewHandler(trackingStore, tokenMgr).Mount(r)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Server.Port,

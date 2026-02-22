@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
 import { authApi } from '../lib/auth'
+import { tracker } from '../lib/tracking'
 import type { User } from '../types/user'
 
 interface AuthState {
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('access_token', res.access_token)
     localStorage.setItem('refresh_token', res.refresh_token)
     setUser(res.user)
+    tracker.login()
   }, [])
 
   const register = useCallback(async (username: string, email: string, password: string) => {
@@ -44,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('access_token', res.access_token)
     localStorage.setItem('refresh_token', res.refresh_token)
     setUser(res.user)
+    tracker.signup()
   }, [])
 
   const logout = useCallback(async () => {

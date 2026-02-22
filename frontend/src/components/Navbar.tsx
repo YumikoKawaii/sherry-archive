@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
+import { tracker } from '../lib/tracking'
 
 export function Navbar() {
   const { user, logout } = useAuth()
@@ -12,7 +13,11 @@ export function Navbar() {
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
-    if (search.trim()) navigate(`/?q=${encodeURIComponent(search.trim())}`)
+    const q = search.trim()
+    if (q) {
+      tracker.search({ query: q, filters: {}, result_count: 0 })
+      navigate(`/?q=${encodeURIComponent(q)}`)
+    }
   }
 
   function handleLogout() {
