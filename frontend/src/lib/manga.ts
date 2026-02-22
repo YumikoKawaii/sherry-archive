@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { Manga, Chapter, ChapterWithPages } from '../types/manga'
+import type { Manga, Chapter, ChapterWithPages, Comment } from '../types/manga'
 import type { PagedData } from '../types/api'
 
 export interface MangaFilters {
@@ -107,4 +107,22 @@ export const mangaApi = {
 
   listByUser: (userId: string, page = 1) =>
     api.get<PagedData<Manga>>(`/users/${userId}/mangas?page=${page}`),
+
+  listMangaComments: (mangaId: string, page = 1) =>
+    api.get<PagedData<Comment>>(`/mangas/${mangaId}/comments?page=${page}`),
+
+  createMangaComment: (mangaId: string, content: string) =>
+    api.post<Comment>(`/mangas/${mangaId}/comments`, { content }),
+
+  listChapterComments: (mangaId: string, chapterId: string, page = 1) =>
+    api.get<PagedData<Comment>>(`/mangas/${mangaId}/chapters/${chapterId}/comments?page=${page}`),
+
+  createChapterComment: (mangaId: string, chapterId: string, content: string) =>
+    api.post<Comment>(`/mangas/${mangaId}/chapters/${chapterId}/comments`, { content }),
+
+  updateComment: (mangaId: string, commentId: string, content: string) =>
+    api.patch<Comment>(`/mangas/${mangaId}/comments/${commentId}`, { content }),
+
+  deleteComment: (mangaId: string, commentId: string) =>
+    api.delete<void>(`/mangas/${mangaId}/comments/${commentId}`),
 }

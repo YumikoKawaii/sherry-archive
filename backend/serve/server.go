@@ -75,6 +75,7 @@ func Server(cmd *cobra.Command, args []string) {
 	chapterRepo := postgres.NewChapterRepo(db)
 	pageRepo := postgres.NewPageRepo(db)
 	bookmarkRepo := postgres.NewBookmarkRepo(db)
+	commentRepo := postgres.NewCommentRepo(db)
 	refreshTokenRepo := postgres.NewRefreshTokenRepo(db)
 
 	// Services
@@ -84,6 +85,7 @@ func Server(cmd *cobra.Command, args []string) {
 	chapterSvc := service.NewChapterService(chapterRepo, mangaRepo)
 	pageSvc := service.NewPageService(pageRepo, chapterRepo, mangaRepo, storageClient)
 	bookmarkSvc := service.NewBookmarkService(bookmarkRepo)
+	commentSvc := service.NewCommentService(commentRepo, mangaRepo, chapterRepo)
 
 	// Handlers
 	handlers := handler.Handlers{
@@ -93,6 +95,7 @@ func Server(cmd *cobra.Command, args []string) {
 		Page:     handler.NewPageHandler(pageSvc),
 		Bookmark: handler.NewBookmarkHandler(bookmarkSvc),
 		User:     handler.NewUserHandler(userSvc, storageClient),
+		Comment:  handler.NewCommentHandler(commentSvc),
 	}
 
 	r := handler.SetupRouter(handlers, tokenMgr)

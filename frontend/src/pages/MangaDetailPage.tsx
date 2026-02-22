@@ -10,6 +10,7 @@ import { TagBadge } from '../components/TagBadge'
 import { Spinner } from '../components/Spinner'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../lib/api'
+import { CommentSection } from '../components/CommentSection'
 
 const STATUSES: { value: MangaStatus; label: string }[] = [
   { value: 'ongoing', label: 'Ongoing' },
@@ -469,6 +470,9 @@ export function MangaDetailPage() {
             </Link>
           </div>
         )}
+
+        {/* Comments — manga-level, shown for all types */}
+        <CommentSection mangaId={manga.id} />
       </div>
     </Layout>
   )

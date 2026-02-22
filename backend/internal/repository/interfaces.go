@@ -69,3 +69,12 @@ type RefreshTokenRepository interface {
 	DeleteByHash(ctx context.Context, hash string) error
 	DeleteByUserID(ctx context.Context, userID uuid.UUID) error
 }
+
+type CommentRepository interface {
+	Create(ctx context.Context, c *model.Comment) error
+	GetByID(ctx context.Context, id uuid.UUID) (*model.CommentWithAuthor, error)
+	ListByManga(ctx context.Context, mangaID uuid.UUID, p pagination.Params) ([]*model.CommentWithAuthor, int, error)
+	ListByChapter(ctx context.Context, chapterID uuid.UUID, p pagination.Params) ([]*model.CommentWithAuthor, int, error)
+	Update(ctx context.Context, c *model.Comment) error
+	Delete(ctx context.Context, id uuid.UUID) error
+}

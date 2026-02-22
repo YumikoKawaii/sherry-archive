@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { mangaApi } from '../lib/manga'
 import type { ChapterWithPages, Chapter } from '../types/manga'
 import { Spinner } from '../components/Spinner'
+import { CommentSection } from '../components/CommentSection'
 
 export function ReaderPage() {
   const { mangaID, chapterID } = useParams<{ mangaID: string; chapterID: string }>()
@@ -163,6 +164,17 @@ export function ReaderPage() {
           </button>
         )}
       </div>
+
+      {/* Chapter comments — only for series (number > 0 means it's not an oneshot chapter) */}
+      {data.chapter.number > 0 && mangaID && chapterID && (
+        <div className="max-w-2xl mx-auto px-4 pb-16">
+          <CommentSection
+            mangaId={mangaID}
+            chapterId={chapterID}
+            title={`Chapter ${data.chapter.number} Comments`}
+          />
+        </div>
+      )}
     </div>
   )
 }

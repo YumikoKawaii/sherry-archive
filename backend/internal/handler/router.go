@@ -15,6 +15,7 @@ type Handlers struct {
 	Page     *PageHandler
 	Bookmark *BookmarkHandler
 	User     *UserHandler
+	Comment  *CommentHandler
 }
 
 func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
@@ -64,6 +65,15 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 		mangas.POST("/:mangaID/chapters/:chapterID/pages/zip", authMW, h.Page.UploadZip)
 		mangas.DELETE("/:mangaID/chapters/:chapterID/pages/:pageNumber", authMW, h.Page.Delete)
 		mangas.PATCH("/:mangaID/chapters/:chapterID/pages/reorder", authMW, h.Page.Reorder)
+
+		// Comment routes
+		mangas.GET("/:mangaID/comments", h.Comment.ListManga)
+		mangas.POST("/:mangaID/comments", authMW, h.Comment.CreateManga)
+		mangas.PATCH("/:mangaID/comments/:commentID", authMW, h.Comment.Update)
+		mangas.DELETE("/:mangaID/comments/:commentID", authMW, h.Comment.Delete)
+
+		mangas.GET("/:mangaID/chapters/:chapterID/comments", h.Comment.ListChapter)
+		mangas.POST("/:mangaID/chapters/:chapterID/comments", authMW, h.Comment.CreateChapter)
 	}
 
 	// User routes

@@ -41,6 +41,21 @@ export interface ChapterWithPages {
   pages: PageItem[]
 }
 
+export interface CommentAuthor {
+  id: string
+  username: string
+  avatar_url?: string
+}
+
+export interface Comment {
+  id: string
+  content: string
+  author: CommentAuthor
+  edited: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface Bookmark {
   id: string
   manga_id: string
