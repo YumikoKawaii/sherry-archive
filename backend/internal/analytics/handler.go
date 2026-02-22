@@ -19,7 +19,7 @@ func NewHandler(store *Store, storage *storage.Client) *Handler {
 }
 
 func (h *Handler) Mount(r *gin.Engine) {
-	g := r.Group("/api/analytics")
+	g := r.Group("/api/v1/analytics")
 	g.GET("/trending", h.Trending)
 	g.GET("/suggestions", h.Suggestions)
 	g.GET("/similar", h.Similar)

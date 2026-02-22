@@ -69,11 +69,11 @@ export function HomePage() {
   // Load trending & suggestions once on mount
   useEffect(() => {
     analyticsApi.trending(12)
-      .then(res => setTrending(res.data))
+      .then(res => setTrending(res ?? []))
       .catch(() => {})
       .finally(() => setTrendingLoaded(true))
     const deviceId = getDeviceId()
-    analyticsApi.suggestions(deviceId, 12).then(res => setSuggestions(res.data)).catch(() => {})
+    analyticsApi.suggestions(deviceId, 12).then(res => setSuggestions(res ?? [])).catch(() => {})
   }, [])
 
   const load = useCallback(async () => {

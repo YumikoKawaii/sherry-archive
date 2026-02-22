@@ -57,7 +57,7 @@ export function MangaDetailPage() {
         setManga(m)
         setChapters([...chs].sort((a, b) => b.number - a.number))
         tracker.mangaView({ manga_id: m.id, manga_type: m.type })
-        analyticsApi.similar(m.id, 12).then(res => setSimilar(res.data)).catch(() => {})
+        analyticsApi.similar(m.id, 12).then(res => setSimilar(res ?? [])).catch(() => {})
       })
       .catch(e => setError(e.message ?? 'Failed to load'))
       .finally(() => setLoading(false))
