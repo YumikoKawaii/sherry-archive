@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { mangaApi } from '../lib/manga'
+import { mangaApi, analyticsApi } from '../lib/manga'
 import type { Manga, Chapter } from '../types/manga'
 import type { MangaStatus, MangaType } from '../types/manga'
 import { Layout } from '../components/Layout'
 import { StatusBadge } from '../components/StatusBadge'
 import { TagBadge } from '../components/TagBadge'
 import { Spinner } from '../components/Spinner'
+import { MangaCard } from '../components/MangaCard'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../lib/api'
 import { CommentSection } from '../components/CommentSection'
@@ -31,6 +32,7 @@ export function MangaDetailPage() {
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [similar, setSimilar] = useState<Manga[]>([])
 
   // Edit panel state
   const [editing, setEditing] = useState(false)
@@ -55,6 +57,7 @@ export function MangaDetailPage() {
         setManga(m)
         setChapters([...chs].sort((a, b) => b.number - a.number))
         tracker.mangaView({ manga_id: m.id, manga_type: m.type })
+        analyticsApi.similar(m.id, 12).then(res => setSimilar(res.data)).catch(() => {})
       })
       .catch(e => setError(e.message ?? 'Failed to load'))
       .finally(() => setLoading(false))
@@ -471,6 +474,24 @@ export function MangaDetailPage() {
               Manage chapters
             </Link>
           </div>
+        )}
+
+        {/* More Like This */}
+        {similar.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="mt-10"
+          >
+            <h2 className="text-lg font-bold text-mint-50 flex items-center gap-2 mb-4">
+              <span className="w-1 h-5 rounded-full bg-jade-500 inline-block" />
+              More Like This
+            </h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              {similar.map(m => <MangaCard key={m.id} manga={m} />)}
+            </div>
+          </motion.div>
         )}
 
         {/* Comments — manga-level, shown for all types */}
