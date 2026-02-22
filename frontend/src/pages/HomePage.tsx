@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { mangaApi } from '../lib/manga'
-import type { Manga } from '../types/manga'
-import type { MangaStatus } from '../types/manga'
+import { mangaApi, analyticsApi } from '../lib/manga'
+import type { Manga, MangaStatus } from '../types/manga'
+import type { TrendingItem } from '../lib/manga'
 import { MangaCard } from '../components/MangaCard'
 import { Spinner } from '../components/Spinner'
 import { Layout } from '../components/Layout'
+import { getDeviceId } from '../lib/tracking'
 
 const STATUSES: { value: MangaStatus | ''; label: string }[] = [
   { value: '', label: 'All' },
@@ -21,6 +22,32 @@ const SORTS = [
   { value: 'title', label: 'Title A–Z' },
 ]
 
+function MangaShelf({ title, items, badge }: {
+  title: string
+  items: Manga[]
+  badge?: (m: Manga) => string | undefined
+}) {
+  if (items.length === 0) return null
+  return (
+    <div>
+      <h2 className="text-sm font-semibold tracking-[0.2em] text-jade-500 uppercase mb-4">{title}</h2>
+      <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none snap-x">
+        {items.map(manga => (
+          <div key={manga.id} className="flex-none w-36 sm:w-40 snap-start relative">
+            <MangaCard manga={manga} />
+            {badge && badge(manga) && (
+              <div className="absolute top-2 left-2 bg-jade-500/90 text-forest-950 text-[10px]
+                              font-bold px-1.5 py-0.5 rounded leading-none">
+                {badge(manga)}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [mangas, setMangas] = useState<Manga[]>([])
@@ -28,11 +55,21 @@ export function HomePage() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
 
+  const [trending, setTrending] = useState<TrendingItem[]>([])
+  const [suggestions, setSuggestions] = useState<Manga[]>([])
+
   const q = searchParams.get('q') ?? ''
   const status = searchParams.get('status') ?? ''
   const sort = searchParams.get('sort') ?? 'newest'
   const author = searchParams.get('author') ?? ''
   const category = searchParams.get('category') ?? ''
+
+  // Load trending & suggestions once on mount
+  useEffect(() => {
+    analyticsApi.trending(12).then(res => setTrending(res.data)).catch(() => {})
+    const deviceId = getDeviceId()
+    analyticsApi.suggestions(deviceId, 12).then(res => setSuggestions(res.data)).catch(() => {})
+  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -93,6 +130,24 @@ export function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Trending & Suggestions shelves */}
+      {(trending.length > 0 || suggestions.length > 0) && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-2 space-y-8">
+          <MangaShelf
+            title="Trending"
+            items={trending}
+            badge={m => {
+              const score = (m as TrendingItem).trending_score
+              return score > 0 ? `↑${Math.round(score)}` : undefined
+            }}
+          />
+          <MangaShelf
+            title="For You"
+            items={suggestions}
+          />
+        </div>
+      )}
 
       {/* Filters */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">

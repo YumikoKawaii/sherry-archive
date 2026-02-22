@@ -9,7 +9,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cobra"
+	"github.com/yumikokawaii/sherry-archive/internal/analytics"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 	"github.com/yumikokawaii/sherry-archive/internal/tracking"
 	"github.com/yumikokawaii/sherry-archive/internal/handler"
@@ -62,6 +64,14 @@ func Server(cmd *cobra.Command, args []string) {
 		log.Fatalf("minio ensure bucket: %v", err)
 	}
 
+	// Redis
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     cfg.Redis.Addr,
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.DB,
+	})
+	defer rdb.Close()
+
 	// Token manager
 	tokenMgr := token.NewManager(
 		cfg.JWT.AccessSecret,
@@ -101,9 +111,18 @@ func Server(cmd *cobra.Command, args []string) {
 
 	r := handler.SetupRouter(handlers, tokenMgr)
 
-	// Tracking — mounted independently, no coupling to the main handler package
+	// Background context cancelled on shutdown
+	bgCtx, bgCancel := context.WithCancel(context.Background())
+	defer bgCancel()
+
+	// Analytics — real-time trending + suggestions via Redis
+	analyticsStore := analytics.NewStore(rdb, db)
+	analytics.NewHandler(analyticsStore, storageClient).Mount(r)
+	go analyticsStore.StartDecay(bgCtx)
+
+	// Tracking — mounted independently; enriched by analytics store
 	trackingStore := tracking.NewPostgresStore(db)
-	tracking.NewHandler(trackingStore, tokenMgr).Mount(r)
+	tracking.NewHandler(trackingStore, tokenMgr, analyticsStore).Mount(r)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Server.Port,

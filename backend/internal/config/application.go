@@ -11,6 +11,7 @@ type Application struct {
 	DB     *DBConfig     `json:"db"     mapstructure:"db"     yaml:"db"`
 	JWT    *JWTConfig    `json:"jwt"    mapstructure:"jwt"    yaml:"jwt"`
 	MinIO  *MinIOConfig  `json:"minio"  mapstructure:"minio"  yaml:"minio"`
+	Redis  *RedisConfig  `json:"redis"  mapstructure:"redis"  yaml:"redis"`
 }
 
 type ServerConfig struct {
@@ -59,6 +60,14 @@ type MinIOConfig struct {
 	PresignExpiry   string `json:"presign_expiry"    mapstructure:"presign_expiry"    yaml:"presign_expiry"`
 }
 
+// RedisConfig holds Redis connection details.
+// Env vars: REDIS__ADDR, REDIS__PASSWORD, REDIS__DB
+type RedisConfig struct {
+	Addr     string `json:"addr"     mapstructure:"addr"     yaml:"addr"`
+	Password string `json:"password" mapstructure:"password" yaml:"password"`
+	DB       int    `json:"db"       mapstructure:"db"       yaml:"db"`
+}
+
 func loadDefault() *Application {
 	return &Application{
 		Server: &ServerConfig{
@@ -86,6 +95,11 @@ func loadDefault() *Application {
 			Bucket:          "sherry-archive",
 			UseSSL:          false,
 			PresignExpiry:   "1h",
+		},
+		Redis: &RedisConfig{
+			Addr:     "localhost:6379",
+			Password: "",
+			DB:       0,
 		},
 	}
 }

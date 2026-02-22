@@ -16,10 +16,11 @@ import (
 type Handler struct {
 	store    Store
 	tokenMgr *token.Manager
+	enricher Enricher // optional, nil = disabled
 }
 
-func NewHandler(store Store, tokenMgr *token.Manager) *Handler {
-	return &Handler{store: store, tokenMgr: tokenMgr}
+func NewHandler(store Store, tokenMgr *token.Manager, enricher Enricher) *Handler {
+	return &Handler{store: store, tokenMgr: tokenMgr, enricher: enricher}
 }
 
 // Mount registers the tracking endpoint on the given engine independently
@@ -63,8 +64,13 @@ func (h *Handler) Ingest(c *gin.Context) {
 
 	// Fire-and-forget with a fresh context — request context is cancelled
 	// the moment this handler returns, which would abort the insert.
+	enricher := h.enricher
 	go func() {
-		_ = h.store.Insert(context.Background(), rows)
+		ctx := context.Background()
+		_ = h.store.Insert(ctx, rows)
+		if enricher != nil {
+			enricher.ProcessEvents(ctx, rows)
+		}
 	}()
 
 	c.Status(http.StatusNoContent)

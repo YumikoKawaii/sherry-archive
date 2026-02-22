@@ -126,3 +126,15 @@ export const mangaApi = {
   deleteComment: (mangaId: string, commentId: string) =>
     api.delete<void>(`/mangas/${mangaId}/comments/${commentId}`),
 }
+
+export interface TrendingItem extends Manga {
+  trending_score: number
+}
+
+export const analyticsApi = {
+  trending: (limit = 12) =>
+    api.get<{ data: TrendingItem[] }>(`/analytics/trending?limit=${limit}`),
+
+  suggestions: (deviceId: string, limit = 12) =>
+    api.get<{ data: Manga[] }>(`/analytics/suggestions?device_id=${encodeURIComponent(deviceId)}&limit=${limit}`),
+}
