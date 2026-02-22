@@ -33,15 +33,17 @@ go test -C backend ./internal/service/ # run a specific package's tests
 
 - **Entry**: `backend/cmd/main.go` — Cobra CLI with two subcommands: `migrate` and `serve`
 - **`migrate`**: `backend/migrate/migrate.go` — loads config, connects DB, runs migrations standalone
-- **`serve`**: `backend/serve/server.go` — DI wiring (repos → services → handlers), HTTP server lifecycle with graceful shutdown
-- **Config**: `backend/internal/config/` — Viper-based; `application.go` defines struct + `loadDefault()`, `load.go` does the loading. Env vars use `__` as separator (e.g. `DB__HOST`, `JWT__ACCESS_SECRET`). Duration fields are strings (`"15m"`). `DB__MIGRATIONS_SOURCE` controls migration file path — auto-resolved from relative to absolute.
+- **`serve`**: `backend/serve/server.go` — DI wiring (repos → services → handlers → tracking → analytics), HTTP server lifecycle with graceful shutdown
+- **Config**: `backend/internal/config/` — Viper-based; `application.go` defines struct + `loadDefault()`, `load.go` does the loading. Env vars use `__` as separator (e.g. `DB__HOST`, `JWT__ACCESS_SECRET`, `REDIS__ADDR`). Duration fields are strings (`"15m"`). `DB__MIGRATIONS_SOURCE` controls migration file path — auto-resolved from relative to absolute.
 - **Handlers**: `backend/internal/handler/` — Gin handlers + `router.go`
 - **Services**: `backend/internal/service/` — business logic, ownership enforcement
 - **Repositories**: `backend/internal/repository/postgres/` — sqlx, raw SQL
 - **Models**: `backend/internal/model/` — UUID v7 PKs everywhere
 - **DTOs**: `backend/internal/dto/` — all request/response structs; never define inline in handlers
 - **Utilities**: `backend/pkg/` — storage (MinIO), token (JWT), password, slug, pagination
-- **Migrations**: `backend/migrations/` — SQL files run via `./cmd migrate`
+- **Migrations**: `backend/migrations/` — SQL files (000001–000011) run via `./cmd migrate`
+- **Tracking**: `backend/internal/tracking/` — independent event ingestion module; mounts `POST /api/track` (no `/v1`) directly on the engine from `serve/server.go`
+- **Analytics**: `backend/internal/analytics/` — Redis-backed speed layer; mounts `GET /api/v1/analytics/trending|suggestions|similar`
 - Go module: `github.com/yumikokawaii/sherry-archive`
 
 ### Key Backend Conventions
@@ -50,15 +52,24 @@ go test -C backend ./internal/service/ # run a specific package's tests
 - Images stored as object keys in DB (not presigned URLs); URLs resolved at read time in handlers
 - Pages uploaded via zip (replace semantics, filename-sorted order)
 - `backend/config.yaml` is gitignored — copy from `config.example.yaml`
+- Tracking goroutines must use `context.Background()`, never `c.Request.Context()` (request context is cancelled when handler returns)
+- `tracking` and `analytics` are independent modules — both use `Mount(r *gin.Engine)` and are wired from `serve/server.go`, never through `handler/router.go`
+- `tracking.Enricher` interface is defined in the tracking package and implemented by `analytics.Store` to avoid import cycles
 
 ### Frontend
 
 - **Entry**: `frontend/src/main.tsx` → `App.tsx` (React Router root)
 - **Pages**: `frontend/src/pages/` — one component per route
 - **Components**: `frontend/src/components/` — shared UI
-- **API client**: `frontend/src/lib/` — `api.ts` (fetch wrapper + `ApiError`), `manga.ts`, `auth.ts`
+- **API client**: `frontend/src/lib/` — `api.ts` (fetch wrapper + `ApiError`), `manga.ts` (mangaApi + analyticsApi), `auth.ts`
+- **Tracking SDK**: `frontend/src/lib/tracking/` — `device.ts` (getDeviceId), `tracker.ts` (typed event methods, POST /api/track), `index.ts`
 - **Auth**: `frontend/src/contexts/AuthContext.tsx` — JWT stored in localStorage, session restored on mount
 - **Types**: `frontend/src/types/`
 - Vite dev server proxies `/api/*` → `http://localhost:8080` (`vite.config.ts`)
 - Tailwind v4 `@theme` in `index.css` — custom tokens: `forest-*`, `jade-*`, `mint-*`
 - Animations via Framer Motion (`motion.*`, `AnimatePresence`)
+
+### Key Frontend Conventions
+
+- `api.get<T>` in `api.ts` returns `json.data as T` — the wrapper already unwraps the `data` field. Always type responses as `T`, never `{ data: T }`, or `.data` will be called twice and return `undefined`.
+- `TagBadge` is a link to `/?tags[]=<tag>` — clicking a tag filters the homepage catalog
