@@ -64,6 +64,7 @@ export function HomePage() {
   const sort = searchParams.get('sort') ?? 'newest'
   const author = searchParams.get('author') ?? ''
   const category = searchParams.get('category') ?? ''
+  const tags = searchParams.getAll('tags[]')
 
   // Load trending & suggestions once on mount
   useEffect(() => {
@@ -86,13 +87,14 @@ export function HomePage() {
         limit: 24,
         author: author || undefined,
         category: category || undefined,
+        'tags[]': tags.length > 0 ? tags : undefined,
       })
       setMangas(res.items)
       setTotal(res.total)
     } finally {
       setLoading(false)
     }
-  }, [q, status, sort, page, author, category])
+  }, [q, status, sort, page, author, category, tags.join(',')])
 
   useEffect(() => { load() }, [load])
 
@@ -210,6 +212,28 @@ export function HomePage() {
               <option key={s.value} value={s.value}>{s.label}</option>
             ))}
           </select>
+
+          {/* Active tag chips */}
+          {tags.map(tag => (
+            <span key={tag}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+                         bg-jade-500/15 text-jade-300 border border-jade-500/30">
+              {tag}
+              <button
+                onClick={() => {
+                  setSearchParams(prev => {
+                    const next = new URLSearchParams(prev)
+                    const remaining = next.getAll('tags[]').filter(t => t !== tag)
+                    next.delete('tags[]')
+                    remaining.forEach(t => next.append('tags[]', t))
+                    return next
+                  })
+                  setPage(1)
+                }}
+                className="text-jade-400/60 hover:text-jade-300 transition leading-none"
+              >×</button>
+            </span>
+          ))}
 
           {/* Result count */}
           <span className="ml-auto text-sm text-mint-200/40">
