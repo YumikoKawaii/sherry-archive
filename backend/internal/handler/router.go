@@ -26,6 +26,14 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
+	// Serve built frontend static assets (Vite outputs to dist/assets/)
+	r.Static("/assets", "./public/assets")
+
+	// SPA catch-all: serve index.html for all non-API routes so React Router works
+	r.NoRoute(func(c *gin.Context) {
+		c.File("./public/index.html")
+	})
+
 	authMW := middleware.Auth(tokenMgr)
 
 	v1 := r.Group("/api/v1")
