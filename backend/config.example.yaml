@@ -18,10 +18,8 @@ jwt:
   access_token_expiry: 15m
   refresh_token_expiry: 168h
 
-minio:
-  endpoint: localhost:9000
-  access_key_id: minioadmin
-  secret_access_key: minioadmin
+s3:
+  region: ap-southeast-1
   bucket: sherry-archive
-  use_ssl: false
   presign_expiry: 1h
+  # endpoint: http://localhost:9000  # uncomment for local MinIO dev

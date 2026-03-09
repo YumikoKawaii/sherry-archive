@@ -10,7 +10,7 @@ type Application struct {
 	Server *ServerConfig `json:"server" mapstructure:"server" yaml:"server"`
 	DB     *DBConfig     `json:"db"     mapstructure:"db"     yaml:"db"`
 	JWT    *JWTConfig    `json:"jwt"    mapstructure:"jwt"    yaml:"jwt"`
-	MinIO  *MinIOConfig  `json:"minio"  mapstructure:"minio"  yaml:"minio"`
+	S3     *S3Config     `json:"s3"     mapstructure:"s3"     yaml:"s3"`
 	Redis  *RedisConfig  `json:"redis"  mapstructure:"redis"  yaml:"redis"`
 }
 
@@ -48,16 +48,16 @@ type JWTConfig struct {
 	RefreshTokenExpiry string `json:"refresh_token_expiry" mapstructure:"refresh_token_expiry" yaml:"refresh_token_expiry"`
 }
 
-// MinIOConfig holds MinIO connection details.
+// S3Config holds AWS S3 connection details.
 // PresignExpiry is a time.Duration string (e.g. "1h").
-// Env vars: MINIO__ENDPOINT, MINIO__ACCESS_KEY_ID, MINIO__SECRET_ACCESS_KEY, etc.
-type MinIOConfig struct {
-	Endpoint        string `json:"endpoint"          mapstructure:"endpoint"          yaml:"endpoint"`
-	AccessKeyID     string `json:"access_key_id"     mapstructure:"access_key_id"     yaml:"access_key_id"`
-	SecretAccessKey string `json:"secret_access_key" mapstructure:"secret_access_key" yaml:"secret_access_key"`
-	Bucket          string `json:"bucket"            mapstructure:"bucket"            yaml:"bucket"`
-	UseSSL          bool   `json:"use_ssl"           mapstructure:"use_ssl"           yaml:"use_ssl"`
-	PresignExpiry   string `json:"presign_expiry"    mapstructure:"presign_expiry"    yaml:"presign_expiry"`
+// Credentials are resolved automatically via IAM role (EC2) or AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY env vars (local dev).
+// Env vars: S3__REGION, S3__BUCKET, S3__PRESIGN_EXPIRY, S3__ENDPOINT (optional, for local MinIO)
+type S3Config struct {
+	Region        string `json:"region"         mapstructure:"region"         yaml:"region"`
+	Bucket        string `json:"bucket"         mapstructure:"bucket"         yaml:"bucket"`
+	PresignExpiry string `json:"presign_expiry" mapstructure:"presign_expiry" yaml:"presign_expiry"`
+	// Endpoint is optional — set to MinIO URL for local dev (e.g. "http://localhost:9000")
+	Endpoint string `json:"endpoint" mapstructure:"endpoint" yaml:"endpoint"`
 }
 
 // RedisConfig holds Redis connection details.
@@ -88,13 +88,11 @@ func loadDefault() *Application {
 			AccessTokenExpiry:  "15m",
 			RefreshTokenExpiry: "168h",
 		},
-		MinIO: &MinIOConfig{
-			Endpoint:        "localhost:9000",
-			AccessKeyID:     "minioadmin",
-			SecretAccessKey: "minioadmin",
-			Bucket:          "sherry-archive",
-			UseSSL:          false,
-			PresignExpiry:   "1h",
+		S3: &S3Config{
+			Region:        "ap-southeast-1",
+			Bucket:        "sherry-archive",
+			PresignExpiry: "1h",
+			Endpoint:      "http://localhost:9000",
 		},
 		Redis: &RedisConfig{
 			Addr:     "localhost:6379",

@@ -36,9 +36,9 @@ func Server(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("invalid jwt.refresh_token_expiry %q: %v", cfg.JWT.RefreshTokenExpiry, err)
 	}
-	presignExpiry, err := time.ParseDuration(cfg.MinIO.PresignExpiry)
+	presignExpiry, err := time.ParseDuration(cfg.S3.PresignExpiry)
 	if err != nil {
-		log.Fatalf("invalid minio.presign_expiry %q: %v", cfg.MinIO.PresignExpiry, err)
+		log.Fatalf("invalid s3.presign_expiry %q: %v", cfg.S3.PresignExpiry, err)
 	}
 
 	// Database
@@ -48,20 +48,16 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 	defer db.Close()
 
-	// MinIO
+	// S3
 	storageClient, err := storage.NewClient(
-		cfg.MinIO.Endpoint,
-		cfg.MinIO.AccessKeyID,
-		cfg.MinIO.SecretAccessKey,
-		cfg.MinIO.Bucket,
-		cfg.MinIO.UseSSL,
+		context.Background(),
+		cfg.S3.Region,
+		cfg.S3.Bucket,
+		cfg.S3.Endpoint,
 		presignExpiry,
 	)
 	if err != nil {
-		log.Fatalf("minio: %v", err)
-	}
-	if err := storageClient.EnsureBucket(context.Background()); err != nil {
-		log.Fatalf("minio ensure bucket: %v", err)
+		log.Fatalf("s3: %v", err)
 	}
 
 	// Redis
