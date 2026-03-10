@@ -93,7 +93,7 @@ func loadDefault() *Application {
 			Region:        "ap-southeast-1",
 			Bucket:        "sherry-archive",
 			PresignExpiry: "1h",
-			Endpoint:      "http://localhost:9000",
+			Endpoint:      "",
 		},
 		Redis: &RedisConfig{
 			Addr:     "localhost:6379",
