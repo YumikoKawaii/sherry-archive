@@ -1,3 +1,4 @@
 .idea
 config.yaml
 /package-lock.json
+/scripts/ssm-put.sh
