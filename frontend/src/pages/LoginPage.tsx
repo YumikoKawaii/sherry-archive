@@ -30,6 +30,7 @@ export function LoginPage() {
       await login(loginEmail, loginPassword)
       navigate('/')
     } catch (err) {
+      console.error('[login error]', err)
       setError(err instanceof ApiError ? err.message : 'Login failed')
     } finally {
       setLoading(false)
