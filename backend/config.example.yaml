@@ -6,7 +6,7 @@ db:
   port: "5432"
   user: postgres
   password: postgres
-  db_name: sherry_archive
+  name: sherry_archive
   ssl_mode: disable
   # Override with an absolute path when running outside the backend/ directory:
   # migrations_source: "file:///absolute/path/to/backend/migrations"
