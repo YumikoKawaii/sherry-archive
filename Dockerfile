@@ -23,4 +23,4 @@ COPY --from=backend-builder /app/migrations ./migrations
 COPY --from=frontend-builder /app/dist ./public
 
 EXPOSE 8080
-CMD ["./server"]
+CMD ["./server", "serve"]
