@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
 type Client struct {
@@ -47,11 +48,12 @@ func NewClient(ctx context.Context, region, bucket, endpoint string, presignExpi
 
 func (c *Client) PutObject(ctx context.Context, objectKey, contentType string, r io.Reader, size int64) error {
 	_, err := c.s3client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:        aws.String(c.bucket),
-		Key:           aws.String(objectKey),
-		Body:          r,
-		ContentType:   aws.String(contentType),
-		ContentLength: aws.Int64(size),
+		Bucket:            aws.String(c.bucket),
+		Key:               aws.String(objectKey),
+		Body:              r,
+		ContentType:       aws.String(contentType),
+		ContentLength:     aws.Int64(size),
+		ChecksumAlgorithm: types.ChecksumAlgorithmCrc32,
 	})
 	return err
 }
