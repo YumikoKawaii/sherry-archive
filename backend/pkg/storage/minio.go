@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	signerv4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -32,7 +33,11 @@ func NewClient(ctx context.Context, region, bucket, endpoint string, presignExpi
 		return nil, err
 	}
 
-	opts := []func(*s3.Options){}
+	opts := []func(*s3.Options){
+		func(o *s3.Options) {
+			o.APIOptions = append(o.APIOptions, signerv4.SwapComputePayloadSHA256ForUnsignedPayloadMiddleware)
+		},
+	}
 	if endpoint != "" {
 		opts = append(opts, func(o *s3.Options) {
 			o.BaseEndpoint = aws.String(endpoint)
