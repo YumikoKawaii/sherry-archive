@@ -41,7 +41,7 @@ put AWS_ACCESS_KEY_ID     "" SecureString
 put AWS_SECRET_ACCESS_KEY "" SecureString
 
 # Redis (container name on Docker network)
-put REDIS__ADDR "redis:6379" String
+put REDIS__ADDR "localhost:6379" String
 put REDIS__DB   "0"          String
 
 echo "==> Done."
