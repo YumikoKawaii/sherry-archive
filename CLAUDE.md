@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Workflow Rules
+
+- **Never `git push` unless explicitly asked.** Commit freely, but always wait for the user to say "push" before pushing to remote.
+
 ## Project Overview
 
 **Sherry Archive** — a manga reading platform with a Go backend and a React frontend.
