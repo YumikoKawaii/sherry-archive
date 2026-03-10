@@ -61,11 +61,12 @@ type S3Config struct {
 }
 
 // RedisConfig holds Redis connection details.
-// Env vars: REDIS__ADDR, REDIS__PASSWORD, REDIS__DB
+// Env vars: REDIS__ADDR, REDIS__PASSWORD, REDIS__DB, REDIS__TLS
 type RedisConfig struct {
 	Addr     string `json:"addr"     mapstructure:"addr"     yaml:"addr"`
 	Password string `json:"password" mapstructure:"password" yaml:"password"`
 	DB       int    `json:"db"       mapstructure:"db"       yaml:"db"`
+	TLS      bool   `json:"tls"      mapstructure:"tls"      yaml:"tls"`
 }
 
 func loadDefault() *Application {
@@ -98,6 +99,7 @@ func loadDefault() *Application {
 			Addr:     "localhost:6379",
 			Password: "",
 			DB:       0,
+			TLS:      true,
 		},
 	}
 }

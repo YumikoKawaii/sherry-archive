@@ -2,6 +2,7 @@ package serve
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"net/http"
 	"os"
@@ -61,11 +62,15 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 
 	// Redis
-	rdb := redis.NewClient(&redis.Options{
+	redisOpts := &redis.Options{
 		Addr:     cfg.Redis.Addr,
 		Password: cfg.Redis.Password,
 		DB:       cfg.Redis.DB,
-	})
+	}
+	if cfg.Redis.TLS {
+		redisOpts.TLSConfig = &tls.Config{}
+	}
+	rdb := redis.NewClient(redisOpts)
 	defer rdb.Close()
 
 	// Token manager
