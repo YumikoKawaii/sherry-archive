@@ -9,8 +9,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
+
+const opTimeout = 10 * time.Second
 
 type Client struct {
 	s3client      *s3.Client
@@ -23,7 +24,10 @@ type Client struct {
 // Credentials are resolved automatically: IAM role on EC2, or AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY env vars for local dev.
 // endpoint is optional — set to MinIO URL (e.g. "http://localhost:9000") for local development.
 func NewClient(ctx context.Context, region, bucket, endpoint string, presignExpiry time.Duration) (*Client, error) {
-	cfg, err := awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(region))
+	cfg, err := awsconfig.LoadDefaultConfig(ctx,
+		awsconfig.WithRegion(region),
+		awsconfig.WithRequestChecksumCalculation(aws.RequestChecksumCalculationWhenRequired),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -47,18 +51,21 @@ func NewClient(ctx context.Context, region, bucket, endpoint string, presignExpi
 }
 
 func (c *Client) PutObject(ctx context.Context, objectKey, contentType string, r io.Reader, size int64) error {
+	ctx, cancel := context.WithTimeout(ctx, opTimeout)
+	defer cancel()
 	_, err := c.s3client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:            aws.String(c.bucket),
-		Key:               aws.String(objectKey),
-		Body:              r,
-		ContentType:       aws.String(contentType),
-		ContentLength:     aws.Int64(size),
-		ChecksumAlgorithm: types.ChecksumAlgorithmCrc32,
+		Bucket:        aws.String(c.bucket),
+		Key:           aws.String(objectKey),
+		Body:          r,
+		ContentType:   aws.String(contentType),
+		ContentLength: aws.Int64(size),
 	})
 	return err
 }
 
 func (c *Client) DeleteObject(ctx context.Context, objectKey string) error {
+	ctx, cancel := context.WithTimeout(ctx, opTimeout)
+	defer cancel()
 	_, err := c.s3client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(c.bucket),
 		Key:    aws.String(objectKey),
@@ -67,6 +74,8 @@ func (c *Client) DeleteObject(ctx context.Context, objectKey string) error {
 }
 
 func (c *Client) PresignedGetURL(ctx context.Context, objectKey string) (*url.URL, error) {
+	ctx, cancel := context.WithTimeout(ctx, opTimeout)
+	defer cancel()
 	req, err := c.presignClient.PresignGetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(c.bucket),
 		Key:    aws.String(objectKey),
