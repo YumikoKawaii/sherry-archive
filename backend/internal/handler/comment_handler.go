@@ -27,7 +27,7 @@ func NewCommentHandler(commentSvc *service.CommentService) *CommentHandler {
 //	@Param		mangaID	path		string	true	"Manga ID"
 //	@Param		page	query		int		false	"Page"
 //	@Param		limit	query		int		false	"Limit"
-//	@Success	200		{object}	dto.PagedResponse[dto.CommentResponse]
+//	@Success	200		{object}	dto.PagedCommentResponse
 //	@Failure	404		{object}	dto.ErrorResponse
 //	@Router		/mangas/{mangaID}/comments [get]
 func (h *CommentHandler) ListManga(c *gin.Context) {
@@ -42,7 +42,7 @@ func (h *CommentHandler) ListManga(c *gin.Context) {
 		respondError(c, err)
 		return
 	}
-	respondOK(c, dto.PagedResponse[dto.CommentResponse]{
+	respondOK(c, dto.PagedCommentResponse{
 		Items: dto.NewCommentResponses(rows),
 		Total: total,
 		Page:  p.Page,
@@ -93,7 +93,7 @@ func (h *CommentHandler) CreateManga(c *gin.Context) {
 //	@Param		chapterID	path		string	true	"Chapter ID"
 //	@Param		page		query		int		false	"Page"
 //	@Param		limit		query		int		false	"Limit"
-//	@Success	200			{object}	dto.PagedResponse[dto.CommentResponse]
+//	@Success	200			{object}	dto.PagedCommentResponse
 //	@Failure	404			{object}	dto.ErrorResponse
 //	@Router		/mangas/{mangaID}/chapters/{chapterID}/comments [get]
 func (h *CommentHandler) ListChapter(c *gin.Context) {
@@ -113,7 +113,7 @@ func (h *CommentHandler) ListChapter(c *gin.Context) {
 		respondError(c, err)
 		return
 	}
-	respondOK(c, dto.PagedResponse[dto.CommentResponse]{
+	respondOK(c, dto.PagedCommentResponse{
 		Items: dto.NewCommentResponses(rows),
 		Total: total,
 		Page:  p.Page,

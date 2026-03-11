@@ -65,7 +65,7 @@ func (h *MangaHandler) toResponseList(ctx context.Context, ms []*model.Manga) []
 //	@Param		sort		query		string		false	"Sort order"	Enums(newest, oldest, title)
 //	@Param		page		query		int			false	"Page number"	default(1)
 //	@Param		limit		query		int			false	"Items per page"	default(24)
-//	@Success	200			{object}	dto.PagedResponse[dto.MangaResponse]
+//	@Success	200			{object}	dto.PagedMangaResponse
 //	@Router		/mangas [get]
 func (h *MangaHandler) List(c *gin.Context) {
 	p := pagination.FromQuery(c)
@@ -83,7 +83,7 @@ func (h *MangaHandler) List(c *gin.Context) {
 		respondError(c, err)
 		return
 	}
-	respondOK(c, dto.PagedResponse[dto.MangaResponse]{
+	respondOK(c, dto.PagedMangaResponse{
 		Items: h.toResponseList(c.Request.Context(), mangas),
 		Total: total,
 		Page:  p.Page,
@@ -296,7 +296,7 @@ func (h *MangaHandler) UpdateCover(c *gin.Context) {
 //	@Produce	json
 //	@Param		userID	path		string	true	"User ID"
 //	@Param		page	query		int		false	"Page number"	default(1)
-//	@Success	200		{object}	dto.PagedResponse[dto.MangaResponse]
+//	@Success	200		{object}	dto.PagedMangaResponse
 //	@Failure	400		{object}	dto.ErrorResponse
 //	@Router		/users/{userID}/mangas [get]
 func (h *MangaHandler) ListByUser(c *gin.Context) {
@@ -311,7 +311,7 @@ func (h *MangaHandler) ListByUser(c *gin.Context) {
 		respondError(c, err)
 		return
 	}
-	respondOK(c, dto.PagedResponse[dto.MangaResponse]{
+	respondOK(c, dto.PagedMangaResponse{
 		Items: h.toResponseList(c.Request.Context(), mangas),
 		Total: total,
 		Page:  p.Page,

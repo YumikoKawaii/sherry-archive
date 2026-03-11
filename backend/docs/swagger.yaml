@@ -1,14 +1,14 @@
 definitions:
-  github_com_yumikokawaii_sherry-archive_internal_dto.AuthResponse:
+  dto.AuthResponse:
     properties:
       access_token:
         type: string
       refresh_token:
         type: string
       user:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.UserResponse'
+        $ref: '#/definitions/dto.UserResponse'
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.BookmarkResponse:
+  dto.BookmarkResponse:
     properties:
       chapter_id:
         type: string
@@ -23,7 +23,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.ChapterResponse:
+  dto.ChapterResponse:
     properties:
       created_at:
         type: string
@@ -40,23 +40,56 @@ definitions:
       updated_at:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.ChapterWithPagesResponse:
+  dto.ChapterWithPagesResponse:
     properties:
       chapter:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ChapterResponse'
+        $ref: '#/definitions/dto.ChapterResponse'
       pages:
         items:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.PageItemResponse'
+          $ref: '#/definitions/dto.PageItemResponse'
         type: array
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.CreateChapterRequest:
+  dto.CommentAuthor:
+    properties:
+      avatar_url:
+        type: string
+      id:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.CommentResponse:
+    properties:
+      author:
+        $ref: '#/definitions/dto.CommentAuthor'
+      content:
+        type: string
+      created_at:
+        type: string
+      edited:
+        type: boolean
+      id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.CreateChapterRequest:
     properties:
       number:
         type: number
       title:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.CreateMangaRequest:
+  dto.CreateCommentRequest:
+    properties:
+      content:
+        maxLength: 2000
+        minLength: 1
+        type: string
+    required:
+    - content
+    type: object
+  dto.CreateMangaRequest:
     properties:
       artist:
         type: string
@@ -67,7 +100,7 @@ definitions:
       description:
         type: string
       status:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_model.MangaStatus'
+        $ref: '#/definitions/model.MangaStatus'
       tags:
         items:
           type: string
@@ -76,16 +109,16 @@ definitions:
         minLength: 1
         type: string
       type:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_model.MangaType'
+        $ref: '#/definitions/model.MangaType'
     required:
     - title
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse:
+  dto.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.LoginRequest:
+  dto.LoginRequest:
     properties:
       email:
         type: string
@@ -95,14 +128,14 @@ definitions:
     - email
     - password
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.LogoutRequest:
+  dto.LogoutRequest:
     properties:
       refresh_token:
         type: string
     required:
     - refresh_token
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.MangaResponse:
+  dto.MangaResponse:
     properties:
       artist:
         type: string
@@ -123,7 +156,7 @@ definitions:
       slug:
         type: string
       status:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_model.MangaStatus'
+        $ref: '#/definitions/model.MangaStatus'
       tags:
         items:
           type: string
@@ -131,22 +164,22 @@ definitions:
       title:
         type: string
       type:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_model.MangaType'
+        $ref: '#/definitions/model.MangaType'
       updated_at:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.OneshotUploadResponse:
+  dto.OneshotUploadResponse:
     properties:
       chapter:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ChapterResponse'
+        $ref: '#/definitions/dto.ChapterResponse'
       metadata_suggestions:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ZipMetadataSuggestions'
+        $ref: '#/definitions/dto.ZipMetadataSuggestions'
       pages:
         items:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.PageUploadResponse'
+          $ref: '#/definitions/dto.PageUploadResponse'
         type: array
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.PageItemResponse:
+  dto.PageItemResponse:
     properties:
       height:
         type: integer
@@ -159,7 +192,7 @@ definitions:
       width:
         type: integer
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.PageUploadResponse:
+  dto.PageUploadResponse:
     properties:
       id:
         type: string
@@ -168,11 +201,11 @@ definitions:
       object_key:
         type: string
     type: object
-  ? github_com_yumikokawaii_sherry-archive_internal_dto.PagedResponse-github_com_yumikokawaii_sherry-archive_internal_dto_MangaResponse
-  : properties:
+  dto.PagedCommentResponse:
+    properties:
       items:
         items:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.MangaResponse'
+          $ref: '#/definitions/dto.CommentResponse'
         type: array
       limit:
         type: integer
@@ -181,7 +214,20 @@ definitions:
       total:
         type: integer
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.PublicUserResponse:
+  dto.PagedMangaResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.MangaResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  dto.PublicUserResponse:
     properties:
       avatar_url:
         type: string
@@ -194,14 +240,14 @@ definitions:
       username:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.RefreshRequest:
+  dto.RefreshRequest:
     properties:
       refresh_token:
         type: string
     required:
     - refresh_token
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.RegisterRequest:
+  dto.RegisterRequest:
     properties:
       email:
         type: string
@@ -217,7 +263,7 @@ definitions:
     - password
     - username
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.ReorderPagesRequest:
+  dto.ReorderPagesRequest:
     properties:
       page_ids:
         items:
@@ -227,21 +273,30 @@ definitions:
     required:
     - page_ids
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.TokenPairResponse:
+  dto.TokenPairResponse:
     properties:
       access_token:
         type: string
       refresh_token:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.UpdateChapterRequest:
+  dto.UpdateChapterRequest:
     properties:
       number:
         type: number
       title:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.UpdateMangaRequest:
+  dto.UpdateCommentRequest:
+    properties:
+      content:
+        maxLength: 2000
+        minLength: 1
+        type: string
+    required:
+    - content
+    type: object
+  dto.UpdateMangaRequest:
     properties:
       artist:
         type: string
@@ -252,7 +307,7 @@ definitions:
       description:
         type: string
       status:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_model.MangaStatus'
+        $ref: '#/definitions/model.MangaStatus'
       tags:
         items:
           type: string
@@ -260,16 +315,16 @@ definitions:
       title:
         type: string
       type:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_model.MangaType'
+        $ref: '#/definitions/model.MangaType'
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.UpdateUserRequest:
+  dto.UpdateUserRequest:
     properties:
       bio:
         type: string
       username:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.UpsertBookmarkRequest:
+  dto.UpsertBookmarkRequest:
     properties:
       chapter_id:
         type: string
@@ -280,7 +335,7 @@ definitions:
     - chapter_id
     - last_page_number
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.UserResponse:
+  dto.UserResponse:
     properties:
       avatar_url:
         type: string
@@ -297,7 +352,7 @@ definitions:
       username:
         type: string
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.ZipMetadataSuggestions:
+  dto.ZipMetadataSuggestions:
     properties:
       artist:
         type: string
@@ -316,16 +371,16 @@ definitions:
           type: string
         type: array
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_dto.ZipUploadResponse:
+  dto.ZipUploadResponse:
     properties:
       metadata_suggestions:
-        $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ZipMetadataSuggestions'
+        $ref: '#/definitions/dto.ZipMetadataSuggestions'
       pages:
         items:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.PageUploadResponse'
+          $ref: '#/definitions/dto.PageUploadResponse'
         type: array
     type: object
-  github_com_yumikokawaii_sherry-archive_internal_model.MangaStatus:
+  model.MangaStatus:
     enum:
     - ongoing
     - completed
@@ -335,7 +390,7 @@ definitions:
     - StatusOngoing
     - StatusCompleted
     - StatusHiatus
-  github_com_yumikokawaii_sherry-archive_internal_model.MangaType:
+  model.MangaType:
     enum:
     - series
     - oneshot
@@ -356,22 +411,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.LoginRequest'
+          $ref: '#/definitions/dto.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.AuthResponse'
+            $ref: '#/definitions/dto.AuthResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Login
       tags:
       - auth
@@ -385,18 +440,18 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.LogoutRequest'
+          $ref: '#/definitions/dto.LogoutRequest'
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Logout
@@ -410,11 +465,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.UserResponse'
+            $ref: '#/definitions/dto.UserResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get current user
@@ -430,22 +485,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.RefreshRequest'
+          $ref: '#/definitions/dto.RefreshRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.TokenPairResponse'
+            $ref: '#/definitions/dto.TokenPairResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Refresh access token
       tags:
       - auth
@@ -459,22 +514,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.RegisterRequest'
+          $ref: '#/definitions/dto.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.AuthResponse'
+            $ref: '#/definitions/dto.AuthResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Register a new user
       tags:
       - auth
@@ -536,7 +591,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.PagedResponse-github_com_yumikokawaii_sherry-archive_internal_dto_MangaResponse'
+            $ref: '#/definitions/dto.PagedMangaResponse'
       summary: List manga
       tags:
       - manga
@@ -549,22 +604,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.CreateMangaRequest'
+          $ref: '#/definitions/dto.CreateMangaRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.MangaResponse'
+            $ref: '#/definitions/dto.MangaResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create manga
@@ -584,19 +639,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete manga
@@ -615,15 +670,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.MangaResponse'
+            $ref: '#/definitions/dto.MangaResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Get manga by ID
       tags:
       - manga
@@ -641,30 +696,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.UpdateMangaRequest'
+          $ref: '#/definitions/dto.UpdateMangaRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.MangaResponse'
+            $ref: '#/definitions/dto.MangaResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update manga
@@ -685,16 +740,16 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ChapterResponse'
+              $ref: '#/definitions/dto.ChapterResponse'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: List chapters for a manga
       tags:
       - chapter
@@ -712,30 +767,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.CreateChapterRequest'
+          $ref: '#/definitions/dto.CreateChapterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ChapterResponse'
+            $ref: '#/definitions/dto.ChapterResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Duplicate chapter number or oneshot already has a chapter
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create chapter
@@ -760,19 +815,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete chapter
@@ -796,15 +851,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ChapterWithPagesResponse'
+            $ref: '#/definitions/dto.ChapterWithPagesResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Get chapter with pages
       tags:
       - chapter
@@ -827,35 +882,114 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.UpdateChapterRequest'
+          $ref: '#/definitions/dto.UpdateChapterRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ChapterResponse'
+            $ref: '#/definitions/dto.ChapterResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update chapter
       tags:
       - chapter
+  /mangas/{mangaID}/chapters/{chapterID}/comments:
+    get:
+      parameters:
+      - description: Manga ID
+        in: path
+        name: mangaID
+        required: true
+        type: string
+      - description: Chapter ID
+        in: path
+        name: chapterID
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PagedCommentResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: List chapter comments
+      tags:
+      - comment
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Manga ID
+        in: path
+        name: mangaID
+        required: true
+        type: string
+      - description: Chapter ID
+        in: path
+        name: chapterID
+        required: true
+        type: string
+      - description: Comment
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Post a chapter comment
+      tags:
+      - comment
   /mangas/{mangaID}/chapters/{chapterID}/pages:
     post:
       consumes:
@@ -883,20 +1017,20 @@ paths:
           description: Created
           schema:
             items:
-              $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.PageUploadResponse'
+              $ref: '#/definitions/dto.PageUploadResponse'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Upload individual pages
@@ -926,19 +1060,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a page
@@ -964,22 +1098,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ReorderPagesRequest'
+          $ref: '#/definitions/dto.ReorderPagesRequest'
       responses:
         "204":
           description: No Content
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Reorder pages
@@ -1014,24 +1148,174 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ZipUploadResponse'
+            $ref: '#/definitions/dto.ZipUploadResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Upload pages from ZIP
       tags:
       - page
+  /mangas/{mangaID}/comments:
+    get:
+      parameters:
+      - description: Manga ID
+        in: path
+        name: mangaID
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PagedCommentResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: List manga-level comments
+      tags:
+      - comment
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Manga ID
+        in: path
+        name: mangaID
+        required: true
+        type: string
+      - description: Comment
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Post a manga-level comment
+      tags:
+      - comment
+  /mangas/{mangaID}/comments/{commentID}:
+    delete:
+      parameters:
+      - description: Manga ID
+        in: path
+        name: mangaID
+        required: true
+        type: string
+      - description: Comment ID
+        in: path
+        name: commentID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a comment (comment owner or manga owner)
+      tags:
+      - comment
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Manga ID
+        in: path
+        name: mangaID
+        required: true
+        type: string
+      - description: Comment ID
+        in: path
+        name: commentID
+        required: true
+        type: string
+      - description: Updated content
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CommentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Edit a comment (owner only)
+      tags:
+      - comment
   /mangas/{mangaID}/cover:
     put:
       consumes:
@@ -1053,23 +1337,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.MangaResponse'
+            $ref: '#/definitions/dto.MangaResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Upload manga cover
@@ -1099,23 +1383,23 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.OneshotUploadResponse'
+            $ref: '#/definitions/dto.OneshotUploadResponse'
         "400":
           description: Not a oneshot or invalid ZIP
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Chapter already exists
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Upload oneshot ZIP
@@ -1135,15 +1419,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.PublicUserResponse'
+            $ref: '#/definitions/dto.PublicUserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Get public user profile
       tags:
       - user
@@ -1166,11 +1450,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.PagedResponse-github_com_yumikokawaii_sherry-archive_internal_dto_MangaResponse'
+            $ref: '#/definitions/dto.PagedMangaResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: List manga by user
       tags:
       - manga
@@ -1184,22 +1468,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.UpdateUserRequest'
+          $ref: '#/definitions/dto.UpdateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.UserResponse'
+            $ref: '#/definitions/dto.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update own profile
@@ -1221,15 +1505,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.UserResponse'
+            $ref: '#/definitions/dto.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Upload avatar
@@ -1244,12 +1528,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.BookmarkResponse'
+              $ref: '#/definitions/dto.BookmarkResponse'
             type: array
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List bookmarks
@@ -1269,11 +1553,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete bookmark
@@ -1292,19 +1576,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.BookmarkResponse'
+            $ref: '#/definitions/dto.BookmarkResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get bookmark for a manga
@@ -1324,22 +1608,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.UpsertBookmarkRequest'
+          $ref: '#/definitions/dto.UpsertBookmarkRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.BookmarkResponse'
+            $ref: '#/definitions/dto.BookmarkResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_yumikokawaii_sherry-archive_internal_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create or update bookmark
