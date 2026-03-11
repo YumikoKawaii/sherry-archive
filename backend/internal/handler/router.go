@@ -28,6 +28,9 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 
 	// Serve built frontend static assets (Vite outputs to dist/assets/)
 	r.Static("/assets", "./public/assets")
+	r.StaticFile("/favicon.ico", "./public/favicon.ico")
+	r.StaticFile("/favicon.png", "./public/favicon.png")
+	r.StaticFile("/apple-touch-icon.png", "./public/apple-touch-icon.png")
 
 	// SPA catch-all: serve index.html for all non-API routes so React Router works
 	r.NoRoute(func(c *gin.Context) {
