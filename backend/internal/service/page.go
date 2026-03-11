@@ -16,6 +16,7 @@ import (
 	"github.com/yumikokawaii/sherry-archive/internal/model"
 	"github.com/yumikokawaii/sherry-archive/internal/repository"
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
+	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -37,6 +38,7 @@ type PageService struct {
 	chapterRepo repository.ChapterRepository
 	mangaRepo   repository.MangaRepository
 	storage     *storage.Client
+	urlCache    *urlcache.URLCache
 }
 
 func NewPageService(
@@ -44,12 +46,14 @@ func NewPageService(
 	chapterRepo repository.ChapterRepository,
 	mangaRepo repository.MangaRepository,
 	storage *storage.Client,
+	urlCache *urlcache.URLCache,
 ) *PageService {
 	return &PageService{
 		pageRepo:    pageRepo,
 		chapterRepo: chapterRepo,
 		mangaRepo:   mangaRepo,
 		storage:     storage,
+		urlCache:    urlCache,
 	}
 }
 
@@ -271,11 +275,11 @@ func (s *PageService) GetPagesWithURLs(ctx context.Context, chapterID uuid.UUID)
 
 	urls := make([]string, len(pages))
 	for i, p := range pages {
-		u, err := s.storage.PresignedGetURL(ctx, p.ObjectKey)
+		u, err := s.urlCache.Resolve(ctx, p.ObjectKey)
 		if err != nil {
 			return nil, nil, err
 		}
-		urls[i] = u.String()
+		urls[i] = u
 	}
 	return pages, urls, nil
 }

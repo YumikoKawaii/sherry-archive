@@ -6,16 +6,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yumikokawaii/sherry-archive/internal/dto"
-	"github.com/yumikokawaii/sherry-archive/pkg/storage"
+	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
 )
 
 type Handler struct {
-	store   *Store
-	storage *storage.Client
+	store    *Store
+	urlCache *urlcache.URLCache
 }
 
-func NewHandler(store *Store, storage *storage.Client) *Handler {
-	return &Handler{store: store, storage: storage}
+func NewHandler(store *Store, urlCache *urlcache.URLCache) *Handler {
+	return &Handler{store: store, urlCache: urlCache}
 }
 
 func (h *Handler) Mount(r *gin.Engine) {
@@ -42,12 +42,7 @@ func (h *Handler) Trending(c *gin.Context) {
 
 	out := make([]trendingItem, 0, len(results))
 	for _, r := range results {
-		coverURL := ""
-		if r.Manga.CoverKey != "" {
-			if u, err := h.storage.PresignedGetURL(c.Request.Context(), r.Manga.CoverKey); err == nil {
-				coverURL = u.String()
-			}
-		}
+		coverURL, _ := h.urlCache.Resolve(c.Request.Context(), r.Manga.CoverKey)
 		out = append(out, trendingItem{
 			MangaResponse: dto.NewMangaResponse(r.Manga, coverURL),
 			TrendingScore: r.Score,
@@ -74,12 +69,7 @@ func (h *Handler) Suggestions(c *gin.Context) {
 
 	out := make([]dto.MangaResponse, 0, len(mangas))
 	for _, m := range mangas {
-		coverURL := ""
-		if m.CoverKey != "" {
-			if u, err := h.storage.PresignedGetURL(c.Request.Context(), m.CoverKey); err == nil {
-				coverURL = u.String()
-			}
-		}
+		coverURL, _ := h.urlCache.Resolve(c.Request.Context(), m.CoverKey)
 		out = append(out, dto.NewMangaResponse(m, coverURL))
 	}
 
@@ -103,12 +93,7 @@ func (h *Handler) Similar(c *gin.Context) {
 
 	out := make([]dto.MangaResponse, 0, len(mangas))
 	for _, m := range mangas {
-		coverURL := ""
-		if m.CoverKey != "" {
-			if u, err := h.storage.PresignedGetURL(c.Request.Context(), m.CoverKey); err == nil {
-				coverURL = u.String()
-			}
-		}
+		coverURL, _ := h.urlCache.Resolve(c.Request.Context(), m.CoverKey)
 		out = append(out, dto.NewMangaResponse(m, coverURL))
 	}
 

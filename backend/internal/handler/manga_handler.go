@@ -14,29 +14,24 @@ import (
 	"github.com/yumikokawaii/sherry-archive/internal/service"
 	"github.com/yumikokawaii/sherry-archive/pkg/pagination"
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
+	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
 )
 
 type MangaHandler struct {
 	mangaSvc *service.MangaService
 	storage  *storage.Client
+	urlCache *urlcache.URLCache
 }
 
-func NewMangaHandler(mangaSvc *service.MangaService, storage *storage.Client) *MangaHandler {
-	return &MangaHandler{mangaSvc: mangaSvc, storage: storage}
+func NewMangaHandler(mangaSvc *service.MangaService, storage *storage.Client, urlCache *urlcache.URLCache) *MangaHandler {
+	return &MangaHandler{mangaSvc: mangaSvc, storage: storage, urlCache: urlCache}
 }
 
-// resolveCoverURL converts a stored object key to a presigned URL.
-// This is a local HMAC computation in the MinIO client — no network call.
+// resolveCoverURL converts a stored object key to a cached presigned URL.
 // Returns empty string if key is empty or signing fails.
 func (h *MangaHandler) resolveCoverURL(ctx context.Context, key string) string {
-	if key == "" {
-		return ""
-	}
-	u, err := h.storage.PresignedGetURL(ctx, key)
-	if err != nil {
-		return ""
-	}
-	return u.String()
+	url, _ := h.urlCache.Resolve(ctx, key)
+	return url
 }
 
 func (h *MangaHandler) toResponse(ctx context.Context, m *model.Manga) dto.MangaResponse {

@@ -20,6 +20,7 @@ import (
 	"github.com/yumikokawaii/sherry-archive/internal/service"
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
+	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
 )
 
 func Server(cmd *cobra.Command, args []string) {
@@ -90,19 +91,22 @@ func Server(cmd *cobra.Command, args []string) {
 	commentRepo := postgres.NewCommentRepo(db)
 	refreshTokenRepo := postgres.NewRefreshTokenRepo(db)
 
+	// URL cache — Redis-backed presigned URL cache-aside
+	urlCache := urlcache.New(storageClient, rdb, presignExpiry)
+
 	// Services
 	authSvc := service.NewAuthService(userRepo, refreshTokenRepo, tokenMgr)
 	userSvc := service.NewUserService(userRepo)
 	mangaSvc := service.NewMangaService(mangaRepo)
 	chapterSvc := service.NewChapterService(chapterRepo, mangaRepo)
-	pageSvc := service.NewPageService(pageRepo, chapterRepo, mangaRepo, storageClient)
+	pageSvc := service.NewPageService(pageRepo, chapterRepo, mangaRepo, storageClient, urlCache)
 	bookmarkSvc := service.NewBookmarkService(bookmarkRepo)
 	commentSvc := service.NewCommentService(commentRepo, mangaRepo, chapterRepo)
 
 	// Handlers
 	handlers := handler.Handlers{
 		Auth:     handler.NewAuthHandler(authSvc),
-		Manga:    handler.NewMangaHandler(mangaSvc, storageClient),
+		Manga:    handler.NewMangaHandler(mangaSvc, storageClient, urlCache),
 		Chapter:  handler.NewChapterHandler(chapterSvc, pageSvc),
 		Page:     handler.NewPageHandler(pageSvc),
 		Bookmark: handler.NewBookmarkHandler(bookmarkSvc),
@@ -118,7 +122,7 @@ func Server(cmd *cobra.Command, args []string) {
 
 	// Analytics — real-time trending + suggestions via Redis
 	analyticsStore := analytics.NewStore(rdb, db)
-	analytics.NewHandler(analyticsStore, storageClient).Mount(r)
+	analytics.NewHandler(analyticsStore, urlCache).Mount(r)
 	go analyticsStore.StartDecay(bgCtx)
 
 	// Tracking — mounted independently; enriched by analytics store
