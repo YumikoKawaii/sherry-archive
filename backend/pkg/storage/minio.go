@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"net/url"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	signerv4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -33,11 +33,7 @@ func NewClient(ctx context.Context, region, bucket, endpoint string, presignExpi
 		return nil, err
 	}
 
-	opts := []func(*s3.Options){
-		func(o *s3.Options) {
-			o.APIOptions = append(o.APIOptions, signerv4.SwapComputePayloadSHA256ForUnsignedPayloadMiddleware)
-		},
-	}
+	opts := []func(*s3.Options){}
 	if endpoint != "" {
 		opts = append(opts, func(o *s3.Options) {
 			o.BaseEndpoint = aws.String(endpoint)
@@ -58,10 +54,14 @@ func NewClient(ctx context.Context, region, bucket, endpoint string, presignExpi
 func (c *Client) PutObject(ctx context.Context, objectKey, contentType string, r io.Reader, size int64) error {
 	ctx, cancel := context.WithTimeout(ctx, opTimeout)
 	defer cancel()
-	_, err := c.s3client.PutObject(ctx, &s3.PutObjectInput{
+	buf, err := io.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	_, err = c.s3client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:        aws.String(c.bucket),
 		Key:           aws.String(objectKey),
-		Body:          r,
+		Body:          bytes.NewReader(buf),
 		ContentType:   aws.String(contentType),
 		ContentLength: aws.Int64(size),
 	})
