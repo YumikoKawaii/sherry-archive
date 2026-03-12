@@ -4,7 +4,7 @@
   ✦ · · · ✦ · · · ✦
 ```
 
-> A self-hosted manga reading platform built for speed and simplicity.
+> A manga reading platform built for speed and simplicity — live at **[sherry-archive.com](https://sherry-archive.com)**
 
 ---
 
