@@ -70,6 +70,13 @@ type RefreshTokenRepository interface {
 	DeleteByUserID(ctx context.Context, userID uuid.UUID) error
 }
 
+type UploadTaskRepository interface {
+	Create(ctx context.Context, t *model.UploadTask) error
+	GetByID(ctx context.Context, id uuid.UUID) (*model.UploadTask, error)
+	UpdateStatus(ctx context.Context, id uuid.UUID, status model.UploadTaskStatus, errMsg string) error
+	SetChapterAndDone(ctx context.Context, id uuid.UUID, chapterID uuid.UUID) error
+}
+
 type CommentRepository interface {
 	Create(ctx context.Context, c *model.Comment) error
 	GetByID(ctx context.Context, id uuid.UUID) (*model.CommentWithAuthor, error)

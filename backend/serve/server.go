@@ -18,6 +18,7 @@ import (
 	"github.com/yumikokawaii/sherry-archive/internal/handler"
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
 	"github.com/yumikokawaii/sherry-archive/internal/service"
+	"github.com/yumikokawaii/sherry-archive/pkg/queue"
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
@@ -82,6 +83,12 @@ func Server(cmd *cobra.Command, args []string) {
 		refreshExpiry,
 	)
 
+	// SQS
+	sqsClient, err := queue.NewClient(context.Background(), cfg.S3.Region, cfg.SQS.QueueURL)
+	if err != nil {
+		log.Fatalf("sqs: %v", err)
+	}
+
 	// Repositories
 	userRepo := postgres.NewUserRepo(db)
 	mangaRepo := postgres.NewMangaRepo(db)
@@ -90,6 +97,7 @@ func Server(cmd *cobra.Command, args []string) {
 	bookmarkRepo := postgres.NewBookmarkRepo(db)
 	commentRepo := postgres.NewCommentRepo(db)
 	refreshTokenRepo := postgres.NewRefreshTokenRepo(db)
+	uploadTaskRepo := postgres.NewUploadTaskRepo(db)
 
 	// URL cache — Redis-backed presigned URL cache-aside
 	urlCache := urlcache.New(storageClient, rdb, presignExpiry)
@@ -102,16 +110,18 @@ func Server(cmd *cobra.Command, args []string) {
 	pageSvc := service.NewPageService(pageRepo, chapterRepo, mangaRepo, storageClient, urlCache)
 	bookmarkSvc := service.NewBookmarkService(bookmarkRepo)
 	commentSvc := service.NewCommentService(commentRepo, mangaRepo, chapterRepo)
+	uploadTaskSvc := service.NewUploadTaskService(uploadTaskRepo, mangaRepo, chapterRepo, storageClient, sqsClient)
 
 	// Handlers
 	handlers := handler.Handlers{
-		Auth:     handler.NewAuthHandler(authSvc),
-		Manga:    handler.NewMangaHandler(mangaSvc, storageClient, urlCache),
-		Chapter:  handler.NewChapterHandler(chapterSvc, pageSvc),
-		Page:     handler.NewPageHandler(pageSvc),
-		Bookmark: handler.NewBookmarkHandler(bookmarkSvc),
-		User:     handler.NewUserHandler(userSvc, storageClient),
-		Comment:  handler.NewCommentHandler(commentSvc),
+		Auth:       handler.NewAuthHandler(authSvc),
+		Manga:      handler.NewMangaHandler(mangaSvc, storageClient, urlCache),
+		Chapter:    handler.NewChapterHandler(chapterSvc, pageSvc),
+		Page:       handler.NewPageHandler(pageSvc, uploadTaskSvc),
+		Bookmark:   handler.NewBookmarkHandler(bookmarkSvc),
+		User:       handler.NewUserHandler(userSvc, storageClient),
+		Comment:    handler.NewCommentHandler(commentSvc),
+		UploadTask: handler.NewUploadTaskHandler(uploadTaskSvc),
 	}
 
 	r := handler.SetupRouter(handlers, tokenMgr)

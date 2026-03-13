@@ -9,13 +9,14 @@ import (
 )
 
 type Handlers struct {
-	Auth     *AuthHandler
-	Manga    *MangaHandler
-	Chapter  *ChapterHandler
-	Page     *PageHandler
-	Bookmark *BookmarkHandler
-	User     *UserHandler
-	Comment  *CommentHandler
+	Auth       *AuthHandler
+	Manga      *MangaHandler
+	Chapter    *ChapterHandler
+	Page       *PageHandler
+	Bookmark   *BookmarkHandler
+	User       *UserHandler
+	Comment    *CommentHandler
+	UploadTask *UploadTaskHandler
 }
 
 func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
@@ -104,6 +105,9 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 		bookmarks.PUT("/:mangaID", h.Bookmark.Upsert)
 		bookmarks.DELETE("/:mangaID", h.Bookmark.Delete)
 	}
+
+	// Upload task status polling
+	v1.GET("/tasks/:taskID", authMW, h.UploadTask.GetTask)
 
 	return r
 }

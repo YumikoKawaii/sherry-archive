@@ -12,6 +12,7 @@ type Application struct {
 	JWT    *JWTConfig    `json:"jwt"    mapstructure:"jwt"    yaml:"jwt"`
 	S3     *S3Config     `json:"s3"     mapstructure:"s3"     yaml:"s3"`
 	Redis  *RedisConfig  `json:"redis"  mapstructure:"redis"  yaml:"redis"`
+	SQS    *SQSConfig    `json:"sqs"    mapstructure:"sqs"    yaml:"sqs"`
 }
 
 type ServerConfig struct {
@@ -69,6 +70,12 @@ type RedisConfig struct {
 	TLS      bool   `json:"tls"      mapstructure:"tls"      yaml:"tls"`
 }
 
+// SQSConfig holds the SQS queue URL for async upload processing.
+// Env var: SQS__QUEUE_URL
+type SQSConfig struct {
+	QueueURL string `json:"queue_url" mapstructure:"queue_url" yaml:"queue_url"`
+}
+
 func loadDefault() *Application {
 	return &Application{
 		Server: &ServerConfig{
@@ -100,6 +107,9 @@ func loadDefault() *Application {
 			Password: "",
 			DB:       0,
 			TLS:      true,
+		},
+		SQS: &SQSConfig{
+			QueueURL: "",
 		},
 	}
 }

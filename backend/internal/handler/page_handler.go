@@ -14,11 +14,12 @@ import (
 )
 
 type PageHandler struct {
-	pageSvc *service.PageService
+	pageSvc       *service.PageService
+	uploadTaskSvc *service.UploadTaskService
 }
 
-func NewPageHandler(pageSvc *service.PageService) *PageHandler {
-	return &PageHandler{pageSvc: pageSvc}
+func NewPageHandler(pageSvc *service.PageService, uploadTaskSvc *service.UploadTaskService) *PageHandler {
+	return &PageHandler{pageSvc: pageSvc, uploadTaskSvc: uploadTaskSvc}
 }
 
 // Upload godoc
@@ -91,8 +92,8 @@ func (h *PageHandler) Upload(c *gin.Context) {
 
 // UploadZip godoc
 //
-//	@Summary	Upload pages from ZIP
-//	@Description	Replaces all pages in the chapter. Files inside the ZIP are sorted by filename. An optional metadata.json at the ZIP root is parsed and returned as suggestions.
+//	@Summary	Upload pages from ZIP (async)
+//	@Description	Enqueues a ZIP upload for async processing. Returns 202 with a task_id to poll for status.
 //	@Tags		page
 //	@Accept		mpfd
 //	@Produce	json
@@ -100,7 +101,7 @@ func (h *PageHandler) Upload(c *gin.Context) {
 //	@Param		mangaID		path		string	true	"Manga ID"
 //	@Param		chapterID	path		string	true	"Chapter ID"
 //	@Param		file		formData	file	true	"ZIP archive"
-//	@Success	201			{object}	dto.ZipUploadResponse
+//	@Success	202			{object}	dto.EnqueueResponse
 //	@Failure	400			{object}	dto.ErrorResponse
 //	@Failure	401			{object}	dto.ErrorResponse
 //	@Failure	403			{object}	dto.ErrorResponse
@@ -117,11 +118,6 @@ func (h *PageHandler) UploadZip(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "zip file is required (field: file)"})
 		return
 	}
-	if fileHeader.Header.Get("Content-Type") != "application/zip" &&
-		fileHeader.Header.Get("Content-Type") != "application/x-zip-compressed" {
-		// Allow content-type to be missing or wrong — we'll try to parse anyway
-		// Only hard-reject if the client sends a clearly wrong type
-	}
 
 	f, err := fileHeader.Open()
 	if err != nil {
@@ -130,44 +126,28 @@ func (h *PageHandler) UploadZip(c *gin.Context) {
 	}
 	defer f.Close()
 
-	pages, meta, err := h.pageSvc.UploadZip(c.Request.Context(), userID, mangaID, chapterID, f, fileHeader.Size)
+	task, err := h.uploadTaskSvc.EnqueueZipUpload(c.Request.Context(), userID, mangaID, chapterID, f)
 	if err != nil {
 		respondError(c, err)
 		return
 	}
-
-	resp := dto.ZipUploadResponse{
-		Pages: toPageUploadResponseList(pages),
-	}
-	if meta != nil {
-		resp.MetadataSuggestions = &dto.ZipMetadataSuggestions{
-			ChapterNumber: meta.ChapterNumber,
-			ChapterTitle:  meta.ChapterTitle,
-			Author:        meta.Author,
-			Artist:        meta.Artist,
-			Tags:          meta.Tags,
-			Category:      meta.Category,
-			Language:      meta.Language,
-		}
-	}
-	respondCreated(c, resp)
+	c.JSON(http.StatusAccepted, gin.H{"data": dto.EnqueueResponse{TaskID: task.ID}})
 }
 
 // UploadOneshotZip godoc
 //
-//	@Summary	Upload oneshot ZIP
-//	@Description	For oneshot manga only. Auto-creates the chapter (number=0), uploads pages, sets the first page as cover if none exists, and returns metadata suggestions from an optional metadata.json in the ZIP.
+//	@Summary	Upload oneshot ZIP (async)
+//	@Description	For oneshot manga only. Enqueues zip processing; Lambda creates the chapter and uploads pages. Returns 202 with a task_id to poll for status.
 //	@Tags		page
 //	@Accept		mpfd
 //	@Produce	json
 //	@Security	BearerAuth
 //	@Param		mangaID	path		string	true	"Manga ID (must be type=oneshot)"
 //	@Param		file	formData	file	true	"ZIP archive"
-//	@Success	201		{object}	dto.OneshotUploadResponse
+//	@Success	202		{object}	dto.EnqueueResponse
 //	@Failure	400		{object}	dto.ErrorResponse	"Not a oneshot or invalid ZIP"
 //	@Failure	401		{object}	dto.ErrorResponse
 //	@Failure	403		{object}	dto.ErrorResponse
-//	@Failure	409		{object}	dto.ErrorResponse	"Chapter already exists"
 //	@Router		/mangas/{mangaID}/oneshot/upload [post]
 func (h *PageHandler) UploadOneshotZip(c *gin.Context) {
 	userID := middleware.MustUserID(c)
@@ -190,28 +170,12 @@ func (h *PageHandler) UploadOneshotZip(c *gin.Context) {
 	}
 	defer f.Close()
 
-	result, err := h.pageSvc.UploadOneshotZip(c.Request.Context(), userID, mangaID, f, fileHeader.Size)
+	task, err := h.uploadTaskSvc.EnqueueOneshotZipUpload(c.Request.Context(), userID, mangaID, f)
 	if err != nil {
 		respondError(c, err)
 		return
 	}
-
-	resp := dto.OneshotUploadResponse{
-		Chapter: dto.NewChapterResponse(result.Chapter),
-		Pages:   toPageUploadResponseList(result.Pages),
-	}
-	if result.Meta != nil {
-		resp.MetadataSuggestions = &dto.ZipMetadataSuggestions{
-			ChapterNumber: result.Meta.ChapterNumber,
-			ChapterTitle:  result.Meta.ChapterTitle,
-			Author:        result.Meta.Author,
-			Artist:        result.Meta.Artist,
-			Tags:          result.Meta.Tags,
-			Category:      result.Meta.Category,
-			Language:      result.Meta.Language,
-		}
-	}
-	respondCreated(c, resp)
+	c.JSON(http.StatusAccepted, gin.H{"data": dto.EnqueueResponse{TaskID: task.ID}})
 }
 
 // Delete godoc

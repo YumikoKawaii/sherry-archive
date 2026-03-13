@@ -54,18 +54,38 @@ func NewClient(ctx context.Context, region, bucket, endpoint string, presignExpi
 func (c *Client) PutObject(ctx context.Context, objectKey, contentType string, r io.Reader, size int64) error {
 	ctx, cancel := context.WithTimeout(ctx, opTimeout)
 	defer cancel()
-	buf, err := io.ReadAll(r)
-	if err != nil {
-		return err
+	// Avoid double-buffering if the caller already has a seekable reader (e.g. bytes.NewReader).
+	rs, ok := r.(io.ReadSeeker)
+	if !ok {
+		buf, err := io.ReadAll(r)
+		if err != nil {
+			return err
+		}
+		size = int64(len(buf))
+		rs = bytes.NewReader(buf)
 	}
-	_, err = c.s3client.PutObject(ctx, &s3.PutObjectInput{
+	_, err := c.s3client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:        aws.String(c.bucket),
 		Key:           aws.String(objectKey),
-		Body:          bytes.NewReader(buf),
+		Body:          rs,
 		ContentType:   aws.String(contentType),
 		ContentLength: aws.Int64(size),
 	})
 	return err
+}
+
+// GetObject downloads an object from S3 and returns its body.
+// The caller is responsible for closing the returned ReadCloser.
+// No internal timeout is applied — use a context deadline if needed.
+func (c *Client) GetObject(ctx context.Context, objectKey string) (io.ReadCloser, error) {
+	out, err := c.s3client.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(c.bucket),
+		Key:    aws.String(objectKey),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return out.Body, nil
 }
 
 func (c *Client) DeleteObject(ctx context.Context, objectKey string) error {
