@@ -75,7 +75,15 @@ func processRecord(ctx context.Context, record events.SQSMessage) error {
 		return fmt.Errorf("unmarshal message: %w", err)
 	}
 
-	_ = uploadTaskRepo.UpdateStatus(ctx, msg.TaskID, model.UploadTaskStatusProcessing, "")
+	// Atomically claim the task (pending → processing).
+	// Returns false if another Lambda already claimed it or it's already done — skip silently.
+	claimed, err := uploadTaskRepo.ClaimProcessing(ctx, msg.TaskID)
+	if err != nil {
+		return fmt.Errorf("claim task: %w", err)
+	}
+	if !claimed {
+		return nil
+	}
 
 	if err := process(ctx, msg); err != nil {
 		_ = uploadTaskRepo.UpdateStatus(ctx, msg.TaskID, model.UploadTaskStatusFailed, err.Error())

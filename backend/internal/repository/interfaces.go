@@ -73,6 +73,9 @@ type RefreshTokenRepository interface {
 type UploadTaskRepository interface {
 	Create(ctx context.Context, t *model.UploadTask) error
 	GetByID(ctx context.Context, id uuid.UUID) (*model.UploadTask, error)
+	// ClaimProcessing atomically transitions a task from pending → processing.
+	// Returns false if the task was already claimed or completed (duplicate delivery guard).
+	ClaimProcessing(ctx context.Context, id uuid.UUID) (claimed bool, err error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status model.UploadTaskStatus, errMsg string) error
 	SetChapterAndDone(ctx context.Context, id uuid.UUID, chapterID uuid.UUID) error
 }

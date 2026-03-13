@@ -33,6 +33,18 @@ func (r *UploadTaskRepo) GetByID(ctx context.Context, id uuid.UUID) (*model.Uplo
 	return &t, err
 }
 
+func (r *UploadTaskRepo) ClaimProcessing(ctx context.Context, id uuid.UUID) (bool, error) {
+	res, err := r.db.ExecContext(ctx,
+		`UPDATE upload_tasks SET status = $1, updated_at = $2 WHERE id = $3 AND status = $4`,
+		model.UploadTaskStatusProcessing, time.Now(), id, model.UploadTaskStatusPending,
+	)
+	if err != nil {
+		return false, err
+	}
+	n, err := res.RowsAffected()
+	return n > 0, err
+}
+
 func (r *UploadTaskRepo) UpdateStatus(ctx context.Context, id uuid.UUID, status model.UploadTaskStatus, errMsg string) error {
 	_, err := r.db.ExecContext(ctx,
 		`UPDATE upload_tasks SET status = $1, error = $2, updated_at = $3 WHERE id = $4`,
