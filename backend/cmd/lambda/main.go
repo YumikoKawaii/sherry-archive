@@ -28,21 +28,22 @@ var (
 )
 
 func init() {
+	log.Println("[init] loading config")
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("config: %v", err)
+		log.Fatalf("[init] config: %v", err)
 	}
 
+	log.Println("[init] connecting to database")
 	db, err := postgres.Connect(cfg.DB.DSN())
 	if err != nil {
-		log.Fatalf("db: %v", err)
+		log.Fatalf("[init] db: %v", err)
 	}
 
-	// presignExpiry is unused in Lambda (we never generate presigned URLs here),
-	// but NewClient requires it — pass any non-zero value.
+	log.Printf("[init] connecting to S3 bucket=%s region=%s", cfg.S3.Bucket, cfg.S3.Region)
 	sc, err := storage.NewClient(context.Background(), cfg.S3.Region, cfg.S3.Bucket, cfg.S3.Endpoint, time.Hour)
 	if err != nil {
-		log.Fatalf("s3: %v", err)
+		log.Fatalf("[init] s3: %v", err)
 	}
 
 	pageRepo := postgres.NewPageRepo(db)
@@ -53,6 +54,7 @@ func init() {
 	pageSvc = service.NewPageService(pageRepo, chapterRepo, mangaRepo, sc, nil)
 	uploadTaskRepo = postgres.NewUploadTaskRepo(db)
 	storageClient = sc
+	log.Println("[init] ready")
 }
 
 func main() {
@@ -75,6 +77,8 @@ func processRecord(ctx context.Context, record events.SQSMessage) error {
 		return fmt.Errorf("unmarshal message: %w", err)
 	}
 
+	log.Printf("[task:%s] received type=%s manga=%s", msg.TaskID, msg.Type, msg.MangaID)
+
 	// Atomically claim the task (pending → processing).
 	// Returns false if another Lambda already claimed it or it's already done — skip silently.
 	claimed, err := uploadTaskRepo.ClaimProcessing(ctx, msg.TaskID)
@@ -82,18 +86,22 @@ func processRecord(ctx context.Context, record events.SQSMessage) error {
 		return fmt.Errorf("claim task: %w", err)
 	}
 	if !claimed {
+		log.Printf("[task:%s] already claimed or done, skipping", msg.TaskID)
 		return nil
 	}
 
+	log.Printf("[task:%s] claimed, processing", msg.TaskID)
 	if err := process(ctx, msg); err != nil {
+		log.Printf("[task:%s] failed: %v", msg.TaskID, err)
 		_ = uploadTaskRepo.UpdateStatus(ctx, msg.TaskID, model.UploadTaskStatusFailed, err.Error())
 		return err
 	}
+	log.Printf("[task:%s] done", msg.TaskID)
 	return nil
 }
 
 func process(ctx context.Context, msg queue.UploadMessage) error {
-	// Download staging zip to a temp file so we have io.ReaderAt for zip.NewReader.
+	log.Printf("[task:%s] downloading staging zip s3_key=%s", msg.TaskID, msg.S3Key)
 	body, err := storageClient.GetObject(ctx, msg.S3Key)
 	if err != nil {
 		return fmt.Errorf("get staging zip: %w", err)
@@ -111,6 +119,8 @@ func process(ctx context.Context, msg queue.UploadMessage) error {
 	if err != nil {
 		return fmt.Errorf("write temp file: %w", err)
 	}
+	log.Printf("[task:%s] zip downloaded size=%d bytes", msg.TaskID, size)
+
 	if _, err := tmp.Seek(0, io.SeekStart); err != nil {
 		return err
 	}
@@ -120,23 +130,26 @@ func process(ctx context.Context, msg queue.UploadMessage) error {
 		if msg.ChapterID == nil {
 			return fmt.Errorf("chapter_id required for zip task")
 		}
+		log.Printf("[task:%s] processing zip chapter=%s", msg.TaskID, *msg.ChapterID)
 		if _, _, err := pageSvc.UploadZip(ctx, msg.OwnerID, msg.MangaID, *msg.ChapterID, tmp, size); err != nil {
 			return err
 		}
 		_ = uploadTaskRepo.UpdateStatus(ctx, msg.TaskID, model.UploadTaskStatusDone, "")
 
 	case model.UploadTaskTypeOneshotZip:
+		log.Printf("[task:%s] processing oneshot zip manga=%s", msg.TaskID, msg.MangaID)
 		result, err := pageSvc.UploadOneshotZip(ctx, msg.OwnerID, msg.MangaID, tmp, size)
 		if err != nil {
 			return err
 		}
+		log.Printf("[task:%s] oneshot chapter created chapter=%s", msg.TaskID, result.Chapter.ID)
 		_ = uploadTaskRepo.SetChapterAndDone(ctx, msg.TaskID, result.Chapter.ID)
 
 	default:
 		return fmt.Errorf("unknown task type: %s", msg.Type)
 	}
 
-	// Delete staging zip — best effort, don't fail the task if this errors.
+	log.Printf("[task:%s] deleting staging zip", msg.TaskID)
 	_ = storageClient.DeleteObject(ctx, msg.S3Key)
 	return nil
 }
