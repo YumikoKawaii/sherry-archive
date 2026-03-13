@@ -7,13 +7,10 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 	"github.com/yumikokawaii/sherry-archive/internal/model"
 	"github.com/yumikokawaii/sherry-archive/internal/repository"
@@ -23,8 +20,6 @@ import (
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
 )
 
-const ssmPath = "/sherry-archive/"
-
 // Initialized once on cold start, reused across warm invocations.
 var (
 	pageSvc        *service.PageService
@@ -32,38 +27,7 @@ var (
 	storageClient  *storage.Client
 )
 
-// loadSSMConfig fetches all parameters under /sherry-archive/ and sets them
-// as env vars so config.Load() (Viper) picks them up — same approach as deploy.sh.
-func loadSSMConfig(ctx context.Context) {
-	cfg, err := awsconfig.LoadDefaultConfig(ctx)
-	if err != nil {
-		log.Fatalf("ssm: load aws config: %v", err)
-	}
-	client := ssm.NewFromConfig(cfg)
-
-	paginator := ssm.NewGetParametersByPathPaginator(client, &ssm.GetParametersByPathInput{
-		Path:           stringPtr(ssmPath),
-		WithDecryption: boolPtr(true),
-		Recursive:      boolPtr(false),
-	})
-	for paginator.HasMorePages() {
-		page, err := paginator.NextPage(ctx)
-		if err != nil {
-			log.Fatalf("ssm: get parameters: %v", err)
-		}
-		for _, p := range page.Parameters {
-			key := strings.TrimPrefix(*p.Name, ssmPath)
-			if err := os.Setenv(key, *p.Value); err != nil {
-				log.Fatalf("ssm: setenv %s: %v", key, err)
-			}
-		}
-	}
-}
-
 func init() {
-	ctx := context.Background()
-	loadSSMConfig(ctx)
-
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("config: %v", err)
@@ -177,5 +141,3 @@ func process(ctx context.Context, msg queue.UploadMessage) error {
 	return nil
 }
 
-func stringPtr(s string) *string { return &s }
-func boolPtr(b bool) *bool       { return &b }
