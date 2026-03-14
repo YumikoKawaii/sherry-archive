@@ -113,6 +113,11 @@ definitions:
     required:
     - title
     type: object
+  dto.EnqueueResponse:
+    properties:
+      task_id:
+        type: string
+    type: object
   dto.ErrorResponse:
     properties:
       error:
@@ -167,17 +172,6 @@ definitions:
         $ref: '#/definitions/model.MangaType'
       updated_at:
         type: string
-    type: object
-  dto.OneshotUploadResponse:
-    properties:
-      chapter:
-        $ref: '#/definitions/dto.ChapterResponse'
-      metadata_suggestions:
-        $ref: '#/definitions/dto.ZipMetadataSuggestions'
-      pages:
-        items:
-          $ref: '#/definitions/dto.PageUploadResponse'
-        type: array
     type: object
   dto.PageItemResponse:
     properties:
@@ -324,6 +318,25 @@ definitions:
       username:
         type: string
     type: object
+  dto.UploadTaskResponse:
+    properties:
+      chapter_id:
+        type: string
+      created_at:
+        type: string
+      error:
+        type: string
+      id:
+        type: string
+      manga_id:
+        type: string
+      status:
+        $ref: '#/definitions/model.UploadTaskStatus'
+      type:
+        $ref: '#/definitions/model.UploadTaskType'
+      updated_at:
+        type: string
+    type: object
   dto.UpsertBookmarkRequest:
     properties:
       chapter_id:
@@ -352,34 +365,6 @@ definitions:
       username:
         type: string
     type: object
-  dto.ZipMetadataSuggestions:
-    properties:
-      artist:
-        type: string
-      author:
-        type: string
-      category:
-        type: string
-      chapter_number:
-        type: number
-      chapter_title:
-        type: string
-      language:
-        type: string
-      tags:
-        items:
-          type: string
-        type: array
-    type: object
-  dto.ZipUploadResponse:
-    properties:
-      metadata_suggestions:
-        $ref: '#/definitions/dto.ZipMetadataSuggestions'
-      pages:
-        items:
-          $ref: '#/definitions/dto.PageUploadResponse'
-        type: array
-    type: object
   model.MangaStatus:
     enum:
     - ongoing
@@ -398,6 +383,26 @@ definitions:
     x-enum-varnames:
     - TypeSeries
     - TypeOneshot
+  model.UploadTaskStatus:
+    enum:
+    - pending
+    - processing
+    - done
+    - failed
+    type: string
+    x-enum-varnames:
+    - UploadTaskStatusPending
+    - UploadTaskStatusProcessing
+    - UploadTaskStatusDone
+    - UploadTaskStatusFailed
+  model.UploadTaskType:
+    enum:
+    - zip
+    - oneshot_zip
+    type: string
+    x-enum-varnames:
+    - UploadTaskTypeZip
+    - UploadTaskTypeOneshotZip
 info:
   contact: {}
 paths:
@@ -1123,9 +1128,8 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: Replaces all pages in the chapter. Files inside the ZIP are sorted
-        by filename. An optional metadata.json at the ZIP root is parsed and returned
-        as suggestions.
+      description: Enqueues a ZIP upload for async processing. Returns 202 with a
+        task_id to poll for status.
       parameters:
       - description: Manga ID
         in: path
@@ -1145,10 +1149,10 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "202":
+          description: Accepted
           schema:
-            $ref: '#/definitions/dto.ZipUploadResponse'
+            $ref: '#/definitions/dto.EnqueueResponse'
         "400":
           description: Bad Request
           schema:
@@ -1163,7 +1167,7 @@ paths:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Upload pages from ZIP
+      summary: Upload pages from ZIP (async)
       tags:
       - page
   /mangas/{mangaID}/comments:
@@ -1363,9 +1367,8 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: For oneshot manga only. Auto-creates the chapter (number=0), uploads
-        pages, sets the first page as cover if none exists, and returns metadata suggestions
-        from an optional metadata.json in the ZIP.
+      description: For oneshot manga only. Enqueues zip processing; Lambda creates
+        the chapter and uploads pages. Returns 202 with a task_id to poll for status.
       parameters:
       - description: Manga ID (must be type=oneshot)
         in: path
@@ -1380,10 +1383,10 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "202":
+          description: Accepted
           schema:
-            $ref: '#/definitions/dto.OneshotUploadResponse'
+            $ref: '#/definitions/dto.EnqueueResponse'
         "400":
           description: Not a oneshot or invalid ZIP
           schema:
@@ -1396,15 +1399,33 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
-        "409":
-          description: Chapter already exists
+      security:
+      - BearerAuth: []
+      summary: Upload oneshot ZIP (async)
+      tags:
+      - page
+  /tasks/{taskID}:
+    get:
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UploadTaskResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Upload oneshot ZIP
+      summary: Get upload task status
       tags:
-      - page
+      - upload
   /users/{userID}:
     get:
       parameters:

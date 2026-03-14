@@ -1070,7 +1070,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Replaces all pages in the chapter. Files inside the ZIP are sorted by filename. An optional metadata.json at the ZIP root is parsed and returned as suggestions.",
+                "description": "Enqueues a ZIP upload for async processing. Returns 202 with a task_id to poll for status.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -1080,7 +1080,7 @@ const docTemplate = `{
                 "tags": [
                     "page"
                 ],
-                "summary": "Upload pages from ZIP",
+                "summary": "Upload pages from ZIP (async)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1105,10 +1105,10 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "$ref": "#/definitions/dto.ZipUploadResponse"
+                            "$ref": "#/definitions/dto.EnqueueResponse"
                         }
                     },
                     "400": {
@@ -1504,7 +1504,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "For oneshot manga only. Auto-creates the chapter (number=0), uploads pages, sets the first page as cover if none exists, and returns metadata suggestions from an optional metadata.json in the ZIP.",
+                "description": "For oneshot manga only. Enqueues zip processing; Lambda creates the chapter and uploads pages. Returns 202 with a task_id to poll for status.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -1514,7 +1514,7 @@ const docTemplate = `{
                 "tags": [
                     "page"
                 ],
-                "summary": "Upload oneshot ZIP",
+                "summary": "Upload oneshot ZIP (async)",
                 "parameters": [
                     {
                         "type": "string",
@@ -1532,10 +1532,10 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "$ref": "#/definitions/dto.OneshotUploadResponse"
+                            "$ref": "#/definitions/dto.EnqueueResponse"
                         }
                     },
                     "400": {
@@ -1555,9 +1555,39 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
+                    }
+                }
+            }
+        },
+        "/tasks/{taskID}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "upload"
+                ],
+                "summary": "Get upload task status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Task ID",
+                        "name": "taskID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UploadTaskResponse"
+                        }
                     },
-                    "409": {
-                        "description": "Chapter already exists",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -2096,6 +2126,14 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.EnqueueResponse": {
+            "type": "object",
+            "properties": {
+                "task_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -2177,23 +2215,6 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
-                }
-            }
-        },
-        "dto.OneshotUploadResponse": {
-            "type": "object",
-            "properties": {
-                "chapter": {
-                    "$ref": "#/definitions/dto.ChapterResponse"
-                },
-                "metadata_suggestions": {
-                    "$ref": "#/definitions/dto.ZipMetadataSuggestions"
-                },
-                "pages": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.PageUploadResponse"
-                    }
                 }
             }
         },
@@ -2417,6 +2438,35 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UploadTaskResponse": {
+            "type": "object",
+            "properties": {
+                "chapter_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "manga_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.UploadTaskStatus"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.UploadTaskType"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UpsertBookmarkRequest": {
             "type": "object",
             "required": [
@@ -2459,49 +2509,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ZipMetadataSuggestions": {
-            "type": "object",
-            "properties": {
-                "artist": {
-                    "type": "string"
-                },
-                "author": {
-                    "type": "string"
-                },
-                "category": {
-                    "type": "string"
-                },
-                "chapter_number": {
-                    "type": "number"
-                },
-                "chapter_title": {
-                    "type": "string"
-                },
-                "language": {
-                    "type": "string"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "dto.ZipUploadResponse": {
-            "type": "object",
-            "properties": {
-                "metadata_suggestions": {
-                    "$ref": "#/definitions/dto.ZipMetadataSuggestions"
-                },
-                "pages": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.PageUploadResponse"
-                    }
-                }
-            }
-        },
         "model.MangaStatus": {
             "type": "string",
             "enum": [
@@ -2524,6 +2531,32 @@ const docTemplate = `{
             "x-enum-varnames": [
                 "TypeSeries",
                 "TypeOneshot"
+            ]
+        },
+        "model.UploadTaskStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "processing",
+                "done",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "UploadTaskStatusPending",
+                "UploadTaskStatusProcessing",
+                "UploadTaskStatusDone",
+                "UploadTaskStatusFailed"
+            ]
+        },
+        "model.UploadTaskType": {
+            "type": "string",
+            "enum": [
+                "zip",
+                "oneshot_zip"
+            ],
+            "x-enum-varnames": [
+                "UploadTaskTypeZip",
+                "UploadTaskTypeOneshotZip"
             ]
         }
     }

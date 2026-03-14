@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { mangaApi, analyticsApi, bookmarkApi } from '../lib/manga'
@@ -38,6 +38,10 @@ export function MangaDetailPage() {
   // Bookmark state
   const [bookmark, setBookmark] = useState<Bookmark | null>(null)
   const [bookmarkLoading, setBookmarkLoading] = useState(false)
+
+  // Cover upload state
+  const [coverUploading, setCoverUploading] = useState(false)
+  const coverInputRef = useRef<HTMLInputElement>(null)
 
   // Delete state
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -120,6 +124,19 @@ export function MangaDetailPage() {
       setSaveError(err instanceof ApiError ? err.message : 'Failed to save')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !mangaID) return
+    setCoverUploading(true)
+    try {
+      const updated = await mangaApi.uploadCover(mangaID, file)
+      setManga(updated)
+    } finally {
+      setCoverUploading(false)
+      e.target.value = ''
     }
   }
 
@@ -379,6 +396,33 @@ export function MangaDetailPage() {
               transition={{ duration: 0.2 }}
               className="mt-6 bg-forest-900 border border-forest-700 rounded-xl p-6 space-y-5"
             >
+              {/* Cover */}
+              <div>
+                <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Cover</label>
+                <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
+                <button
+                  type="button"
+                  onClick={() => coverInputRef.current?.click()}
+                  disabled={coverUploading}
+                  className="relative w-24 h-32 rounded-lg overflow-hidden border border-forest-600
+                             hover:border-jade-500/50 transition group disabled:opacity-50"
+                >
+                  {manga.cover_url ? (
+                    <img src={manga.cover_url} alt="Cover" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-forest-800 flex items-center justify-center">
+                      <span className="text-2xl opacity-20">漫</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-forest-950/70 opacity-0 group-hover:opacity-100
+                                  transition flex items-center justify-center">
+                    <span className="text-xs text-mint-50 font-medium">
+                      {coverUploading ? 'Uploading…' : 'Change'}
+                    </span>
+                  </div>
+                </button>
+              </div>
+
               {/* Status */}
               <div>
                 <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Status</label>

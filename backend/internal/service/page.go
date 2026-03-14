@@ -175,6 +175,15 @@ func (s *PageService) UploadZip(ctx context.Context, requesterID, mangaID, chapt
 		return nil, nil, err
 	}
 
+	// Auto-set cover from first page if manga has no cover yet (best-effort).
+	if len(pages) > 0 {
+		if m, err := s.mangaRepo.GetByID(ctx, mangaID); err == nil && m.CoverKey == "" {
+			m.CoverKey = pages[0].ObjectKey
+			m.UpdatedAt = time.Now()
+			_ = s.mangaRepo.Update(ctx, m)
+		}
+	}
+
 	return pages, meta, nil
 }
 
