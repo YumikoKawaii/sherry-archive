@@ -1,14 +1,16 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { mangaApi } from '../lib/manga'
+import { mangaApi, bookmarkApi } from '../lib/manga'
 import type { ChapterWithPages, Chapter } from '../types/manga'
 import { Spinner } from '../components/Spinner'
 import { CommentSection } from '../components/CommentSection'
 import { tracker } from '../lib/tracking'
+import { useAuth } from '../contexts/AuthContext'
 
 export function ReaderPage() {
   const { mangaID, chapterID } = useParams<{ mangaID: string; chapterID: string }>()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [data, setData] = useState<ChapterWithPages | null>(null)
   const [allChapters, setAllChapters] = useState<Chapter[]>([])
@@ -17,6 +19,15 @@ export function ReaderPage() {
   const [error, setError] = useState('')
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const openedAt = useRef<number>(Date.now())
+  const bookmarkTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function updateBookmark(pageNumber: number) {
+    if (!user || !mangaID || !chapterID) return
+    if (bookmarkTimer.current) clearTimeout(bookmarkTimer.current)
+    bookmarkTimer.current = setTimeout(() => {
+      bookmarkApi.upsert(mangaID, { chapter_id: chapterID, last_page_number: pageNumber }).catch(() => {})
+    }, 1500)
+  }
 
   useEffect(() => {
     if (!mangaID || !chapterID) return
@@ -147,13 +158,16 @@ export function ReaderPage() {
               alt={`Page ${page.number}`}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1, transition: { duration: 0.3 } }}
-              onViewportEnter={isLast ? () => {
-                tracker.chapterComplete({
-                  manga_id: mangaID!,
-                  chapter_id: chapterID!,
-                  duration_seconds: Math.round((Date.now() - openedAt.current) / 1000),
-                })
-              } : undefined}
+              onViewportEnter={() => {
+                updateBookmark(page.number)
+                if (isLast) {
+                  tracker.chapterComplete({
+                    manga_id: mangaID!,
+                    chapter_id: chapterID!,
+                    duration_seconds: Math.round((Date.now() - openedAt.current) / 1000),
+                  })
+                }
+              }}
               viewport={{ once: true, margin: '200px' }}
               className="w-full max-w-2xl block"
               style={page.width && page.height
