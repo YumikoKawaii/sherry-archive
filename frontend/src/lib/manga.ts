@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { Manga, Chapter, ChapterWithPages, Comment } from '../types/manga'
+import type { Manga, Chapter, ChapterWithPages, Comment, Bookmark } from '../types/manga'
 import type { PagedData } from '../types/api'
 
 export interface MangaFilters {
@@ -105,6 +105,9 @@ export const mangaApi = {
     return api.postForm<OneshotUploadResult>(`/mangas/${mangaId}/oneshot/upload`, form)
   },
 
+  delete: (mangaId: string) =>
+    api.delete<void>(`/mangas/${mangaId}`),
+
   listByUser: (userId: string, page = 1) =>
     api.get<PagedData<Manga>>(`/users/${userId}/mangas?page=${page}`),
 
@@ -125,6 +128,20 @@ export const mangaApi = {
 
   deleteComment: (mangaId: string, commentId: string) =>
     api.delete<void>(`/mangas/${mangaId}/comments/${commentId}`),
+}
+
+export const bookmarkApi = {
+  get: (mangaId: string) =>
+    api.get<Bookmark>(`/users/me/bookmarks/${mangaId}`),
+
+  upsert: (mangaId: string, payload: { chapter_id: string; last_page_number: number }) =>
+    api.put<Bookmark>(`/users/me/bookmarks/${mangaId}`, payload),
+
+  delete: (mangaId: string) =>
+    api.delete<void>(`/users/me/bookmarks/${mangaId}`),
+
+  list: () =>
+    api.get<Bookmark[]>(`/users/me/bookmarks`),
 }
 
 export interface TrendingItem extends Manga {

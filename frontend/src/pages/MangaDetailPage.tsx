@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { mangaApi, analyticsApi } from '../lib/manga'
-import type { Manga, Chapter } from '../types/manga'
+import { mangaApi, analyticsApi, bookmarkApi } from '../lib/manga'
+import type { Manga, Chapter, Bookmark } from '../types/manga'
 import type { MangaStatus, MangaType } from '../types/manga'
 import { Layout } from '../components/Layout'
 import { StatusBadge } from '../components/StatusBadge'
@@ -28,11 +28,19 @@ const TYPES: { value: MangaType; label: string }[] = [
 export function MangaDetailPage() {
   const { mangaID } = useParams<{ mangaID: string }>()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [manga, setManga] = useState<Manga | null>(null)
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [similar, setSimilar] = useState<Manga[]>([])
+
+  // Bookmark state
+  const [bookmark, setBookmark] = useState<Bookmark | null>(null)
+  const [bookmarkLoading, setBookmarkLoading] = useState(false)
+
+  // Delete state
+  const [deleting, setDeleting] = useState(false)
 
   // Edit panel state
   const [editing, setEditing] = useState(false)
@@ -58,6 +66,9 @@ export function MangaDetailPage() {
         setChapters([...chs].sort((a, b) => b.number - a.number))
         tracker.mangaView({ manga_id: m.id, manga_type: m.type })
         analyticsApi.similar(m.id, 12).then(res => setSimilar(res ?? [])).catch(() => {})
+        if (user && user.id !== m.owner_id) {
+          bookmarkApi.get(m.id).then(setBookmark).catch(() => setBookmark(null))
+        }
       })
       .catch(e => setError(e.message ?? 'Failed to load'))
       .finally(() => setLoading(false))
@@ -108,6 +119,37 @@ export function MangaDetailPage() {
       setSaveError(err instanceof ApiError ? err.message : 'Failed to save')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleBookmarkToggle() {
+    if (!mangaID || !manga) return
+    setBookmarkLoading(true)
+    try {
+      if (bookmark) {
+        await bookmarkApi.delete(mangaID)
+        tracker.bookmarkRemove({ manga_id: mangaID })
+        setBookmark(null)
+      } else {
+        const firstChapter = [...chapters].sort((a, b) => a.number - b.number)[0]
+        if (!firstChapter) return
+        const b = await bookmarkApi.upsert(mangaID, { chapter_id: firstChapter.id, last_page_number: 1 })
+        tracker.bookmarkAdd({ manga_id: mangaID })
+        setBookmark(b)
+      }
+    } finally {
+      setBookmarkLoading(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!mangaID || !window.confirm('Delete this manga? This cannot be undone.')) return
+    setDeleting(true)
+    try {
+      await mangaApi.delete(mangaID)
+      navigate('/')
+    } catch {
+      setDeleting(false)
     }
   }
 
@@ -236,18 +278,54 @@ export function MangaDetailPage() {
                 </>
               )}
 
-              {/* Owner actions */}
-              {isOwner && (
+              {/* Continue reading — shown when bookmarked */}
+              {bookmark && (
+                <Link
+                  to={`/manga/${manga.id}/chapter/${bookmark.chapter_id}`}
+                  className="px-5 py-2.5 rounded-lg text-sm font-medium border border-forest-600
+                             text-mint-200 hover:border-jade-500/50 hover:text-mint-50 transition"
+                >
+                  Continue →
+                </Link>
+              )}
+
+              {/* Bookmark — shown to logged-in non-owners */}
+              {user && !isOwner && (
                 <button
-                  onClick={editing ? () => setEditing(false) : openEdit}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition ${
-                    editing
-                      ? 'bg-jade-500/20 border-jade-500/60 text-jade-300'
+                  onClick={handleBookmarkToggle}
+                  disabled={bookmarkLoading || (!bookmark && chapters.length === 0)}
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition disabled:opacity-40 ${
+                    bookmark
+                      ? 'bg-jade-500/20 border-jade-500/60 text-jade-300 hover:bg-red-500/10 hover:border-red-500/40 hover:text-red-400'
                       : 'border-forest-600 text-mint-200/50 hover:border-jade-500/40 hover:text-jade-300'
                   }`}
                 >
-                  {editing ? 'Cancel edit' : 'Edit'}
+                  {bookmark ? '✓ Bookmarked' : 'Bookmark'}
                 </button>
+              )}
+
+              {/* Owner actions */}
+              {isOwner && (
+                <>
+                  <button
+                    onClick={editing ? () => setEditing(false) : openEdit}
+                    className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition ${
+                      editing
+                        ? 'bg-jade-500/20 border-jade-500/60 text-jade-300'
+                        : 'border-forest-600 text-mint-200/50 hover:border-jade-500/40 hover:text-jade-300'
+                    }`}
+                  >
+                    {editing ? 'Cancel edit' : 'Edit'}
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="px-4 py-2.5 rounded-lg text-sm font-medium border border-red-500/30
+                               text-red-400/60 hover:border-red-500/60 hover:text-red-400 transition disabled:opacity-40"
+                  >
+                    {deleting ? 'Deleting…' : 'Delete'}
+                  </button>
+                </>
               )}
             </div>
           </motion.div>
