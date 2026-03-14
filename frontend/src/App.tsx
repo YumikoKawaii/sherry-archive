@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { CreateMangaPage } from './pages/CreateMangaPage'
 import { ManageChaptersPage } from './pages/ManageChaptersPage'
+import { BookmarksPage } from './pages/BookmarksPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/manga/:mangaID" element={<MangaDetailPage />} />
           <Route path="/manga/:mangaID/manage" element={<ManageChaptersPage />} />
           <Route path="/manga/:mangaID/chapter/:chapterID" element={<ReaderPage />} />
+          <Route path="/me" element={<BookmarksPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
