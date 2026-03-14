@@ -40,6 +40,7 @@ export function MangaDetailPage() {
   const [bookmarkLoading, setBookmarkLoading] = useState(false)
 
   // Delete state
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
   // Edit panel state
@@ -143,13 +144,14 @@ export function MangaDetailPage() {
   }
 
   async function handleDelete() {
-    if (!mangaID || !window.confirm('Delete this manga? This cannot be undone.')) return
+    if (!mangaID) return
     setDeleting(true)
     try {
       await mangaApi.delete(mangaID)
       navigate('/')
     } catch {
       setDeleting(false)
+      setConfirmDelete(false)
     }
   }
 
@@ -317,14 +319,49 @@ export function MangaDetailPage() {
                   >
                     {editing ? 'Cancel edit' : 'Edit'}
                   </button>
-                  <button
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="px-4 py-2.5 rounded-lg text-sm font-medium border border-red-500/30
-                               text-red-400/60 hover:border-red-500/60 hover:text-red-400 transition disabled:opacity-40"
-                  >
-                    {deleting ? 'Deleting…' : 'Delete'}
-                  </button>
+                  <AnimatePresence mode="wait">
+                    {confirmDelete ? (
+                      <motion.div
+                        key="confirm"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="flex items-center gap-2"
+                      >
+                        <span className="text-xs text-red-400/80">Delete forever?</span>
+                        <button
+                          onClick={handleDelete}
+                          disabled={deleting}
+                          className="px-3 py-2 rounded-lg text-xs font-semibold bg-red-500/20 border border-red-500/60
+                                     text-red-400 hover:bg-red-500/30 transition disabled:opacity-50"
+                        >
+                          {deleting ? 'Deleting…' : 'Yes, delete'}
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(false)}
+                          disabled={deleting}
+                          className="px-3 py-2 rounded-lg text-xs border border-forest-600
+                                     text-mint-200/50 hover:text-mint-50 hover:border-forest-500 transition"
+                        >
+                          Cancel
+                        </button>
+                      </motion.div>
+                    ) : (
+                      <motion.button
+                        key="delete"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        onClick={() => setConfirmDelete(true)}
+                        className="px-4 py-2.5 rounded-lg text-sm font-medium border border-red-500/30
+                                   text-red-400/60 hover:border-red-500/60 hover:text-red-400 transition"
+                      >
+                        Delete
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
             </div>
