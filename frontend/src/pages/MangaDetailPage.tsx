@@ -67,7 +67,7 @@ export function MangaDetailPage() {
         setChapters([...chs].sort((a, b) => b.number - a.number))
         tracker.mangaView({ manga_id: m.id, manga_type: m.type })
         analyticsApi.similar(m.id, 12).then(res => setSimilar(res ?? [])).catch(() => {})
-        if (user && user.id !== m.owner_id) {
+        if (user) {
           bookmarkApi.get(m.id).then(setBookmark).catch(() => setBookmark(null))
         }
       })
@@ -291,8 +291,8 @@ export function MangaDetailPage() {
                 </Link>
               )}
 
-              {/* Bookmark — shown to logged-in non-owners */}
-              {user && !isOwner && (
+              {/* Bookmark — shown to all logged-in users */}
+              {user && (
                 <button
                   onClick={handleBookmarkToggle}
                   disabled={bookmarkLoading || (!bookmark && chapters.length === 0)}
