@@ -27,7 +27,7 @@ npm --prefix frontend run lint         # ESLint
 ```bash
 go run -C backend ./cmd migrate up     # apply pending DB migrations
 go run -C backend ./cmd serve          # run dev server (http://localhost:8080)
-go run -C backend ./cmd jobs           # run interest aggregation job
+go run -C backend ./cmd aggregate-user-interests  # run interest aggregation job
 go build -C backend ./...              # build all
 go test -C backend ./...               # run all tests
 go test -C backend ./internal/service/ # run a specific package's tests

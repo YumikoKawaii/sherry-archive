@@ -25,8 +25,8 @@ func main() {
 	})
 
 	cmd.AddCommand(&cobra.Command{
-		Use:   "jobs",
-		Short: "Run background jobs (interest aggregation)",
+		Use:   "aggregate-user-interests",
+		Short: "Aggregate user interest profiles from tracking events",
 		Run:   jobs.Run,
 	})
 

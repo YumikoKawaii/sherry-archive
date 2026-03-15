@@ -93,7 +93,7 @@ Backend runs at `http://localhost:8080`, frontend at `http://localhost:5173`.
 # Backend
 go run -C backend ./cmd serve          # HTTP server
 go run -C backend ./cmd migrate up     # apply DB migrations
-go run -C backend ./cmd jobs           # run interest aggregation job
+go run -C backend ./cmd aggregate-user-interests  # run interest aggregation job
 go build -C backend ./...              # build all
 go test -C backend ./...               # run all tests
 
