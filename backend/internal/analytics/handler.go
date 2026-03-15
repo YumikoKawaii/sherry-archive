@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/yumikokawaii/sherry-archive/internal/dto"
 	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
 )
@@ -52,7 +53,7 @@ func (h *Handler) Trending(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": out})
 }
 
-// Suggestions returns personalised manga for a given device_id.
+// Suggestions returns personalised manga for a given device_id, optionally scoped to a user_id.
 func (h *Handler) Suggestions(c *gin.Context) {
 	deviceID := c.Query("device_id")
 	if deviceID == "" {
@@ -61,7 +62,14 @@ func (h *Handler) Suggestions(c *gin.Context) {
 	}
 	limit := parseLimit(c, 12)
 
-	mangas, err := h.store.GetSuggestions(c.Request.Context(), deviceID, limit)
+	var userID *uuid.UUID
+	if raw := c.Query("user_id"); raw != "" {
+		if id, err := uuid.Parse(raw); err == nil {
+			userID = &id
+		}
+	}
+
+	mangas, err := h.store.GetSuggestions(c.Request.Context(), userID, deviceID, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

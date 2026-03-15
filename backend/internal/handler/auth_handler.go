@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/yumikokawaii/sherry-archive/internal/dto"
 	"github.com/yumikokawaii/sherry-archive/internal/middleware"
 	"github.com/yumikokawaii/sherry-archive/internal/service"
@@ -39,6 +40,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		Username: req.Username,
 		Email:    req.Email,
 		Password: req.Password,
+		DeviceID: parseDeviceID(req.DeviceID),
 	})
 	if err != nil {
 		respondError(c, err)
@@ -72,6 +74,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	user, pair, err := h.authSvc.Login(c.Request.Context(), service.LoginInput{
 		Email:    req.Email,
 		Password: req.Password,
+		DeviceID: parseDeviceID(req.DeviceID),
 	})
 	if err != nil {
 		respondError(c, err)
@@ -136,6 +139,17 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusNoContent)
+}
+
+func parseDeviceID(s *string) *uuid.UUID {
+	if s == nil {
+		return nil
+	}
+	id, err := uuid.Parse(*s)
+	if err != nil {
+		return nil
+	}
+	return &id
 }
 
 // Me godoc

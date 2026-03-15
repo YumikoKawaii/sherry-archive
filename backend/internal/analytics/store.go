@@ -120,12 +120,11 @@ func (s *Store) ProcessEvents(ctx context.Context, events []tracking.EventRow) {
 			}
 		}
 
-		// Update interest profile and seen set
-		if pts, ok := interestPoints[e.Event]; ok {
+		// Update seen set (still real-time for suggestion exclusion)
+		if _, ok := interestPoints[e.Event]; ok {
 			deviceKey := seenPrefix + e.DeviceID.String()
 			s.rdb.SAdd(ctx, deviceKey, mangaID)
 			s.rdb.Expire(ctx, deviceKey, seenTTL)
-			s.updateInterestProfile(ctx, e.DeviceID.String(), mangaID, pts)
 		}
 	}
 }
@@ -250,27 +249,33 @@ func (s *Store) GetTrending(ctx context.Context, limit int) ([]*TrendingResult, 
 
 // --- Suggestions ---
 
-func (s *Store) GetSuggestions(ctx context.Context, deviceID string, limit int) ([]*model.Manga, error) {
-	interestKey := interestsPrefix + deviceID
-	raw, err := s.rdb.HGetAll(ctx, interestKey).Result()
-	if err != nil || len(raw) == 0 {
-		return nil, nil // no profile yet
+const interestCacheTTL = 24 * time.Hour
+
+// GetSuggestions returns personalised manga recommendations.
+// If userID is non-nil, the user's interest profile is used with fallback to deviceID.
+func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID string, limit int) ([]*model.Manga, error) {
+	var identityID string
+	if userID != nil {
+		identityID = userID.String()
+	} else {
+		identityID = deviceID
 	}
 
-	// Parse and sort interests by score descending
-	type dim struct {
-		key   string
-		score float64
+	dims, err := s.loadInterests(ctx, identityID)
+	if err != nil || len(dims) == 0 {
+		// Fallback to device profile if user profile is empty
+		if userID != nil && deviceID != "" {
+			dims, err = s.loadInterests(ctx, deviceID)
+			if err != nil || len(dims) == 0 {
+				return nil, nil
+			}
+		} else {
+			return nil, nil
+		}
 	}
-	dims := make([]dim, 0, len(raw))
-	for k, v := range raw {
-		var score float64
-		fmt.Sscanf(v, "%f", &score)
-		dims = append(dims, dim{k, score})
-	}
+
 	sort.Slice(dims, func(i, j int) bool { return dims[i].score > dims[j].score })
 
-	// Extract top interests per dimension
 	var topTags, topAuthors, topCategories []string
 	for _, d := range dims {
 		switch {
@@ -283,16 +288,66 @@ func (s *Store) GetSuggestions(ctx context.Context, deviceID string, limit int) 
 		}
 	}
 
-	// Get seen manga IDs to exclude
-	seenStrs, _ := s.rdb.SMembers(ctx, seenPrefix+deviceID).Result()
+	// Seen set is still device-scoped (real-time)
+	seenKey := seenPrefix + deviceID
+	seenStrs, _ := s.rdb.SMembers(ctx, seenKey).Result()
 	seenIDs := make([]uuid.UUID, 0, len(seenStrs))
-	for _, s := range seenStrs {
-		if id, err := uuid.Parse(s); err == nil {
+	for _, str := range seenStrs {
+		if id, err := uuid.Parse(str); err == nil {
 			seenIDs = append(seenIDs, id)
 		}
 	}
 
 	return s.querySuggestions(ctx, topTags, topAuthors, topCategories, seenIDs, limit)
+}
+
+type interestDim struct {
+	key   string
+	score float64
+}
+
+// loadInterests fetches interest dimensions for an identity, using Redis as cache-aside.
+func (s *Store) loadInterests(ctx context.Context, identityID string) ([]interestDim, error) {
+	cacheKey := interestsPrefix + identityID
+
+	// Try Redis cache first
+	raw, err := s.rdb.HGetAll(ctx, cacheKey).Result()
+	if err == nil && len(raw) > 0 {
+		dims := make([]interestDim, 0, len(raw))
+		for k, v := range raw {
+			var score float64
+			fmt.Sscanf(v, "%f", &score)
+			dims = append(dims, interestDim{k, score})
+		}
+		return dims, nil
+	}
+
+	// Cache miss — query DB
+	id, err := uuid.Parse(identityID)
+	if err != nil {
+		return nil, nil
+	}
+	var rows []struct {
+		Dimension string  `db:"dimension"`
+		Score     float64 `db:"score"`
+	}
+	err = s.db.SelectContext(ctx, &rows,
+		`SELECT dimension, score FROM user_interests WHERE identity_id = $1`, id)
+	if err != nil || len(rows) == 0 {
+		return nil, nil
+	}
+
+	// Populate cache
+	args := make([]interface{}, 0, len(rows)*2)
+	dims := make([]interestDim, 0, len(rows))
+	for _, r := range rows {
+		args = append(args, r.Dimension, fmt.Sprintf("%f", r.Score))
+		dims = append(dims, interestDim{r.Dimension, r.Score})
+	}
+	s.rdb.HSet(ctx, cacheKey, args...)
+	s.rdb.Expire(ctx, cacheKey, interestCacheTTL)
+
+	return dims, nil
 }
 
 func (s *Store) querySuggestions(

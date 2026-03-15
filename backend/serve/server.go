@@ -102,6 +102,7 @@ func Server(cmd *cobra.Command, args []string) {
 	commentRepo := postgres.NewCommentRepo(db)
 	refreshTokenRepo := postgres.NewRefreshTokenRepo(db)
 	uploadTaskRepo := postgres.NewUploadTaskRepo(db)
+	deviceMappingRepo := postgres.NewDeviceUserMappingRepo(db)
 
 	// URL signer — CloudFront when configured, S3 presign otherwise
 	var signer urlcache.Signer = storageClient
@@ -120,7 +121,7 @@ func Server(cmd *cobra.Command, args []string) {
 	urlCache := urlcache.New(signer, rdb, presignExpiry)
 
 	// Services
-	authSvc := service.NewAuthService(userRepo, refreshTokenRepo, tokenMgr)
+	authSvc := service.NewAuthService(userRepo, refreshTokenRepo, deviceMappingRepo, tokenMgr)
 	userSvc := service.NewUserService(userRepo)
 	mangaSvc := service.NewMangaService(mangaRepo)
 	chapterSvc := service.NewChapterService(chapterRepo, mangaRepo)

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/yumikokawaii/sherry-archive/internal/model"
@@ -78,6 +79,21 @@ type UploadTaskRepository interface {
 	ClaimProcessing(ctx context.Context, id uuid.UUID) (claimed bool, err error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status model.UploadTaskStatus, errMsg string) error
 	SetChapterAndDone(ctx context.Context, id uuid.UUID, chapterID uuid.UUID) error
+}
+
+type DeviceUserMappingRepository interface {
+	Upsert(ctx context.Context, deviceID, userID uuid.UUID) error
+	GetUserByDevice(ctx context.Context, deviceID uuid.UUID) (uuid.UUID, error)
+}
+
+type UserInterestRepository interface {
+	ListByIdentity(ctx context.Context, identityID uuid.UUID) ([]*model.UserInterest, error)
+	UpsertBatch(ctx context.Context, interests []*model.UserInterest) error
+}
+
+type InterestSyncWatermarkRepository interface {
+	Get(ctx context.Context, identityID uuid.UUID) (*model.InterestSyncWatermark, error)
+	Upsert(ctx context.Context, identityID uuid.UUID, lastSyncedAt time.Time) error
 }
 
 type CommentRepository interface {

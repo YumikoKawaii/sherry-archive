@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
+	"github.com/yumikokawaii/sherry-archive/jobs"
 	"github.com/yumikokawaii/sherry-archive/migrate"
 	"github.com/yumikokawaii/sherry-archive/serve"
 )
@@ -21,6 +22,12 @@ func main() {
 		Use:   "migrate up",
 		Short: "Apply pending database migrations",
 		Run:   migrate.Up,
+	})
+
+	cmd.AddCommand(&cobra.Command{
+		Use:   "jobs",
+		Short: "Run background jobs (interest aggregation)",
+		Run:   jobs.Run,
 	})
 
 	if err := cmd.Execute(); err != nil {

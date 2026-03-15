@@ -16,23 +16,31 @@ import (
 )
 
 type AuthService struct {
-	userRepo    repository.UserRepository
-	tokenRepo   repository.RefreshTokenRepository
-	tokenMgr    *token.Manager
+	userRepo          repository.UserRepository
+	tokenRepo         repository.RefreshTokenRepository
+	deviceMappingRepo repository.DeviceUserMappingRepository
+	tokenMgr          *token.Manager
 }
 
 func NewAuthService(
 	userRepo repository.UserRepository,
 	tokenRepo repository.RefreshTokenRepository,
+	deviceMappingRepo repository.DeviceUserMappingRepository,
 	tokenMgr *token.Manager,
 ) *AuthService {
-	return &AuthService{userRepo: userRepo, tokenRepo: tokenRepo, tokenMgr: tokenMgr}
+	return &AuthService{
+		userRepo:          userRepo,
+		tokenRepo:         tokenRepo,
+		deviceMappingRepo: deviceMappingRepo,
+		tokenMgr:          tokenMgr,
+	}
 }
 
 type RegisterInput struct {
 	Username string
 	Email    string
 	Password string
+	DeviceID *uuid.UUID
 }
 
 type TokenPair struct {
@@ -77,12 +85,17 @@ func (s *AuthService) Register(ctx context.Context, in RegisterInput) (*model.Us
 	if err != nil {
 		return nil, nil, err
 	}
+
+	if in.DeviceID != nil {
+		_ = s.deviceMappingRepo.Upsert(ctx, *in.DeviceID, u.ID)
+	}
 	return u, pair, nil
 }
 
 type LoginInput struct {
 	Email    string
 	Password string
+	DeviceID *uuid.UUID
 }
 
 func (s *AuthService) Login(ctx context.Context, in LoginInput) (*model.User, *TokenPair, error) {
@@ -101,6 +114,10 @@ func (s *AuthService) Login(ctx context.Context, in LoginInput) (*model.User, *T
 	pair, err := s.issueTokenPair(ctx, u.ID)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	if in.DeviceID != nil {
+		_ = s.deviceMappingRepo.Upsert(ctx, *in.DeviceID, u.ID)
 	}
 	return u, pair, nil
 }
