@@ -97,7 +97,10 @@ func (s *ChapterService) Update(ctx context.Context, requesterID, chapterID uuid
 		return nil, apperror.ErrForbidden
 	}
 
-	if in.Number != nil {
+	if in.Number != nil && *in.Number != ch.Number {
+		if existing, err := s.chapterRepo.GetByMangaAndNumber(ctx, ch.MangaID, *in.Number); err == nil && existing != nil {
+			return nil, apperror.ErrConflict
+		}
 		ch.Number = *in.Number
 	}
 	if in.Title != nil {
