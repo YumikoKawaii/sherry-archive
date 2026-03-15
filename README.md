@@ -146,7 +146,7 @@ backend/
 
 | Resource | Detail |
 |----------|--------|
-| EC2 | `18.141.43.132` — app server, Docker, Nginx |
+| EC2 | App server, Docker, Nginx |
 | RDS | PostgreSQL, SSL required |
 | ElastiCache | Valkey (Redis-compatible), TLS |
 | S3 | `sherry-archive`, `ap-southeast-1` |

@@ -114,7 +114,7 @@ go test -C backend ./internal/service/ # run a specific package's tests
 
 ## Infrastructure
 
-- EC2: `18.141.43.132`, Docker, Nginx → Go on `:8080`
+- EC2: Docker, Nginx → Go on `:8080`
 - RDS: PostgreSQL, SSL required
 - ElastiCache: Valkey, TLS enabled
 - S3: `sherry-archive`, `ap-southeast-1`
