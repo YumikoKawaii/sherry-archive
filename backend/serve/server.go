@@ -103,8 +103,21 @@ func Server(cmd *cobra.Command, args []string) {
 	refreshTokenRepo := postgres.NewRefreshTokenRepo(db)
 	uploadTaskRepo := postgres.NewUploadTaskRepo(db)
 
-	// URL cache — Redis-backed presigned URL cache-aside
-	urlCache := urlcache.New(storageClient, rdb, presignExpiry)
+	// URL signer — CloudFront when configured, S3 presign otherwise
+	var signer urlcache.Signer = storageClient
+	if cfg.CloudFront.Domain != "" {
+		cfSigner, err := storage.NewCloudFrontSigner(
+			cfg.CloudFront.Domain,
+			cfg.CloudFront.KeyPairID,
+			cfg.CloudFront.PrivateKey,
+			presignExpiry,
+		)
+		if err != nil {
+			log.Fatalf("cloudfront signer: %v", err)
+		}
+		signer = cfSigner
+	}
+	urlCache := urlcache.New(signer, rdb, presignExpiry)
 
 	// Services
 	authSvc := service.NewAuthService(userRepo, refreshTokenRepo, tokenMgr)

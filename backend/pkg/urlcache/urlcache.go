@@ -3,31 +3,36 @@ package urlcache
 import (
 	"context"
 	"errors"
+	"net/url"
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/yumikokawaii/sherry-archive/pkg/storage"
 )
 
 const keyPrefix = "presign:"
 
-// URLCache caches presigned S3 URLs in Redis so the same URL is reused
+// Signer generates signed/presigned URLs for object storage keys.
+type Signer interface {
+	PresignedGetURL(ctx context.Context, key string) (*url.URL, error)
+}
+
+// URLCache caches presigned URLs in Redis so the same URL is reused
 // within the presign window. All callers sharing the same key get the same
-// URL, which is a prerequisite for CDN caching later.
+// URL, which is a prerequisite for CDN caching.
 type URLCache struct {
-	storage *storage.Client
-	rdb     *redis.Client
-	ttl     time.Duration // slightly less than presign expiry
+	signer Signer
+	rdb    *redis.Client
+	ttl    time.Duration // slightly less than presign expiry
 }
 
 // New creates a URLCache. ttl is set to presignExpiry minus a 5-minute buffer
 // so cached URLs are always comfortably valid when served.
-func New(s *storage.Client, rdb *redis.Client, presignExpiry time.Duration) *URLCache {
+func New(s Signer, rdb *redis.Client, presignExpiry time.Duration) *URLCache {
 	ttl := presignExpiry - 5*time.Minute
 	if ttl <= 0 {
 		ttl = presignExpiry
 	}
-	return &URLCache{storage: s, rdb: rdb, ttl: ttl}
+	return &URLCache{signer: s, rdb: rdb, ttl: ttl}
 }
 
 // Resolve returns a presigned URL for the given object key, using Redis as a
@@ -46,7 +51,7 @@ func (c *URLCache) Resolve(ctx context.Context, key string) (string, error) {
 		// Redis unavailable — fall through, don't fail the request
 	}
 
-	u, err := c.storage.PresignedGetURL(ctx, key)
+	u, err := c.signer.PresignedGetURL(ctx, key)
 	if err != nil {
 		return "", err
 	}

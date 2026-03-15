@@ -12,8 +12,9 @@ type Application struct {
 	JWT    *JWTConfig    `json:"jwt"    mapstructure:"jwt"    yaml:"jwt"`
 	S3     *S3Config     `json:"s3"     mapstructure:"s3"     yaml:"s3"`
 	Redis  *RedisConfig  `json:"redis"  mapstructure:"redis"  yaml:"redis"`
-	SQS       *SQSConfig       `json:"sqs"       mapstructure:"sqs"       yaml:"sqs"`
-	Analytics *AnalyticsConfig `json:"analytics" mapstructure:"analytics" yaml:"analytics"`
+	SQS        *SQSConfig        `json:"sqs"        mapstructure:"sqs"        yaml:"sqs"`
+	Analytics  *AnalyticsConfig  `json:"analytics"  mapstructure:"analytics"  yaml:"analytics"`
+	CloudFront *CloudFrontConfig `json:"cloudfront" mapstructure:"cloudfront" yaml:"cloudfront"`
 }
 
 type ServerConfig struct {
@@ -77,6 +78,15 @@ type SQSConfig struct {
 	QueueURL string `json:"queue_url" mapstructure:"queue_url" yaml:"queue_url"`
 }
 
+// CloudFrontConfig holds CloudFront signing credentials for CDN URL generation.
+// When Domain is set, the app generates CloudFront signed URLs instead of S3 presigned URLs.
+// Env vars: CLOUDFRONT__DOMAIN, CLOUDFRONT__KEY_PAIR_ID, CLOUDFRONT__PRIVATE_KEY (PEM string)
+type CloudFrontConfig struct {
+	Domain     string `json:"domain"       mapstructure:"domain"       yaml:"domain"`
+	KeyPairID  string `json:"key_pair_id"  mapstructure:"key_pair_id"  yaml:"key_pair_id"`
+	PrivateKey string `json:"private_key"  mapstructure:"private_key"  yaml:"private_key"`
+}
+
 // AnalyticsConfig holds tuning parameters for the real-time analytics engine.
 // Env vars: ANALYTICS__CONTRIBUTION_CAP, ANALYTICS__DECAY_INTERVAL
 type AnalyticsConfig struct {
@@ -126,6 +136,7 @@ func loadDefault() *Application {
 			ContributionCap: 15,
 			DecayInterval:   "1h",
 		},
+		CloudFront: &CloudFrontConfig{},
 	}
 }
 
