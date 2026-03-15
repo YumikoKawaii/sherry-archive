@@ -12,7 +12,8 @@ type Application struct {
 	JWT    *JWTConfig    `json:"jwt"    mapstructure:"jwt"    yaml:"jwt"`
 	S3     *S3Config     `json:"s3"     mapstructure:"s3"     yaml:"s3"`
 	Redis  *RedisConfig  `json:"redis"  mapstructure:"redis"  yaml:"redis"`
-	SQS    *SQSConfig    `json:"sqs"    mapstructure:"sqs"    yaml:"sqs"`
+	SQS       *SQSConfig       `json:"sqs"       mapstructure:"sqs"       yaml:"sqs"`
+	Analytics *AnalyticsConfig `json:"analytics" mapstructure:"analytics" yaml:"analytics"`
 }
 
 type ServerConfig struct {
@@ -76,6 +77,16 @@ type SQSConfig struct {
 	QueueURL string `json:"queue_url" mapstructure:"queue_url" yaml:"queue_url"`
 }
 
+// AnalyticsConfig holds tuning parameters for the real-time analytics engine.
+// Env vars: ANALYTICS__CONTRIBUTION_CAP, ANALYTICS__DECAY_INTERVAL
+type AnalyticsConfig struct {
+	// ContributionCap is the max trending points a single device can contribute
+	// to one manga within the contribution window (24h). Default: 15.
+	ContributionCap float64 `json:"contribution_cap" mapstructure:"contribution_cap" yaml:"contribution_cap"`
+	// DecayInterval is how often the trending decay runs (e.g. "1h", "30m"). Default: "1h".
+	DecayInterval string `json:"decay_interval" mapstructure:"decay_interval" yaml:"decay_interval"`
+}
+
 func loadDefault() *Application {
 	return &Application{
 		Server: &ServerConfig{
@@ -110,6 +121,10 @@ func loadDefault() *Application {
 		},
 		SQS: &SQSConfig{
 			QueueURL: "",
+		},
+		Analytics: &AnalyticsConfig{
+			ContributionCap: 15,
+			DecayInterval:   "1h",
 		},
 	}
 }

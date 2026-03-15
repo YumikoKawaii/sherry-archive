@@ -43,6 +43,10 @@ func Server(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("invalid s3.presign_expiry %q: %v", cfg.S3.PresignExpiry, err)
 	}
+	decayInterval, err := time.ParseDuration(cfg.Analytics.DecayInterval)
+	if err != nil {
+		log.Fatalf("invalid analytics.decay_interval %q: %v", cfg.Analytics.DecayInterval, err)
+	}
 
 	// Database
 	db, err := postgres.Connect(cfg.DB.DSN())
@@ -131,7 +135,7 @@ func Server(cmd *cobra.Command, args []string) {
 	defer bgCancel()
 
 	// Analytics — real-time trending + suggestions via Redis
-	analyticsStore := analytics.NewStore(rdb, db)
+	analyticsStore := analytics.NewStore(rdb, db, cfg.Analytics.ContributionCap, decayInterval)
 	analytics.NewHandler(analyticsStore, urlCache).Mount(r)
 	go analyticsStore.StartDecay(bgCtx)
 

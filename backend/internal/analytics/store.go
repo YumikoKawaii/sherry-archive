@@ -21,22 +21,27 @@ const (
 	seenPrefix         = "seen:"
 	interestsPrefix    = "interests:"
 	mangaMetaPrefix    = "manga:meta:"
+	contributedPrefix  = "contributed:"
+	contributionWindow = 24 * time.Hour
 	mangaMetaTTL       = time.Hour
 	seenTTL            = 30 * 24 * time.Hour
 )
 
 // Store updates and queries the Redis-backed real-time analytics data.
 type Store struct {
-	rdb *redis.Client
-	db  *sqlx.DB
+	rdb             *redis.Client
+	db              *sqlx.DB
+	contributionCap float64
+	decayInterval   time.Duration
 
 	// Lua scripts — loaded once, referenced by SHA.
-	updateInterest *redis.Script
-	decayTrending  *redis.Script
+	updateInterest   *redis.Script
+	decayTrending    *redis.Script
+	contributePoints *redis.Script
 }
 
-func NewStore(rdb *redis.Client, db *sqlx.DB) *Store {
-	s := &Store{rdb: rdb, db: db}
+func NewStore(rdb *redis.Client, db *sqlx.DB, contributionCap float64, decayInterval time.Duration) *Store {
+	s := &Store{rdb: rdb, db: db, contributionCap: contributionCap, decayInterval: decayInterval}
 	// Atomic interest update with per-write decay.
 	// KEYS[1] = interests:{device_id}, ARGV[1] = field, ARGV[2] = decay, ARGV[3] = points
 	s.updateInterest = redis.NewScript(`
@@ -53,6 +58,25 @@ func NewStore(rdb *redis.Client, db *sqlx.DB) *Store {
 			redis.call('HSET', KEYS[1], ARGV[1], tostring(score))
 		end
 		return tostring(score)
+	`)
+	// Cap per-device contribution to trending within the 24h window.
+	// KEYS[1] = contributed:{device_id}:{manga_id}
+	// ARGV[1] = requested points, ARGV[2] = cap, ARGV[3] = window TTL in seconds
+	// Returns the actual points to add (0 if already at cap).
+	s.contributePoints = redis.NewScript(`
+		local current = tonumber(redis.call('GET', KEYS[1]) or 0)
+		local cap = tonumber(ARGV[2])
+		if current >= cap then
+			return '0'
+		end
+		local pts = tonumber(ARGV[1])
+		local allowed = math.min(pts, cap - current)
+		local newval = current + allowed
+		redis.call('SET', KEYS[1], tostring(newval))
+		if current == 0 then
+			redis.call('EXPIRE', KEYS[1], tonumber(ARGV[3]))
+		end
+		return tostring(allowed)
 	`)
 	// Decay all members of the trending sorted set.
 	// KEYS[1] = trending, ARGV[1] = decay factor
@@ -82,9 +106,18 @@ func (s *Store) ProcessEvents(ctx context.Context, events []tracking.EventRow) {
 			continue
 		}
 
-		// Update trending sorted set
+		// Update trending sorted set, capped per device per manga per window
 		if pts, ok := trendingPoints[e.Event]; ok {
-			s.rdb.ZIncrBy(ctx, trendingKey, pts, mangaID)
+			contribKey := contributedPrefix + e.DeviceID.String() + ":" + mangaID
+			res, err := s.contributePoints.Run(ctx, s.rdb, []string{contribKey},
+				pts, s.contributionCap, int(contributionWindow.Seconds())).Text()
+			if err == nil {
+				var allowed float64
+				fmt.Sscanf(res, "%f", &allowed)
+				if allowed > 0 {
+					s.rdb.ZIncrBy(ctx, trendingKey, allowed, mangaID)
+				}
+			}
 		}
 
 		// Update interest profile and seen set
@@ -335,7 +368,7 @@ func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*m
 // StartDecay runs the hourly trending decay in the background.
 // Call it as a goroutine from serve/server.go.
 func (s *Store) StartDecay(ctx context.Context) {
-	ticker := time.NewTicker(time.Hour)
+	ticker := time.NewTicker(s.decayInterval)
 	defer ticker.Stop()
 	for {
 		select {
