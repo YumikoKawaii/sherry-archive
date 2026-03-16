@@ -121,6 +121,7 @@ func (s *Store) ProcessEvents(ctx context.Context, events []tracking.EventRow) {
 // --- Manga metadata cache ---
 
 type mangaMeta struct {
+	Title    string
 	Tags     []string
 	Author   string
 	Category string
@@ -135,6 +136,7 @@ func (s *Store) getMangaMeta(ctx context.Context, mangaID string) (*mangaMeta, e
 		var tags []string
 		_ = json.Unmarshal([]byte(vals["tags"]), &tags)
 		return &mangaMeta{
+			Title:    vals["title"],
 			Tags:     tags,
 			Author:   vals["author"],
 			Category: vals["category"],
@@ -143,18 +145,20 @@ func (s *Store) getMangaMeta(ctx context.Context, mangaID string) (*mangaMeta, e
 
 	// Cache miss — query Postgres
 	var row struct {
+		Title    string         `db:"title"`
 		Tags     pq.StringArray `db:"tags"`
 		Author   string         `db:"author"`
 		Category string         `db:"category"`
 	}
 	err = s.db.GetContext(ctx, &row,
-		`SELECT tags, author, category FROM mangas WHERE id = $1`, mangaID)
+		`SELECT title, tags, author, category FROM mangas WHERE id = $1`, mangaID)
 	if err != nil {
 		return nil, err
 	}
 
 	tagsJSON, _ := json.Marshal([]string(row.Tags))
 	s.rdb.HSet(ctx, cacheKey,
+		"title", row.Title,
 		"tags", string(tagsJSON),
 		"author", row.Author,
 		"category", row.Category,
@@ -162,6 +166,7 @@ func (s *Store) getMangaMeta(ctx context.Context, mangaID string) (*mangaMeta, e
 	s.rdb.Expire(ctx, cacheKey, mangaMetaTTL)
 
 	return &mangaMeta{
+		Title:    row.Title,
 		Tags:     row.Tags,
 		Author:   row.Author,
 		Category: row.Category,
@@ -437,7 +442,9 @@ func (s *Store) coldStartSuggestions(ctx context.Context, contextMangaID *uuid.U
 // --- Similar ---
 
 // GetSimilar returns manga similar to the given manga_id by matching tags,
-// author, or category. The source manga is excluded from the results.
+// author, or category, ranked by tag overlap count then popularity as tiebreaker.
+// Series siblings (same title prefix) are capped at 50% of the results to keep
+// the shelf diverse — users who want the full series can use search.
 func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*model.Manga, error) {
 	meta, err := s.getMangaMeta(ctx, mangaID)
 	if err != nil || meta == nil {
@@ -452,8 +459,9 @@ func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*m
 		return nil, err
 	}
 
-	var mangas []*model.Manga
-	err = s.db.SelectContext(ctx, &mangas, `
+	// Fetch extra candidates to have enough after the sibling cap is applied.
+	var candidates []*model.Manga
+	err = s.db.SelectContext(ctx, &candidates, `
 		SELECT m.* FROM mangas m
 		LEFT JOIN manga_popularity p ON p.manga_id = m.id
 		WHERE m.id != $1
@@ -462,15 +470,38 @@ func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*m
 		     OR ($3 != '' AND m.author = $3)
 		     OR ($4 != '' AND m.category = $4)
 		  )
-		ORDER BY COALESCE(p.score, 0) DESC
+		ORDER BY (
+		  SELECT COUNT(*) FROM unnest(m.tags) t WHERE t = ANY($2::text[])
+		) DESC, COALESCE(p.score, 0) ASC
 		LIMIT $5`,
 		srcID,
 		pq.Array(meta.Tags),
 		meta.Author,
 		meta.Category,
-		limit,
+		limit*2,
 	)
-	return mangas, err
+	if err != nil {
+		return nil, err
+	}
+
+	// Cap series siblings at 50% of limit to keep the shelf diverse.
+	srcKey := extractSearchKey(meta.Title)
+	siblingCap := limit / 2
+	siblingCount := 0
+	result := make([]*model.Manga, 0, limit)
+	for _, m := range candidates {
+		if len(result) >= limit {
+			break
+		}
+		if extractSearchKey(m.Title) == srcKey {
+			if siblingCount >= siblingCap {
+				continue
+			}
+			siblingCount++
+		}
+		result = append(result, m)
+	}
+	return result, nil
 }
 
 // InvalidateInterestCache removes the Redis interest cache for an identity,
@@ -497,6 +528,31 @@ func (s *Store) StartDecay(ctx context.Context) {
 }
 
 // --- Helpers ---
+
+// extractSearchKey derives a series key from a manga title by stripping subtitles.
+// Splits on the first occurrence of "/", " - ", or ": " (in that priority order),
+// requiring at least 3 characters before the separator to avoid false splits like "X/1999".
+// The result is lowercased and trimmed.
+func extractSearchKey(title string) string {
+	type sep struct {
+		s      string
+		minPos int
+	}
+	separators := []sep{
+		{"/", 3},
+		{" - ", 3},
+		{": ", 3},
+	}
+	key := title
+	for _, sep := range separators {
+		if i := strings.Index(title, sep.s); i >= sep.minPos {
+			key = title[:i]
+			break
+		}
+	}
+	key = strings.ToLower(strings.TrimSpace(key))
+	return strings.Join(strings.Fields(key), " ")
+}
 
 func extractMangaID(e tracking.EventRow) string {
 	var props map[string]any
