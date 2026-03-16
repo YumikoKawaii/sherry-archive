@@ -228,12 +228,20 @@ func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID 
 		// Fallback to device profile if user profile is empty
 		if userID != nil && deviceID != "" {
 			dims, err = s.loadInterests(ctx, deviceID)
-			if err != nil || len(dims) == 0 {
-				return nil, nil
-			}
-		} else {
-			return nil, nil
 		}
+	}
+
+	// Cold-start fallback: no interest profile built yet
+	if len(dims) == 0 {
+		var identityUUID uuid.UUID
+		if id, err := uuid.Parse(identityID); err == nil {
+			identityUUID = id
+		}
+		seenIDs, _ := s.seenRepo.ListIDsByIdentity(ctx, identityUUID)
+		if contextMangaID != nil {
+			seenIDs = append(seenIDs, *contextMangaID)
+		}
+		return s.coldStartSuggestions(ctx, contextMangaID, seenIDs, limit)
 	}
 
 	// Filter stop tags from dims
@@ -384,6 +392,31 @@ func (s *Store) querySuggestions(
 		pq.Array(tags),
 		pq.Array(authors),
 		pq.Array(categories),
+		limit,
+	)
+	return mangas, err
+}
+
+// coldStartSuggestions is the fallback when no interest profile exists yet.
+// If a context manga is provided, returns similar manga ranked by popularity.
+// Otherwise returns the most popular manga the user hasn't seen.
+func (s *Store) coldStartSuggestions(ctx context.Context, contextMangaID *uuid.UUID, seenIDs []uuid.UUID, limit int) ([]*model.Manga, error) {
+	if contextMangaID != nil {
+		meta, err := s.getMangaMeta(ctx, contextMangaID.String())
+		if err == nil && meta != nil && (len(meta.Tags) > 0 || meta.Author != "" || meta.Category != "") {
+			return s.querySuggestions(ctx, meta.Tags, []string{meta.Author}, []string{meta.Category}, seenIDs, limit)
+		}
+	}
+
+	// No context — return top popular unseen manga
+	var mangas []*model.Manga
+	err := s.db.SelectContext(ctx, &mangas, `
+		SELECT m.* FROM mangas m
+		LEFT JOIN manga_popularity p ON p.manga_id = m.id
+		WHERE ($1::uuid[] IS NULL OR m.id != ALL($1::uuid[]))
+		ORDER BY COALESCE(p.score, 0) DESC
+		LIMIT $2`,
+		pq.Array(seenIDs),
 		limit,
 	)
 	return mangas, err
