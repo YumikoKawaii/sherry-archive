@@ -71,8 +71,8 @@ export function MangaDetailPage() {
         setManga(m)
         setChapters([...chs].sort((a, b) => b.number - a.number))
         tracker.mangaView({ manga_id: m.id, manga_type: m.type })
-        analyticsApi.similar(m.id, 12).then(res => setSimilar(res ?? [])).catch(() => {})
-        analyticsApi.suggestions(getDeviceId(), { userId: user?.id, mangaId: m.id, limit: 8 })
+        analyticsApi.similar(m.id, 6).then(res => setSimilar(res ?? [])).catch(() => {})
+        analyticsApi.suggestions(getDeviceId(), { userId: user?.id, mangaId: m.id, limit: 6 })
           .then(res => setSuggestions(res ?? [])).catch(() => {})
         if (user) {
           bookmarkApi.get(m.id).then(setBookmark).catch(() => setBookmark(null))
