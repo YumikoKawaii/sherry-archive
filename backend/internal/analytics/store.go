@@ -459,25 +459,42 @@ func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*m
 		return nil, err
 	}
 
-	// Fetch extra candidates to have enough after the sibling cap is applied.
-	var candidates []*model.Manga
-	err = s.db.SelectContext(ctx, &candidates, `
-		SELECT m.* FROM mangas m
-		LEFT JOIN manga_popularity p ON p.manga_id = m.id
-		WHERE m.id != $1
-		  AND (
-		        ($2::text[] != '{}' AND m.tags && $2::text[])
-		     OR ($3 != '' AND m.author = $3)
-		     OR ($4 != '' AND m.category = $4)
-		  )
-		ORDER BY (
-		  SELECT COUNT(*) FROM unnest(m.tags) t WHERE t = ANY($2::text[])
-		) DESC, COALESCE(p.score, 0) ASC
-		LIMIT $5`,
+	// Phase 1: retrieve candidate IDs via separate index scans + UNION.
+	// Each branch uses its own index (GIN for tags, B-tree for author/category).
+	var candidateIDs []uuid.UUID
+	err = s.db.SelectContext(ctx, &candidateIDs, `
+		SELECT id FROM mangas WHERE id != $1 AND tags && $2::text[]
+		UNION
+		SELECT id FROM mangas WHERE id != $1 AND author != '' AND author = $3
+		UNION
+		SELECT id FROM mangas WHERE id != $1 AND category != '' AND category = $4`,
 		srcID,
 		pq.Array(meta.Tags),
 		meta.Author,
 		meta.Category,
+	)
+	if err != nil || len(candidateIDs) == 0 {
+		return nil, err
+	}
+
+	// Phase 2: rank candidates by Jaccard similarity, popularity as tiebreaker.
+	// LATERAL computes overlap once per row — reused in both numerator and denominator.
+	var candidates []*model.Manga
+	err = s.db.SelectContext(ctx, &candidates, `
+		SELECT m.* FROM mangas m
+		LEFT JOIN manga_popularity p ON p.manga_id = m.id
+		CROSS JOIN LATERAL (
+		  SELECT COUNT(*) AS overlap FROM unnest(m.tags) t
+		  WHERE t = ANY($2::text[])
+		) o
+		WHERE m.id = ANY($1)
+		ORDER BY
+		  o.overlap::float / NULLIF(array_length(m.tags, 1) + $3 - o.overlap, 0) DESC,
+		  COALESCE(p.score, 0) ASC
+		LIMIT $4`,
+		pq.Array(candidateIDs),
+		pq.Array(meta.Tags),
+		len(meta.Tags),
 		limit*2,
 	)
 	if err != nil {
