@@ -95,6 +95,9 @@ type AnalyticsConfig struct {
 	ContributionCap float64 `json:"contribution_cap" mapstructure:"contribution_cap" yaml:"contribution_cap"`
 	// DecayInterval is how often the trending decay runs (e.g. "1h", "30m"). Default: "1h".
 	DecayInterval string `json:"decay_interval" mapstructure:"decay_interval" yaml:"decay_interval"`
+	// StopTags is a comma-separated list of tags excluded from interest profiles and suggestion queries.
+	// Env var: ANALYTICS__STOP_TAGS (e.g. "oneshot,full-color,long-strip")
+	StopTags string `json:"stop_tags" mapstructure:"stop_tags" yaml:"stop_tags"`
 }
 
 func loadDefault() *Application {
@@ -135,6 +138,7 @@ func loadDefault() *Application {
 		Analytics: &AnalyticsConfig{
 			ContributionCap: 15,
 			DecayInterval:   "1h",
+			StopTags:        "oneshot",
 		},
 		CloudFront: &CloudFrontConfig{},
 	}

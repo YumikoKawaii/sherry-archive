@@ -69,7 +69,14 @@ func (h *Handler) Suggestions(c *gin.Context) {
 		}
 	}
 
-	mangas, err := h.store.GetSuggestions(c.Request.Context(), userID, deviceID, limit)
+	var contextMangaID *uuid.UUID
+	if raw := c.Query("manga_id"); raw != "" {
+		if id, err := uuid.Parse(raw); err == nil {
+			contextMangaID = &id
+		}
+	}
+
+	mangas, err := h.store.GetSuggestions(c.Request.Context(), userID, deviceID, contextMangaID, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

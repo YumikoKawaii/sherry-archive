@@ -24,7 +24,6 @@ const (
 	contributedPrefix  = "contributed:"
 	contributionWindow = 24 * time.Hour
 	mangaMetaTTL       = time.Hour
-	seenTTL            = 30 * 24 * time.Hour
 )
 
 // Store updates and queries the Redis-backed real-time analytics data.
@@ -33,6 +32,7 @@ type Store struct {
 	db              *sqlx.DB
 	contributionCap float64
 	decayInterval   time.Duration
+	stopTags        map[string]struct{}
 
 	// Lua scripts — loaded once, referenced by SHA.
 	updateInterest   *redis.Script
@@ -40,8 +40,8 @@ type Store struct {
 	contributePoints *redis.Script
 }
 
-func NewStore(rdb *redis.Client, db *sqlx.DB, contributionCap float64, decayInterval time.Duration) *Store {
-	s := &Store{rdb: rdb, db: db, contributionCap: contributionCap, decayInterval: decayInterval}
+func NewStore(rdb *redis.Client, db *sqlx.DB, contributionCap float64, decayInterval time.Duration, stopTags map[string]struct{}) *Store {
+	s := &Store{rdb: rdb, db: db, contributionCap: contributionCap, decayInterval: decayInterval, stopTags: stopTags}
 	// Atomic interest update with per-write decay.
 	// KEYS[1] = interests:{device_id}, ARGV[1] = field, ARGV[2] = decay, ARGV[3] = points
 	s.updateInterest = redis.NewScript(`
@@ -120,11 +120,10 @@ func (s *Store) ProcessEvents(ctx context.Context, events []tracking.EventRow) {
 			}
 		}
 
-		// Update seen set (still real-time for suggestion exclusion)
+		// Update seen set permanently (no TTL — manga excluded from suggestions forever)
 		if _, ok := interestPoints[e.Event]; ok {
 			deviceKey := seenPrefix + e.DeviceID.String()
 			s.rdb.SAdd(ctx, deviceKey, mangaID)
-			s.rdb.Expire(ctx, deviceKey, seenTTL)
 		}
 	}
 }
@@ -253,7 +252,8 @@ const interestCacheTTL = 24 * time.Hour
 
 // GetSuggestions returns personalised manga recommendations.
 // If userID is non-nil, the user's interest profile is used with fallback to deviceID.
-func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID string, limit int) ([]*model.Manga, error) {
+// If contextMangaID is non-nil, the currently viewing manga's metadata boosts matching.
+func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID string, contextMangaID *uuid.UUID, limit int) ([]*model.Manga, error) {
 	var identityID string
 	if userID != nil {
 		identityID = userID.String()
@@ -274,6 +274,19 @@ func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID 
 		}
 	}
 
+	// Filter stop tags from dims
+	filtered := dims[:0]
+	for _, d := range dims {
+		if strings.HasPrefix(d.key, "tag:") {
+			tag := strings.TrimPrefix(d.key, "tag:")
+			if _, stopped := s.stopTags[tag]; stopped {
+				continue
+			}
+		}
+		filtered = append(filtered, d)
+	}
+	dims = filtered
+
 	sort.Slice(dims, func(i, j int) bool { return dims[i].score > dims[j].score })
 
 	var topTags, topAuthors, topCategories []string
@@ -288,7 +301,28 @@ func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID 
 		}
 	}
 
-	// Seen set is still device-scoped (real-time)
+	// Boost from currently viewing manga context
+	if contextMangaID != nil {
+		meta, err := s.getMangaMeta(ctx, contextMangaID.String())
+		if err == nil && meta != nil {
+			for _, tag := range meta.Tags {
+				if _, stopped := s.stopTags[tag]; stopped {
+					continue
+				}
+				if len(topTags) < 8 && !contains(topTags, tag) {
+					topTags = append(topTags, tag)
+				}
+			}
+			if meta.Author != "" && len(topAuthors) < 5 && !contains(topAuthors, meta.Author) {
+				topAuthors = append(topAuthors, meta.Author)
+			}
+			if meta.Category != "" && len(topCategories) < 5 && !contains(topCategories, meta.Category) {
+				topCategories = append(topCategories, meta.Category)
+			}
+		}
+	}
+
+	// Seen set is device-scoped, permanent exclusion
 	seenKey := seenPrefix + deviceID
 	seenStrs, _ := s.rdb.SMembers(ctx, seenKey).Result()
 	seenIDs := make([]uuid.UUID, 0, len(seenStrs))
@@ -298,7 +332,21 @@ func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID 
 		}
 	}
 
+	// Exclude context manga too
+	if contextMangaID != nil {
+		seenIDs = append(seenIDs, *contextMangaID)
+	}
+
 	return s.querySuggestions(ctx, topTags, topAuthors, topCategories, seenIDs, limit)
+}
+
+func contains(slice []string, s string) bool {
+	for _, v := range slice {
+		if v == s {
+			return true
+		}
+	}
+	return false
 }
 
 type interestDim struct {
@@ -362,14 +410,15 @@ func (s *Store) querySuggestions(
 
 	var mangas []*model.Manga
 	err := s.db.SelectContext(ctx, &mangas, `
-		SELECT * FROM mangas
-		WHERE ($1::uuid[] IS NULL OR id != ALL($1::uuid[]))
+		SELECT m.* FROM mangas m
+		LEFT JOIN manga_popularity p ON p.manga_id = m.id
+		WHERE ($1::uuid[] IS NULL OR m.id != ALL($1::uuid[]))
 		  AND (
-		        tags && $2::text[]
-		     OR (author != '' AND author = ANY($3::text[]))
-		     OR (category != '' AND category = ANY($4::text[]))
+		        m.tags && $2::text[]
+		     OR (m.author != '' AND m.author = ANY($3::text[]))
+		     OR (m.category != '' AND m.category = ANY($4::text[]))
 		  )
-		ORDER BY created_at DESC
+		ORDER BY COALESCE(p.score, 0) DESC
 		LIMIT $5`,
 		pq.Array(seenIDs),
 		pq.Array(tags),
@@ -400,14 +449,15 @@ func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*m
 
 	var mangas []*model.Manga
 	err = s.db.SelectContext(ctx, &mangas, `
-		SELECT * FROM mangas
-		WHERE id != $1
+		SELECT m.* FROM mangas m
+		LEFT JOIN manga_popularity p ON p.manga_id = m.id
+		WHERE m.id != $1
 		  AND (
-		        ($2::text[] != '{}' AND tags && $2::text[])
-		     OR ($3 != '' AND author = $3)
-		     OR ($4 != '' AND category = $4)
+		        ($2::text[] != '{}' AND m.tags && $2::text[])
+		     OR ($3 != '' AND m.author = $3)
+		     OR ($4 != '' AND m.category = $4)
 		  )
-		ORDER BY created_at DESC
+		ORDER BY COALESCE(p.score, 0) DESC
 		LIMIT $5`,
 		srcID,
 		pq.Array(meta.Tags),

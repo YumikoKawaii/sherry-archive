@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -42,20 +43,34 @@ func Run(_ *cobra.Command, _ []string) {
 	}
 	defer rdb.Close()
 
+	// Build stop tags set
+	stopTags := make(map[string]struct{})
+	if cfg.Analytics.StopTags != "" {
+		for _, t := range strings.Split(cfg.Analytics.StopTags, ",") {
+			if t = strings.TrimSpace(t); t != "" {
+				stopTags[t] = struct{}{}
+			}
+		}
+	}
+
 	ctx := context.Background()
 	log.Println("==> Starting interest aggregation job")
+	log.Printf("  stop tags: %v", cfg.Analytics.StopTags)
 
-	if err := runAggregation(ctx, db, rdb); err != nil {
+	if err := runAggregation(ctx, db, rdb, stopTags, cfg.Analytics.ContributionCap); err != nil {
 		log.Fatalf("aggregation failed: %v", err)
 	}
 
 	log.Println("==> Done")
 }
 
-func runAggregation(ctx context.Context, db *sqlx.DB, rdb *redis.Client) error {
+func runAggregation(ctx context.Context, db *sqlx.DB, rdb *redis.Client, stopTags map[string]struct{}, cap float64) error {
 	mappingRepo := postgres.NewDeviceUserMappingRepo(db)
 	interestRepo := postgres.NewUserInterestRepo(db)
 	watermarkRepo := postgres.NewInterestSyncWatermarkRepo(db)
+
+	// Popularity deltas accumulated across all devices: manga_id → delta
+	popularityDeltas := make(map[string]float64)
 
 	// Find all distinct device_ids that have unprocessed events
 	deviceIDs, err := fetchDevicesWithNewEvents(ctx, db, watermarkRepo)
@@ -80,11 +95,20 @@ func runAggregation(ctx context.Context, db *sqlx.DB, rdb *redis.Client) error {
 			since = watermark.LastSyncedAt
 		}
 
-		if err := processIdentity(ctx, db, rdb, interestRepo, watermarkRepo, deviceID, identityID, since, jobTime); err != nil {
+		if err := processIdentity(ctx, db, rdb, interestRepo, watermarkRepo, deviceID, identityID, since, jobTime, stopTags, cap, popularityDeltas); err != nil {
 			log.Printf("  [WARN] identity %s: %v", identityID, err)
 			continue
 		}
 	}
+
+	// Upsert popularity scores
+	if len(popularityDeltas) > 0 {
+		log.Printf("  upserting popularity for %d manga(s)", len(popularityDeltas))
+		if err := upsertPopularity(ctx, db, popularityDeltas); err != nil {
+			log.Printf("  [WARN] upsert popularity: %v", err)
+		}
+	}
+
 	return nil
 }
 
@@ -96,6 +120,9 @@ func processIdentity(
 	watermarkRepo *postgres.InterestSyncWatermarkRepo,
 	deviceID, identityID uuid.UUID,
 	since, jobTime time.Time,
+	stopTags map[string]struct{},
+	cap float64,
+	popularityDeltas map[string]float64,
 ) error {
 	// Fetch new events for this device since watermark
 	events, err := fetchEventsSince(ctx, db, deviceID, since)
@@ -105,6 +132,8 @@ func processIdentity(
 	if len(events) == 0 {
 		return nil
 	}
+
+	log.Printf("    device %s → identity %s: %d event(s)", deviceID, identityID, len(events))
 
 	// Fetch manga metadata for all unique manga_ids in events
 	mangaIDs := extractMangaIDs(events)
@@ -123,6 +152,14 @@ func processIdentity(
 		scores[row.Dimension] = row.Score
 	}
 
+	// Popularity: track capped contribution per manga per day for this device
+	// key: manga_id+"_"+date, value: accumulated points in that day
+	type dayKey struct {
+		mangaID string
+		day     string
+	}
+	dayContrib := make(map[dayKey]float64)
+
 	// Calculate deltas from new events
 	for _, e := range events {
 		pts, ok := interestPointsMap[e.Event]
@@ -138,15 +175,34 @@ func processIdentity(
 			continue
 		}
 
-		// Tags — proportional split
-		if len(meta.Tags) > 0 {
-			tagPts := pts / float64(len(meta.Tags))
-			for _, tag := range meta.Tags {
+		// Popularity: apply cap per device per manga per day
+		if trendPts, ok := trendingPointsMap[e.Event]; ok {
+			dk := dayKey{mangaID, e.CreatedAt.Format("2006-01-02")}
+			remaining := cap - dayContrib[dk]
+			if remaining > 0 {
+				allowed := trendPts
+				if allowed > remaining {
+					allowed = remaining
+				}
+				dayContrib[dk] += allowed
+				popularityDeltas[mangaID] += allowed
+			}
+		}
+
+		// Interest profile — skip stop tags
+		activeTags := make([]string, 0, len(meta.Tags))
+		for _, tag := range meta.Tags {
+			if _, stopped := stopTags[tag]; !stopped {
+				activeTags = append(activeTags, tag)
+			}
+		}
+		if len(activeTags) > 0 {
+			tagPts := pts / float64(len(activeTags))
+			for _, tag := range activeTags {
 				dim := "tag:" + tag
 				scores[dim] = scores[dim]*interestDecay + tagPts
 			}
 		}
-		// Author and category — full points
 		if meta.Author != "" {
 			dim := "author:" + meta.Author
 			scores[dim] = scores[dim]*interestDecay + pts
@@ -208,6 +264,7 @@ func populateCache(ctx context.Context, rdb *redis.Client, identityID string, in
 type eventRow struct {
 	Event      string          `db:"event"`
 	Properties json.RawMessage `db:"properties"`
+	CreatedAt  time.Time       `db:"created_at"`
 }
 
 func fetchDevicesWithNewEvents(ctx context.Context, db *sqlx.DB, watermarkRepo *postgres.InterestSyncWatermarkRepo) ([]uuid.UUID, error) {
@@ -235,10 +292,10 @@ func fetchEventsSince(ctx context.Context, db *sqlx.DB, deviceID uuid.UUID, sinc
 	var err error
 	if since.IsZero() {
 		err = db.SelectContext(ctx, &rows,
-			`SELECT event, properties FROM events WHERE device_id = $1 ORDER BY created_at ASC`, deviceID)
+			`SELECT event, properties, created_at FROM events WHERE device_id = $1 ORDER BY created_at ASC`, deviceID)
 	} else {
 		err = db.SelectContext(ctx, &rows,
-			`SELECT event, properties FROM events WHERE device_id = $1 AND created_at > $2 ORDER BY created_at ASC`, deviceID, since)
+			`SELECT event, properties, created_at FROM events WHERE device_id = $1 AND created_at > $2 ORDER BY created_at ASC`, deviceID, since)
 	}
 	return rows, err
 }
@@ -311,6 +368,34 @@ var interestPointsMap = map[string]float64{
 	"comment_post":     4,
 	"bookmark_add":     8,
 	"bookmark_remove":  -3,
+}
+
+var trendingPointsMap = map[string]float64{
+	"manga_view":       1,
+	"chapter_open":     3,
+	"chapter_complete": 5,
+}
+
+func upsertPopularity(ctx context.Context, db *sqlx.DB, deltas map[string]float64) error {
+	now := time.Now()
+	for mangaIDStr, delta := range deltas {
+		mangaID, err := uuid.Parse(mangaIDStr)
+		if err != nil {
+			continue
+		}
+		_, err = db.ExecContext(ctx, `
+			INSERT INTO manga_popularity (manga_id, score, updated_at)
+			VALUES ($1, $2, $3)
+			ON CONFLICT (manga_id) DO UPDATE
+			  SET score = manga_popularity.score + EXCLUDED.score,
+			      updated_at = EXCLUDED.updated_at`,
+			mangaID, delta, now,
+		)
+		if err != nil {
+			log.Printf("  [WARN] popularity upsert for %s: %v", mangaIDStr, err)
+		}
+	}
+	return nil
 }
 
 // connectRedis reuses the same logic as serve/server.go

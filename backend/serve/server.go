@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -149,7 +150,15 @@ func Server(cmd *cobra.Command, args []string) {
 	defer bgCancel()
 
 	// Analytics — real-time trending + suggestions via Redis
-	analyticsStore := analytics.NewStore(rdb, db, cfg.Analytics.ContributionCap, decayInterval)
+	stopTags := make(map[string]struct{})
+	if cfg.Analytics.StopTags != "" {
+		for _, t := range strings.Split(cfg.Analytics.StopTags, ",") {
+			if t = strings.TrimSpace(t); t != "" {
+				stopTags[t] = struct{}{}
+			}
+		}
+	}
+	analyticsStore := analytics.NewStore(rdb, db, cfg.Analytics.ContributionCap, decayInterval, stopTags)
 	analytics.NewHandler(analyticsStore, urlCache).Mount(r)
 	go analyticsStore.StartDecay(bgCtx)
 
