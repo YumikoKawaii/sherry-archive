@@ -103,10 +103,16 @@ func (s *Store) ProcessEvents(ctx context.Context, events []tracking.EventRow) {
 			}
 		}
 
-		// Record seen manga in DB (permanent exclusion from suggestions)
+		// Record seen manga in DB (permanent exclusion from suggestions).
+		// Use user_id when available so logged-in reads are immediately excluded
+		// from user-scoped suggestions without waiting for a merge.
 		if _, ok := interestPoints[e.Event]; ok {
 			if mID, err := uuid.Parse(mangaID); err == nil {
-				_ = s.seenRepo.Add(ctx, e.DeviceID, mID)
+				identityID := e.DeviceID
+				if e.UserID != nil {
+					identityID = *e.UserID
+				}
+				_ = s.seenRepo.Add(ctx, identityID, mID)
 			}
 		}
 	}
