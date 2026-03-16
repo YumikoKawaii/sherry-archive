@@ -376,22 +376,34 @@ func (s *Store) querySuggestions(
 		return nil, nil
 	}
 
-	var mangas []*model.Manga
-	err := s.db.SelectContext(ctx, &mangas, `
-		SELECT m.* FROM mangas m
-		LEFT JOIN manga_popularity p ON p.manga_id = m.id
-		WHERE ($1::uuid[] IS NULL OR m.id != ALL($1::uuid[]))
-		  AND (
-		        m.tags && $2::text[]
-		     OR (m.author != '' AND m.author = ANY($3::text[]))
-		     OR (m.category != '' AND m.category = ANY($4::text[]))
-		  )
-		ORDER BY COALESCE(p.score, 0) DESC
-		LIMIT $5`,
+	// Phase 2: collect candidate IDs via separate index scans + UNION.
+	// Each branch uses its own index (GIN for tags, B-tree for author/category).
+	// UNION deduplicates. $1 (seen array) is reused across all three branches.
+	var candidateIDs []uuid.UUID
+	err := s.db.SelectContext(ctx, &candidateIDs, `
+		SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND tags && $2::text[]
+		UNION
+		SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND author != '' AND author = ANY($3::text[])
+		UNION
+		SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND category != '' AND category = ANY($4::text[])`,
 		pq.Array(seenIDs),
 		pq.Array(tags),
 		pq.Array(authors),
 		pq.Array(categories),
+	)
+	if err != nil || len(candidateIDs) == 0 {
+		return nil, err
+	}
+
+	// Phase 3: fetch full rows for candidates, rank by popularity score.
+	var mangas []*model.Manga
+	err = s.db.SelectContext(ctx, &mangas, `
+		SELECT m.* FROM mangas m
+		LEFT JOIN manga_popularity p ON p.manga_id = m.id
+		WHERE m.id = ANY($1)
+		ORDER BY COALESCE(p.score, 0) DESC
+		LIMIT $2`,
+		pq.Array(candidateIDs),
 		limit,
 	)
 	return mangas, err

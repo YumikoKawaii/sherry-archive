@@ -383,20 +383,26 @@ for each device with unprocessed events:
 SELECT manga_id FROM seen_manga WHERE identity_id = $identity_id
 ```
 
-**Phase 2+3 — Candidate retrieval + ranking**
+**Phase 2 — Candidate retrieval (UNION of separate index scans)**
+```sql
+SELECT id FROM mangas WHERE id != ALL($seen) AND tags && $tags
+UNION
+SELECT id FROM mangas WHERE id != ALL($seen) AND author != '' AND author = ANY($authors)
+UNION
+SELECT id FROM mangas WHERE id != ALL($seen) AND category != '' AND category = ANY($categories)
+```
+Each branch gets its own index: GIN on `tags`, B-tree on `author`, B-tree on `category`.
+`OR` in a single query would prevent the planner from using all three indexes.
+UNION deduplicates candidate IDs.
+
+**Phase 3 — Ranking**
 ```sql
 SELECT m.* FROM mangas m
 LEFT JOIN manga_popularity p ON p.manga_id = m.id
-WHERE m.id != ALL($seen_ids)
-  AND (
-    m.tags && $tags
- OR m.author = ANY($authors)
- OR m.category = ANY($categories)
-  )
+WHERE m.id = ANY($candidate_ids)
 ORDER BY COALESCE(p.score, 0) DESC
 LIMIT $n
 ```
-Uses GIN index on `tags`, B-tree on `author` and `category`.
 
 ### 5.4 Identity model
 
