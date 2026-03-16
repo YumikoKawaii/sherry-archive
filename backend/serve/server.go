@@ -123,8 +123,19 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 	urlCache := urlcache.New(signer, rdb, presignExpiry)
 
+	// Analytics — real-time trending + suggestions via Redis
+	stopTags := make(map[string]struct{})
+	if cfg.Analytics.StopTags != "" {
+		for _, t := range strings.Split(cfg.Analytics.StopTags, ",") {
+			if t = strings.TrimSpace(t); t != "" {
+				stopTags[t] = struct{}{}
+			}
+		}
+	}
+	analyticsStore := analytics.NewStore(rdb, db, seenMangaRepo, cfg.Analytics.ContributionCap, decayInterval, stopTags)
+
 	// Services
-	authSvc := service.NewAuthService(userRepo, refreshTokenRepo, deviceMappingRepo, seenMangaRepo, userInterestRepo, tokenMgr)
+	authSvc := service.NewAuthService(userRepo, refreshTokenRepo, deviceMappingRepo, seenMangaRepo, userInterestRepo, analyticsStore, tokenMgr)
 	userSvc := service.NewUserService(userRepo)
 	mangaSvc := service.NewMangaService(mangaRepo)
 	chapterSvc := service.NewChapterService(chapterRepo, mangaRepo)
@@ -151,16 +162,6 @@ func Server(cmd *cobra.Command, args []string) {
 	bgCtx, bgCancel := context.WithCancel(context.Background())
 	defer bgCancel()
 
-	// Analytics — real-time trending + suggestions via Redis
-	stopTags := make(map[string]struct{})
-	if cfg.Analytics.StopTags != "" {
-		for _, t := range strings.Split(cfg.Analytics.StopTags, ",") {
-			if t = strings.TrimSpace(t); t != "" {
-				stopTags[t] = struct{}{}
-			}
-		}
-	}
-	analyticsStore := analytics.NewStore(rdb, db, seenMangaRepo, cfg.Analytics.ContributionCap, decayInterval, stopTags)
 	analytics.NewHandler(analyticsStore, urlCache).Mount(r)
 	go analyticsStore.StartDecay(bgCtx)
 

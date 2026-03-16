@@ -15,13 +15,19 @@ import (
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 )
 
+// InterestCacheInvalidator is implemented by analytics.Store.
+type InterestCacheInvalidator interface {
+	InvalidateInterestCache(ctx context.Context, identityID uuid.UUID)
+}
+
 type AuthService struct {
-	userRepo          repository.UserRepository
-	tokenRepo         repository.RefreshTokenRepository
-	deviceMappingRepo repository.DeviceUserMappingRepository
-	seenMangaRepo     repository.SeenMangaRepository
-	userInterestRepo  repository.UserInterestRepository
-	tokenMgr          *token.Manager
+	userRepo           repository.UserRepository
+	tokenRepo          repository.RefreshTokenRepository
+	deviceMappingRepo  repository.DeviceUserMappingRepository
+	seenMangaRepo      repository.SeenMangaRepository
+	userInterestRepo   repository.UserInterestRepository
+	cacheInvalidator   InterestCacheInvalidator
+	tokenMgr           *token.Manager
 }
 
 func NewAuthService(
@@ -30,6 +36,7 @@ func NewAuthService(
 	deviceMappingRepo repository.DeviceUserMappingRepository,
 	seenMangaRepo repository.SeenMangaRepository,
 	userInterestRepo repository.UserInterestRepository,
+	cacheInvalidator InterestCacheInvalidator,
 	tokenMgr *token.Manager,
 ) *AuthService {
 	return &AuthService{
@@ -38,6 +45,7 @@ func NewAuthService(
 		deviceMappingRepo: deviceMappingRepo,
 		seenMangaRepo:     seenMangaRepo,
 		userInterestRepo:  userInterestRepo,
+		cacheInvalidator:  cacheInvalidator,
 		tokenMgr:          tokenMgr,
 	}
 }
@@ -201,4 +209,5 @@ func hashToken(t string) string {
 func (s *AuthService) mergeDeviceData(ctx context.Context, deviceID, userID uuid.UUID) {
 	_ = s.seenMangaRepo.MergeInto(ctx, deviceID, userID)
 	_ = s.userInterestRepo.MergeInto(ctx, deviceID, userID)
+	s.cacheInvalidator.InvalidateInterestCache(ctx, userID)
 }

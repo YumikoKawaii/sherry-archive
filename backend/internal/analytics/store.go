@@ -422,6 +422,12 @@ func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*m
 	return mangas, err
 }
 
+// InvalidateInterestCache removes the Redis interest cache for an identity,
+// forcing the next suggestion request to reload from DB.
+func (s *Store) InvalidateInterestCache(ctx context.Context, identityID uuid.UUID) {
+	s.rdb.Del(ctx, interestsPrefix+identityID.String())
+}
+
 // --- Decay loop ---
 
 // StartDecay runs the hourly trending decay in the background.
