@@ -484,22 +484,26 @@ func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*m
 		return nil, err
 	}
 
-	// Cap series siblings at 50% of limit to keep the shelf diverse.
+	// Series siblings first (capped at 50%), then non-siblings — each group
+	// retains the overlap-rank order from the DB query.
 	srcKey := extractSearchKey(meta.Title)
 	siblingCap := limit / 2
-	siblingCount := 0
 	result := make([]*model.Manga, 0, limit)
+	for _, m := range candidates {
+		if len(result) >= siblingCap {
+			break
+		}
+		if extractSearchKey(m.Title) == srcKey {
+			result = append(result, m)
+		}
+	}
 	for _, m := range candidates {
 		if len(result) >= limit {
 			break
 		}
-		if extractSearchKey(m.Title) == srcKey {
-			if siblingCount >= siblingCap {
-				continue
-			}
-			siblingCount++
+		if extractSearchKey(m.Title) != srcKey {
+			result = append(result, m)
 		}
-		result = append(result, m)
 	}
 	return result, nil
 }
