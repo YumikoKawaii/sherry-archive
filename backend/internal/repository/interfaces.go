@@ -89,6 +89,13 @@ type DeviceUserMappingRepository interface {
 type UserInterestRepository interface {
 	ListByIdentity(ctx context.Context, identityID uuid.UUID) ([]*model.UserInterest, error)
 	UpsertBatch(ctx context.Context, interests []*model.UserInterest) error
+	MergeInto(ctx context.Context, fromID, toID uuid.UUID) error
+}
+
+type SeenMangaRepository interface {
+	Add(ctx context.Context, identityID, mangaID uuid.UUID) error
+	ListIDsByIdentity(ctx context.Context, identityID uuid.UUID) ([]uuid.UUID, error)
+	MergeInto(ctx context.Context, fromID, toID uuid.UUID) error
 }
 
 type InterestSyncWatermarkRepository interface {

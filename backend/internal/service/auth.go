@@ -19,6 +19,8 @@ type AuthService struct {
 	userRepo          repository.UserRepository
 	tokenRepo         repository.RefreshTokenRepository
 	deviceMappingRepo repository.DeviceUserMappingRepository
+	seenMangaRepo     repository.SeenMangaRepository
+	userInterestRepo  repository.UserInterestRepository
 	tokenMgr          *token.Manager
 }
 
@@ -26,12 +28,16 @@ func NewAuthService(
 	userRepo repository.UserRepository,
 	tokenRepo repository.RefreshTokenRepository,
 	deviceMappingRepo repository.DeviceUserMappingRepository,
+	seenMangaRepo repository.SeenMangaRepository,
+	userInterestRepo repository.UserInterestRepository,
 	tokenMgr *token.Manager,
 ) *AuthService {
 	return &AuthService{
 		userRepo:          userRepo,
 		tokenRepo:         tokenRepo,
 		deviceMappingRepo: deviceMappingRepo,
+		seenMangaRepo:     seenMangaRepo,
+		userInterestRepo:  userInterestRepo,
 		tokenMgr:          tokenMgr,
 	}
 }
@@ -88,6 +94,7 @@ func (s *AuthService) Register(ctx context.Context, in RegisterInput) (*model.Us
 
 	if in.DeviceID != nil {
 		_ = s.deviceMappingRepo.Upsert(ctx, *in.DeviceID, u.ID)
+		s.mergeDeviceData(ctx, *in.DeviceID, u.ID)
 	}
 	return u, pair, nil
 }
@@ -118,6 +125,7 @@ func (s *AuthService) Login(ctx context.Context, in LoginInput) (*model.User, *T
 
 	if in.DeviceID != nil {
 		_ = s.deviceMappingRepo.Upsert(ctx, *in.DeviceID, u.ID)
+		s.mergeDeviceData(ctx, *in.DeviceID, u.ID)
 	}
 	return u, pair, nil
 }
@@ -186,4 +194,11 @@ func (s *AuthService) issueTokenPair(ctx context.Context, userID uuid.UUID) (*To
 func hashToken(t string) string {
 	h := sha256.Sum256([]byte(t))
 	return hex.EncodeToString(h[:])
+}
+
+// mergeDeviceData copies seen_manga and user_interests from the device identity
+// into the user identity. Called fire-and-forget after login/register.
+func (s *AuthService) mergeDeviceData(ctx context.Context, deviceID, userID uuid.UUID) {
+	_ = s.seenMangaRepo.MergeInto(ctx, deviceID, userID)
+	_ = s.userInterestRepo.MergeInto(ctx, deviceID, userID)
 }

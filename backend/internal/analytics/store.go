@@ -13,12 +13,12 @@ import (
 	"github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 	"github.com/yumikokawaii/sherry-archive/internal/model"
+	"github.com/yumikokawaii/sherry-archive/internal/repository"
 	"github.com/yumikokawaii/sherry-archive/internal/tracking"
 )
 
 const (
 	trendingKey        = "trending"
-	seenPrefix         = "seen:"
 	interestsPrefix    = "interests:"
 	mangaMetaPrefix    = "manga:meta:"
 	contributedPrefix  = "contributed:"
@@ -30,6 +30,7 @@ const (
 type Store struct {
 	rdb             *redis.Client
 	db              *sqlx.DB
+	seenRepo        repository.SeenMangaRepository
 	contributionCap float64
 	decayInterval   time.Duration
 	stopTags        map[string]struct{}
@@ -40,8 +41,8 @@ type Store struct {
 	contributePoints *redis.Script
 }
 
-func NewStore(rdb *redis.Client, db *sqlx.DB, contributionCap float64, decayInterval time.Duration, stopTags map[string]struct{}) *Store {
-	s := &Store{rdb: rdb, db: db, contributionCap: contributionCap, decayInterval: decayInterval, stopTags: stopTags}
+func NewStore(rdb *redis.Client, db *sqlx.DB, seenRepo repository.SeenMangaRepository, contributionCap float64, decayInterval time.Duration, stopTags map[string]struct{}) *Store {
+	s := &Store{rdb: rdb, db: db, seenRepo: seenRepo, contributionCap: contributionCap, decayInterval: decayInterval, stopTags: stopTags}
 	// Atomic interest update with per-write decay.
 	// KEYS[1] = interests:{device_id}, ARGV[1] = field, ARGV[2] = decay, ARGV[3] = points
 	s.updateInterest = redis.NewScript(`
@@ -120,10 +121,11 @@ func (s *Store) ProcessEvents(ctx context.Context, events []tracking.EventRow) {
 			}
 		}
 
-		// Update seen set permanently (no TTL — manga excluded from suggestions forever)
+		// Record seen manga in DB (permanent exclusion from suggestions)
 		if _, ok := interestPoints[e.Event]; ok {
-			deviceKey := seenPrefix + e.DeviceID.String()
-			s.rdb.SAdd(ctx, deviceKey, mangaID)
+			if mID, err := uuid.Parse(mangaID); err == nil {
+				_ = s.seenRepo.Add(ctx, e.DeviceID, mID)
+			}
 		}
 	}
 }
@@ -322,21 +324,19 @@ func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID 
 		}
 	}
 
-	// Seen set is device-scoped, permanent exclusion
-	seenKey := seenPrefix + deviceID
-	seenStrs, _ := s.rdb.SMembers(ctx, seenKey).Result()
-	seenIDs := make([]uuid.UUID, 0, len(seenStrs))
-	for _, str := range seenStrs {
-		if id, err := uuid.Parse(str); err == nil {
-			seenIDs = append(seenIDs, id)
-		}
+	// Phase 1: fetch seen manga IDs from DB (permanent exclusion)
+	var identityUUID uuid.UUID
+	if id, err := uuid.Parse(identityID); err == nil {
+		identityUUID = id
 	}
+	seenIDs, _ := s.seenRepo.ListIDsByIdentity(ctx, identityUUID)
 
 	// Exclude context manga too
 	if contextMangaID != nil {
 		seenIDs = append(seenIDs, *contextMangaID)
 	}
 
+	// Phase 2+3: retrieve candidates excluding seen, ranked by popularity
 	return s.querySuggestions(ctx, topTags, topAuthors, topCategories, seenIDs, limit)
 }
 

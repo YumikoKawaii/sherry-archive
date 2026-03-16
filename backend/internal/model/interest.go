@@ -23,3 +23,9 @@ type InterestSyncWatermark struct {
 	IdentityID   uuid.UUID `db:"identity_id"`
 	LastSyncedAt time.Time `db:"last_synced_at"`
 }
+
+type SeenManga struct {
+	IdentityID uuid.UUID `db:"identity_id"`
+	MangaID    uuid.UUID `db:"manga_id"`
+	SeenAt     time.Time `db:"seen_at"`
+}

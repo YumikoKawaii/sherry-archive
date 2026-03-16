@@ -23,6 +23,18 @@ func (r *UserInterestRepo) ListByIdentity(ctx context.Context, identityID uuid.U
 	return rows, err
 }
 
+func (r *UserInterestRepo) MergeInto(ctx context.Context, fromID, toID uuid.UUID) error {
+	_, err := r.db.ExecContext(ctx, `
+		INSERT INTO user_interests (identity_id, dimension, score, updated_at)
+		SELECT $2, dimension, score, updated_at FROM user_interests WHERE identity_id = $1
+		ON CONFLICT (identity_id, dimension) DO UPDATE
+		  SET score      = GREATEST(EXCLUDED.score, user_interests.score),
+		      updated_at = GREATEST(EXCLUDED.updated_at, user_interests.updated_at)`,
+		fromID, toID,
+	)
+	return err
+}
+
 func (r *UserInterestRepo) UpsertBatch(ctx context.Context, interests []*model.UserInterest) error {
 	if len(interests) == 0 {
 		return nil
