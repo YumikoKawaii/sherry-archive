@@ -36,30 +36,12 @@ type Store struct {
 	stopTags        map[string]struct{}
 
 	// Lua scripts — loaded once, referenced by SHA.
-	updateInterest   *redis.Script
 	decayTrending    *redis.Script
 	contributePoints *redis.Script
 }
 
 func NewStore(rdb *redis.Client, db *sqlx.DB, seenRepo repository.SeenMangaRepository, contributionCap float64, decayInterval time.Duration, stopTags map[string]struct{}) *Store {
 	s := &Store{rdb: rdb, db: db, seenRepo: seenRepo, contributionCap: contributionCap, decayInterval: decayInterval, stopTags: stopTags}
-	// Atomic interest update with per-write decay.
-	// KEYS[1] = interests:{device_id}, ARGV[1] = field, ARGV[2] = decay, ARGV[3] = points
-	s.updateInterest = redis.NewScript(`
-		local cur = redis.call('HGET', KEYS[1], ARGV[1])
-		local score
-		if cur then
-			score = tonumber(cur) * tonumber(ARGV[2]) + tonumber(ARGV[3])
-		else
-			score = tonumber(ARGV[3])
-		end
-		if score <= 0 then
-			redis.call('HDEL', KEYS[1], ARGV[1])
-		else
-			redis.call('HSET', KEYS[1], ARGV[1], tostring(score))
-		end
-		return tostring(score)
-	`)
 	// Cap per-device contribution to trending within the 24h window.
 	// KEYS[1] = contributed:{device_id}:{manga_id}
 	// ARGV[1] = requested points, ARGV[2] = cap, ARGV[3] = window TTL in seconds
@@ -127,34 +109,6 @@ func (s *Store) ProcessEvents(ctx context.Context, events []tracking.EventRow) {
 				_ = s.seenRepo.Add(ctx, e.DeviceID, mID)
 			}
 		}
-	}
-}
-
-func (s *Store) updateInterestProfile(ctx context.Context, deviceID, mangaID string, pts float64) {
-	meta, err := s.getMangaMeta(ctx, mangaID)
-	if err != nil || meta == nil {
-		return
-	}
-
-	interestKey := interestsPrefix + deviceID
-
-	// Tags — proportional split
-	if len(meta.Tags) > 0 {
-		tagPts := pts / float64(len(meta.Tags))
-		for _, tag := range meta.Tags {
-			s.updateInterest.Run(ctx, s.rdb, []string{interestKey},
-				"tag:"+tag, interestDecay, tagPts)
-		}
-	}
-
-	// Author and Category — full points (single-valued, no split)
-	if meta.Author != "" {
-		s.updateInterest.Run(ctx, s.rdb, []string{interestKey},
-			"author:"+meta.Author, interestDecay, pts)
-	}
-	if meta.Category != "" {
-		s.updateInterest.Run(ctx, s.rdb, []string{interestKey},
-			"category:"+meta.Category, interestDecay, pts)
 	}
 }
 

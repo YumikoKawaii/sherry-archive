@@ -21,12 +21,6 @@ var trendingPoints = map[string]float64{
 }
 
 const (
-	// interestDecay is the multiplier applied to the existing interest score
-	// before adding new points: new = old * decay + points.
-	// At 0.98, a score decays to ~1% of its original value after ~230 interactions
-	// from other events, naturally fading old interests.
-	interestDecay = 0.98
-
 	// trendingDecay is applied to the entire trending set once per hour.
 	// At 0.9, a score decays to ~1% after ~44 hours with no new activity.
 	trendingDecay = 0.9
