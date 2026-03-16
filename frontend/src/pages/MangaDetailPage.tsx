@@ -12,7 +12,7 @@ import { MangaCard } from '../components/MangaCard'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../lib/api'
 import { CommentSection } from '../components/CommentSection'
-import { tracker } from '../lib/tracking'
+import { tracker, getDeviceId } from '../lib/tracking'
 
 const STATUSES: { value: MangaStatus; label: string }[] = [
   { value: 'ongoing', label: 'Ongoing' },
@@ -34,6 +34,7 @@ export function MangaDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [similar, setSimilar] = useState<Manga[]>([])
+  const [suggestions, setSuggestions] = useState<Manga[]>([])
 
   // Bookmark state
   const [bookmark, setBookmark] = useState<Bookmark | null>(null)
@@ -71,6 +72,8 @@ export function MangaDetailPage() {
         setChapters([...chs].sort((a, b) => b.number - a.number))
         tracker.mangaView({ manga_id: m.id, manga_type: m.type })
         analyticsApi.similar(m.id, 12).then(res => setSimilar(res ?? [])).catch(() => {})
+        analyticsApi.suggestions(getDeviceId(), { userId: user?.id, mangaId: m.id, limit: 8 })
+          .then(res => setSuggestions(res ?? [])).catch(() => {})
         if (user) {
           bookmarkApi.get(m.id).then(setBookmark).catch(() => setBookmark(null))
         }
@@ -649,6 +652,24 @@ export function MangaDetailPage() {
             </h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
               {similar.map(m => <MangaCard key={m.id} manga={m} />)}
+            </div>
+          </motion.div>
+        )}
+
+        {/* For You — context-aware suggestions */}
+        {suggestions.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.35 }}
+            className="mt-10"
+          >
+            <h2 className="text-lg font-bold text-mint-50 flex items-center gap-2 mb-4">
+              <span className="w-1 h-5 rounded-full bg-jade-500 inline-block" />
+              For You
+            </h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              {suggestions.map(m => <MangaCard key={m.id} manga={m} />)}
             </div>
           </motion.div>
         )}

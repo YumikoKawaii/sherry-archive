@@ -8,6 +8,7 @@ import { MangaCard } from '../components/MangaCard'
 import { Spinner } from '../components/Spinner'
 import { Layout } from '../components/Layout'
 import { getDeviceId } from '../lib/tracking'
+import { useAuth } from '../contexts/AuthContext'
 
 const STATUSES: { value: MangaStatus | ''; label: string }[] = [
   { value: '', label: 'All' },
@@ -49,6 +50,7 @@ function MangaShelf({ title, items, badge }: {
 }
 
 export function HomePage() {
+  const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const [mangas, setMangas] = useState<Manga[]>([])
   const [total, setTotal] = useState(0)
@@ -66,15 +68,20 @@ export function HomePage() {
   const category = searchParams.get('category') ?? ''
   const tags = searchParams.getAll('tags[]')
 
-  // Load trending & suggestions once on mount
+  // Load trending once on mount
   useEffect(() => {
     analyticsApi.trending(12)
       .then(res => setTrending(res ?? []))
       .catch(() => {})
       .finally(() => setTrendingLoaded(true))
-    const deviceId = getDeviceId()
-    analyticsApi.suggestions(deviceId, 12).then(res => setSuggestions(res ?? [])).catch(() => {})
   }, [])
+
+  // Reload suggestions when auth state changes (login/logout)
+  useEffect(() => {
+    const deviceId = getDeviceId()
+    analyticsApi.suggestions(deviceId, { userId: user?.id, limit: 12 })
+      .then(res => setSuggestions(res ?? [])).catch(() => {})
+  }, [user?.id])
 
   const load = useCallback(async () => {
     setLoading(true)

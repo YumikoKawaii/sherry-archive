@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
 import { authApi } from '../lib/auth'
-import { tracker } from '../lib/tracking'
+import { tracker, getDeviceId } from '../lib/tracking'
 import type { User } from '../types/user'
 
 interface AuthState {
@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await authApi.login(email, password)
+    const res = await authApi.login(email, password, getDeviceId())
     localStorage.setItem('access_token', res.access_token)
     localStorage.setItem('refresh_token', res.refresh_token)
     setUser(res.user)
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const register = useCallback(async (username: string, email: string, password: string) => {
-    const res = await authApi.register(username, email, password)
+    const res = await authApi.register(username, email, password, getDeviceId())
     localStorage.setItem('access_token', res.access_token)
     localStorage.setItem('refresh_token', res.refresh_token)
     setUser(res.user)

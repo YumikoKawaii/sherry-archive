@@ -152,8 +152,13 @@ export const analyticsApi = {
   trending: (limit = 12) =>
     api.get<TrendingItem[]>(`/analytics/trending?limit=${limit}`),
 
-  suggestions: (deviceId: string, limit = 12) =>
-    api.get<Manga[]>(`/analytics/suggestions?device_id=${encodeURIComponent(deviceId)}&limit=${limit}`),
+  suggestions: (deviceId: string, opts: { userId?: string; mangaId?: string; limit?: number } = {}) => {
+    const { userId, mangaId, limit = 12 } = opts
+    let url = `/analytics/suggestions?device_id=${encodeURIComponent(deviceId)}&limit=${limit}`
+    if (userId) url += `&user_id=${encodeURIComponent(userId)}`
+    if (mangaId) url += `&manga_id=${encodeURIComponent(mangaId)}`
+    return api.get<Manga[]>(url)
+  },
 
   similar: (mangaId: string, limit = 8) =>
     api.get<Manga[]>(`/analytics/similar?manga_id=${encodeURIComponent(mangaId)}&limit=${limit}`),

@@ -13,11 +13,11 @@ export interface TokenPair {
 }
 
 export const authApi = {
-  register: (username: string, email: string, password: string) =>
-    api.post<AuthResponse>('/auth/register', { username, email, password }),
+  register: (username: string, email: string, password: string, deviceId: string) =>
+    api.post<AuthResponse>('/auth/register', { username, email, password, device_id: deviceId }),
 
-  login: (email: string, password: string) =>
-    api.post<AuthResponse>('/auth/login', { email, password }),
+  login: (email: string, password: string, deviceId: string) =>
+    api.post<AuthResponse>('/auth/login', { email, password, device_id: deviceId }),
 
   refresh: (refresh_token: string) =>
     api.post<TokenPair>('/auth/refresh', { refresh_token }),
