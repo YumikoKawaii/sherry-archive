@@ -133,9 +133,9 @@ export function HomePage() {
               Manga Archive
             </p>
             <h1 className="text-4xl sm:text-5xl font-black text-mint-50 leading-tight">
-              Your experience.
-              <span className="text-jade-400"> My traffic. </span>
-              Our future.
+              <span className="block sm:inline">Your experience.</span>
+              <span className="block sm:inline text-jade-400"> My traffic.</span>
+              <span className="block sm:inline"> Our future.</span>
             </h1>
             <p className="mt-4 text-mint-200/60 text-lg leading-relaxed">
               I am the bone of my code. Claude is my Servant, bound by Command Seal.
