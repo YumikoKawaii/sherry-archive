@@ -238,8 +238,6 @@ func (p *publisher) flush(ctx context.Context) {
 		avg := h.sum / h.count
 		for stat, val := range map[string]float64{
 			"avg": avg,
-			"min": h.min,
-			"max": h.max,
 			"p50": h.percentile(0.50),
 			"p99": h.percentile(0.99),
 		} {
