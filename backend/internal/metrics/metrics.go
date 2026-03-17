@@ -18,8 +18,11 @@ import (
 )
 
 // flushInterval controls how often accumulated metrics are pushed to CloudWatch.
-// 10s keeps data loss on restarts/deploys small and gives sub-minute granularity.
 const flushInterval = 60 * time.Second
+
+// dbPollInterval controls how often the DB pool gauges are sampled within a flush window.
+// More frequent than flushInterval so spikes in InUse/Idle are not missed between flushes.
+const dbPollInterval = 5 * time.Second
 
 // highRes tells CloudWatch to store at 1-second resolution so dashboards can
 // show 10s / 30s / 1m granularity instead of the default 1-minute minimum.
@@ -116,6 +119,12 @@ type publisher struct {
 	prevWaitCount    int64
 	prevWaitDuration int64 // nanoseconds
 
+	// DB pool gauge peaks — sampled every dbPollInterval, reset after each flush
+	dbMu            sync.Mutex
+	dbPeakOpen      int
+	dbPeakInUse     int
+	dbPeakIdle      int
+
 	mu                sync.Mutex
 	windowStart       time.Time
 	httpRequests      map[httpKey]float64
@@ -144,6 +153,9 @@ func Init(ctx context.Context, region, namespace string, db *sql.DB) error {
 	}
 	pub = p
 	go p.run(ctx)
+	if db != nil {
+		go p.pollDB(ctx)
+	}
 	return nil
 }
 
@@ -183,6 +195,32 @@ func RecordAnalyticsRequest(endpoint string) {
 	pub.mu.Lock()
 	pub.analyticsRequests[endpoint]++
 	pub.mu.Unlock()
+}
+
+// pollDB samples db.Stats() every dbPollInterval and tracks peak gauge values
+// within the current flush window. Peaks are consumed and reset by flush().
+func (p *publisher) pollDB(ctx context.Context) {
+	t := time.NewTicker(dbPollInterval)
+	defer t.Stop()
+	for {
+		select {
+		case <-t.C:
+			s := p.db.Stats()
+			p.dbMu.Lock()
+			if s.OpenConnections > p.dbPeakOpen {
+				p.dbPeakOpen = s.OpenConnections
+			}
+			if s.InUse > p.dbPeakInUse {
+				p.dbPeakInUse = s.InUse
+			}
+			if s.Idle > p.dbPeakIdle {
+				p.dbPeakIdle = s.Idle
+			}
+			p.dbMu.Unlock()
+		case <-ctx.Done():
+			return
+		}
+	}
 }
 
 func (p *publisher) run(ctx context.Context) {
@@ -289,34 +327,41 @@ func (p *publisher) flush(ctx context.Context) {
 	if p.db != nil {
 		s := p.db.Stats()
 
-		// Gauges — current snapshot of the pool state.
+		// Consume peak gauge values accumulated by pollDB (sampled every 5s).
+		// Peaks catch spikes that would be invisible in a single end-of-window snapshot.
+		p.dbMu.Lock()
+		peakOpen := p.dbPeakOpen
+		peakInUse := p.dbPeakInUse
+		peakIdle := p.dbPeakIdle
+		p.dbPeakOpen, p.dbPeakInUse, p.dbPeakIdle = 0, 0, 0
+		p.dbMu.Unlock()
+
 		data = append(data,
 			types.MetricDatum{
 				MetricName:        aws.String("DBPoolOpenConnections"),
 				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(float64(s.OpenConnections)),
+				Value:             aws.Float64(float64(peakOpen)),
 				Unit:              types.StandardUnitCount,
 				StorageResolution: aws.Int32(highRes),
 			},
 			types.MetricDatum{
 				MetricName:        aws.String("DBPoolInUse"),
 				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(float64(s.InUse)),
+				Value:             aws.Float64(float64(peakInUse)),
 				Unit:              types.StandardUnitCount,
 				StorageResolution: aws.Int32(highRes),
 			},
 			types.MetricDatum{
 				MetricName:        aws.String("DBPoolIdle"),
 				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(float64(s.Idle)),
+				Value:             aws.Float64(float64(peakIdle)),
 				Unit:              types.StandardUnitCount,
 				StorageResolution: aws.Int32(highRes),
 			},
 		)
 
-		// Deltas — how many waits and how much wait time occurred in this window.
-		// sql.DBStats.WaitCount and WaitDuration are cumulative since process start,
-		// so we subtract the previous snapshot to get the per-window value.
+		// Deltas — WaitCount and WaitDuration are cumulative in sql.DBStats,
+		// so subtract the previous snapshot to get the per-window value.
 		waitCountDelta := s.WaitCount - p.prevWaitCount
 		waitDurationDelta := s.WaitDuration.Nanoseconds() - p.prevWaitDuration
 		p.prevWaitCount = s.WaitCount
@@ -333,7 +378,7 @@ func (p *publisher) flush(ctx context.Context) {
 			types.MetricDatum{
 				MetricName:        aws.String("DBPoolWaitDuration"),
 				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(float64(waitDurationDelta) / 1e9), // nanoseconds → seconds
+				Value:             aws.Float64(float64(waitDurationDelta) / 1e9),
 				Unit:              types.StandardUnitSeconds,
 				StorageResolution: aws.Int32(highRes),
 			},
