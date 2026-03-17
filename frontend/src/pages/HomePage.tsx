@@ -132,7 +132,7 @@ export function HomePage() {
             <p className="text-xs font-semibold tracking-[0.3em] text-jade-500 mb-3 uppercase">
               Manga Archive
             </p>
-            <h1 className="text-4xl sm:text-5xl font-black text-mint-50 leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-black text-mint-50 leading-tight sm:whitespace-nowrap">
               <span className="block sm:inline">Your experience.</span>
               <span className="block sm:inline text-jade-400"> My traffic.</span>
               <span className="block sm:inline"> Our future.</span>
