@@ -102,12 +102,12 @@ func (h *histogram) percentile(q float64) float64 {
 var pub *publisher
 
 type httpKey struct {
-	method, route, statusClass string
+	method, route, status, statusClass string
 }
 
-// durKey includes statusClass but only 2xx responses are observed (see RecordHTTP).
+// durKey only tracks 2xx responses (see RecordHTTP).
 type durKey struct {
-	method, route, statusClass string
+	method, route, status, statusClass string
 }
 
 type publisher struct {
@@ -184,9 +184,9 @@ func RecordHTTP(method, route, status string, durationSecs float64) {
 	}
 	sc := statusClass(status)
 	pub.mu.Lock()
-	pub.httpRequests[httpKey{method, route, sc}]++
+	pub.httpRequests[httpKey{method, route, status, sc}]++
 	if sc == "2xx" {
-		dk := durKey{method, route, sc}
+		dk := durKey{method, route, status, sc}
 		h := pub.httpDurations[dk]
 		if h.count == 0 {
 			h = newHistogram()
@@ -274,7 +274,7 @@ func (p *publisher) flush(ctx context.Context) {
 
 	var data []types.MetricDatum
 
-	// HTTP request counts — one data point per (method, route, status) combination.
+	// HTTP request counts — one data point per (method, route, statusCode, statusClass).
 	for k, count := range httpReqs {
 		data = append(data, types.MetricDatum{
 			MetricName:        aws.String("HTTPRequestCount"),
@@ -285,12 +285,13 @@ func (p *publisher) flush(ctx context.Context) {
 			Dimensions: []types.Dimension{
 				{Name: aws.String("Method"), Value: aws.String(k.method)},
 				{Name: aws.String("Route"), Value: aws.String(k.route)},
+				{Name: aws.String("StatusCode"), Value: aws.String(k.status)},
 				{Name: aws.String("StatusClass"), Value: aws.String(k.statusClass)},
 			},
 		})
 	}
 
-	// HTTP latency — 2xx only; pushed per (method, route, status, stat).
+	// HTTP latency — 2xx only; pushed per (method, route, statusCode, statusClass, stat).
 	for k, h := range httpDurs {
 		if h.count == 0 {
 			continue
@@ -310,6 +311,7 @@ func (p *publisher) flush(ctx context.Context) {
 				Dimensions: []types.Dimension{
 					{Name: aws.String("Method"), Value: aws.String(k.method)},
 					{Name: aws.String("Route"), Value: aws.String(k.route)},
+					{Name: aws.String("StatusCode"), Value: aws.String(k.status)},
 					{Name: aws.String("StatusClass"), Value: aws.String(k.statusClass)},
 					{Name: aws.String("Stat"), Value: aws.String(stat)},
 				},
