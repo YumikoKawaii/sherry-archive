@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -70,9 +69,9 @@ var (
 )
 
 func init() {
+	// GoCollector and ProcessCollector are already registered by the default
+	// Prometheus registry — registering them again would panic.
 	prometheus.MustRegister(
-		collectors.NewGoCollector(),
-		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 		HTTPRequestsTotal,
 		HTTPRequestDuration,
 		DBOpenConnections,
