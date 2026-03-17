@@ -105,7 +105,7 @@ type httpKey struct {
 	method, route, status string
 }
 
-// durKey includes status so latency percentiles reflect only the relevant status class.
+// durKey includes status but only 2xx responses are observed (see RecordHTTP).
 type durKey struct {
 	method, route, status string
 }
@@ -167,13 +167,15 @@ func RecordHTTP(method, route, status string, durationSecs float64) {
 	}
 	pub.mu.Lock()
 	pub.httpRequests[httpKey{method, route, status}]++
-	dk := durKey{method, route, status}
-	h := pub.httpDurations[dk]
-	if h.count == 0 {
-		h = newHistogram()
+	if len(status) > 0 && status[0] == '2' {
+		dk := durKey{method, route, status}
+		h := pub.httpDurations[dk]
+		if h.count == 0 {
+			h = newHistogram()
+		}
+		h.observe(durationSecs)
+		pub.httpDurations[dk] = h
 	}
-	h.observe(durationSecs)
-	pub.httpDurations[dk] = h
 	pub.mu.Unlock()
 }
 
@@ -270,8 +272,7 @@ func (p *publisher) flush(ctx context.Context) {
 		})
 	}
 
-	// HTTP latency — pushed per (method, route, status, stat) so percentiles reflect
-	// only the relevant status class (e.g. 200 latency is not polluted by 500s).
+	// HTTP latency — 2xx only; pushed per (method, route, status, stat).
 	for k, h := range httpDurs {
 		if h.count == 0 {
 			continue
