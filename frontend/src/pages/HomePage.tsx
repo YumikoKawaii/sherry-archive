@@ -137,7 +137,7 @@ export function HomePage() {
               <span className="block sm:inline text-jade-400"> My traffic.</span>
               <span className="block sm:inline"> Our future.</span>
             </h1>
-            <p className="mt-4 text-mint-200/60 text-lg leading-relaxed">
+            <p className="mt-4 text-mint-200/60 text-lg leading-relaxed sm:whitespace-nowrap">
               I am the bone of my code. Claude is my Servant, bound by Command Seal.
             </p>
           </motion.div>
