@@ -19,24 +19,25 @@ import (
 
 // flushInterval controls how often accumulated metrics are pushed to CloudWatch.
 // 10s keeps data loss on restarts/deploys small and gives sub-minute granularity.
-const flushInterval = 10 * time.Second
+const flushInterval = 60 * time.Second
 
 // highRes tells CloudWatch to store at 1-second resolution so dashboards can
 // show 10s / 30s / 1m granularity instead of the default 1-minute minimum.
 const highRes = int32(1)
 
 // latencyBuckets defines upper bounds (in seconds) for the request duration histogram.
-// Linear interpolation within each bucket approximates p50/p99.
+// Finer resolution in the 100–250ms range where most API responses are expected to land.
 var latencyBuckets = []float64{
-	0.005, 0.010, 0.025, 0.050, 0.100,
-	0.250, 0.500, 1.000, 2.500, 5.000,
+	0.010, 0.025, 0.050, 0.075,
+	0.100, 0.125, 0.150, 0.175, 0.200, 0.225, 0.250,
+	0.500, 1.000, 2.500,
 }
 
 // histogram tracks request latency using fixed buckets.
 // Gives min/max/avg via StatisticValues AND p50/p99 via bucket interpolation.
 type histogram struct {
 	// counts[i] = requests that fell in bucket i; counts[len(latencyBuckets)] = overflow (+Inf)
-	counts [11]float64
+	counts [15]float64
 	count  float64
 	sum    float64
 	min    float64
