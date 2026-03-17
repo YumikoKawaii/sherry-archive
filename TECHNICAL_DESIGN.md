@@ -522,7 +522,7 @@ Logout:
 
 ### Overview
 
-Metrics are pushed directly to **AWS CloudWatch** using `aws-sdk-go-v2/service/cloudwatch`. The app accumulates counters and duration statistics in memory and calls `PutMetricData` every **60 seconds** — no scraper, no sidecar, no exposed HTTP endpoint required.
+Metrics are pushed directly to **AWS CloudWatch** using `aws-sdk-go-v2/service/cloudwatch`. The app accumulates counters and duration statistics in memory and calls `PutMetricData` every **10 seconds** — no scraper, no sidecar, no exposed HTTP endpoint required.
 
 All metrics land in the **`SherryArchive`** CloudWatch namespace. Build a CloudWatch Dashboard from there (`Metrics → Custom namespaces → SherryArchive`).
 
@@ -576,6 +576,9 @@ Read from `db.Stats()` at each flush interval.
 - `metrics.Init(ctx, region, namespace, db)` is called from `serve/server.go` after the background context is created, so the flush goroutine is cancelled on graceful shutdown.
 - The flush goroutine snapshots and resets accumulators atomically under a mutex before each `PutMetricData` call to avoid data races and double-counting.
 - `PutMetricData` batches up to 1000 data points per API call (CloudWatch limit).
+- Each data point is stamped with `windowStart` (the time accumulation began, not the flush time) so CloudWatch places the counts in the correct 10s bucket — enabling accurate `Sum / 10 = req/s` calculations via CloudWatch Metric Math.
+- All metrics use `StorageResolution: 1` (high-resolution), which allows dashboard granularity down to 10s instead of the default 1-minute minimum.
+- Flush interval is 10s to limit data loss on deploys/crashes to at most one 10s window.
 
 ---
 
