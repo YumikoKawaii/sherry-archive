@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -60,4 +61,57 @@ func (c *URLCache) Resolve(ctx context.Context, key string) (string, error) {
 	c.rdb.Set(ctx, cacheKey, raw, c.ttl) // best-effort, ignore error
 
 	return raw, nil
+}
+
+// ResolveMany resolves presigned URLs for multiple keys efficiently:
+// one MGET fetches all cached values in a single Redis round trip,
+// then only cache misses are signed — in parallel.
+// The returned slice is ordered the same as keys.
+func (c *URLCache) ResolveMany(ctx context.Context, keys []string) ([]string, error) {
+	if len(keys) == 0 {
+		return nil, nil
+	}
+
+	cacheKeys := make([]string, len(keys))
+	for i, k := range keys {
+		cacheKeys[i] = keyPrefix + k
+	}
+
+	// Single round trip to Redis for all keys.
+	vals, err := c.rdb.MGet(ctx, cacheKeys...).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		// Redis unavailable — fall back to signing all keys sequentially.
+		vals = make([]any, len(keys))
+	}
+
+	urls := make([]string, len(keys))
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+
+	for i, v := range vals {
+		if s, ok := v.(string); ok && s != "" {
+			urls[i] = s
+			continue
+		}
+		if keys[i] == "" {
+			continue
+		}
+		// Cache miss — sign in parallel.
+		wg.Add(1)
+		go func(idx int, key string) {
+			defer wg.Done()
+			u, err := c.signer.PresignedGetURL(ctx, key)
+			if err != nil {
+				return
+			}
+			raw := u.String()
+			mu.Lock()
+			urls[idx] = raw
+			mu.Unlock()
+			c.rdb.Set(ctx, keyPrefix+key, raw, c.ttl) // best-effort
+		}(i, keys[i])
+	}
+
+	wg.Wait()
+	return urls, nil
 }

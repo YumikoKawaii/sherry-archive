@@ -282,13 +282,14 @@ func (s *PageService) GetPagesWithURLs(ctx context.Context, chapterID uuid.UUID)
 		return nil, nil, err
 	}
 
-	urls := make([]string, len(pages))
+	keys := make([]string, len(pages))
 	for i, p := range pages {
-		u, err := s.urlCache.Resolve(ctx, p.ObjectKey)
-		if err != nil {
-			return nil, nil, err
-		}
-		urls[i] = u
+		keys[i] = p.ObjectKey
+	}
+
+	urls, err := s.urlCache.ResolveMany(ctx, keys)
+	if err != nil {
+		return nil, nil, err
 	}
 	return pages, urls, nil
 }
