@@ -11,14 +11,16 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cobra"
 	"github.com/yumikokawaii/sherry-archive/internal/analytics"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
-	"github.com/yumikokawaii/sherry-archive/internal/tracking"
 	"github.com/yumikokawaii/sherry-archive/internal/handler"
+	"github.com/yumikokawaii/sherry-archive/internal/metrics"
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
 	"github.com/yumikokawaii/sherry-archive/internal/service"
+	"github.com/yumikokawaii/sherry-archive/internal/tracking"
 	"github.com/yumikokawaii/sherry-archive/pkg/queue"
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
@@ -168,6 +170,10 @@ func Server(cmd *cobra.Command, args []string) {
 	// Tracking — mounted independently; enriched by analytics store
 	trackingStore := tracking.NewPostgresStore(db)
 	tracking.NewHandler(trackingStore, tokenMgr, analyticsStore).Mount(r)
+
+	// Metrics — Prometheus scrape endpoint; restrict to internal access via Nginx
+	r.GET("/metrics", gin.WrapH(metrics.Handler()))
+	go metrics.CollectDBStats(bgCtx, db.DB)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Server.Port,

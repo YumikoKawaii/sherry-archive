@@ -8,8 +8,9 @@
 4. [Backend Architecture](#4-backend-architecture)
 5. [Analytics & Recommendation System](#5-analytics--recommendation-system)
 6. [Frontend Architecture](#6-frontend-architecture)
-7. [Configuration Reference](#7-configuration-reference)
-8. [Data Flow Diagrams](#8-data-flow-diagrams)
+7. [Observability & Metrics](#7-observability--metrics)
+8. [Configuration Reference](#8-configuration-reference)
+9. [Data Flow Diagrams](#9-data-flow-diagrams)
 
 ---
 
@@ -517,7 +518,72 @@ Logout:
 
 ---
 
-## 7. Configuration Reference
+## 7. Observability & Metrics
+
+### Prometheus endpoint
+
+The backend exposes a standard Prometheus scrape endpoint at:
+
+```
+GET /metrics
+```
+
+This endpoint is **not** proxied publicly by Nginx — it should only be accessible from the local host (CloudWatch Agent or Prometheus scraper running on the same EC2 instance). Add the following to the Nginx server block to block external access:
+
+```nginx
+location /metrics {
+    allow 127.0.0.1;
+    deny all;
+    proxy_pass http://localhost:8080;
+}
+```
+
+### AWS integration
+
+| Option | How |
+|---|---|
+| **CloudWatch** | Install CloudWatch Agent on EC2; configure Prometheus scraping in `amazon-cloudwatch-agent.json`; metrics appear under `CWAgent` namespace in CloudWatch — build a CloudWatch Dashboard from there |
+| **Amazon Managed Prometheus (AMP)** | Configure the CloudWatch Agent or a Prometheus server with `remote_write` to AMP, then connect Amazon Managed Grafana for dashboards |
+
+### Metrics reference
+
+#### HTTP layer (`backend/internal/metrics/`)
+
+| Metric | Type | Labels | Description |
+|---|---|---|---|
+| `http_requests_total` | Counter | `method`, `route`, `status_code` | Total requests; `route` is the Gin template (e.g. `/api/v1/mangas/:mangaID`), not the raw path — keeps cardinality low |
+| `http_request_duration_seconds` | Histogram | `method`, `route` | Request latency with default Prometheus buckets |
+
+#### Database connection pool
+
+| Metric | Type | Description |
+|---|---|---|
+| `db_open_connections` | Gauge | Total open connections (in-use + idle); polled every 15s |
+| `db_in_use_connections` | Gauge | Connections currently executing a query |
+| `db_idle_connections` | Gauge | Connections sitting idle in the pool |
+| `db_wait_count_total` | Gauge | Cumulative goroutine waits for a connection |
+
+#### Business metrics
+
+| Metric | Type | Labels | Description |
+|---|---|---|---|
+| `tracking_events_total` | Counter | `event_type` | Events ingested via `POST /api/track` (manga_view, chapter_open, chapter_complete, …) |
+| `analytics_requests_total` | Counter | `endpoint` | Requests to analytics endpoints (`trending`, `suggestions`, `similar`) |
+
+#### Go runtime (auto-collected)
+
+Standard Go runtime metrics provided by `prometheus/client_golang` collectors: heap allocations, GC pause duration, goroutine count, open file descriptors, CPU time, etc.
+
+### Implementation notes
+
+- HTTP middleware (`metrics.Middleware()`) is registered on the Gin engine via `router.go`.
+- DB pool stats are polled in a background goroutine started from `serve/server.go`, sharing the same `bgCtx` (cancelled on graceful shutdown).
+- Analytics and tracking handlers increment their respective counters directly before executing business logic.
+- The `/metrics` endpoint is mounted last on the Gin engine (after all API + SPA routes) and will not be caught by the SPA `NoRoute` handler.
+
+---
+
+## 8. Configuration Reference
 
 Config is loaded from `config.yaml` (searched in `.` then `..`) or environment variables using `__` as separator.
 
@@ -551,7 +617,7 @@ Config is loaded from `config.yaml` (searched in `.` then `..`) or environment v
 
 ---
 
-## 8. Data Flow Diagrams
+## 9. Data Flow Diagrams
 
 ### Reading a chapter (tracking flow)
 

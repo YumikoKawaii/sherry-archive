@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/yumikokawaii/sherry-archive/internal/metrics"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 )
 
@@ -60,6 +61,10 @@ func (h *Handler) Ingest(c *gin.Context) {
 			UserAgent:  ua,
 			CreatedAt:  now,
 		})
+	}
+
+	for _, row := range rows {
+		metrics.TrackingEventsTotal.WithLabelValues(string(row.Event)).Inc()
 	}
 
 	// Fire-and-forget with a fresh context — request context is cancelled

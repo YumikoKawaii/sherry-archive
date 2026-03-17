@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/yumikokawaii/sherry-archive/internal/dto"
+	"github.com/yumikokawaii/sherry-archive/internal/metrics"
 	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
 )
 
@@ -28,6 +29,7 @@ func (h *Handler) Mount(r *gin.Engine) {
 
 // Trending returns the top N manga ranked by recent activity score.
 func (h *Handler) Trending(c *gin.Context) {
+	metrics.AnalyticsRequestsTotal.WithLabelValues("trending").Inc()
 	limit := parseLimit(c, 12)
 
 	results, err := h.store.GetTrending(c.Request.Context(), limit)
@@ -55,6 +57,7 @@ func (h *Handler) Trending(c *gin.Context) {
 
 // Suggestions returns personalised manga for a given device_id, optionally scoped to a user_id.
 func (h *Handler) Suggestions(c *gin.Context) {
+	metrics.AnalyticsRequestsTotal.WithLabelValues("suggestions").Inc()
 	deviceID := c.Query("device_id")
 	if deviceID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "device_id is required"})
@@ -93,6 +96,7 @@ func (h *Handler) Suggestions(c *gin.Context) {
 
 // Similar returns manga similar to a given manga_id by shared tags, author, or category.
 func (h *Handler) Similar(c *gin.Context) {
+	metrics.AnalyticsRequestsTotal.WithLabelValues("similar").Inc()
 	mangaID := c.Query("manga_id")
 	if mangaID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "manga_id is required"})

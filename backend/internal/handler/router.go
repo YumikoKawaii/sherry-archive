@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/yumikokawaii/sherry-archive/internal/metrics"
 	"github.com/yumikokawaii/sherry-archive/internal/middleware"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 )
@@ -21,7 +22,7 @@ type Handlers struct {
 
 func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 	r := gin.New()
-	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(gin.Logger(), gin.Recovery(), metrics.Middleware())
 
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
