@@ -105,9 +105,9 @@ type httpKey struct {
 	method, route, status, statusClass string
 }
 
-// durKey only tracks 2xx responses (see RecordHTTP).
+// durKey only tracks 2xx responses (see RecordHTTP); status dims are omitted as they are always 2xx.
 type durKey struct {
-	method, route, status, statusClass string
+	method, route string
 }
 
 type publisher struct {
@@ -186,7 +186,7 @@ func RecordHTTP(method, route, status string, durationSecs float64) {
 	pub.mu.Lock()
 	pub.httpRequests[httpKey{method, route, status, sc}]++
 	if sc == "2xx" {
-		dk := durKey{method, route, status, sc}
+		dk := durKey{method, route}
 		h := pub.httpDurations[dk]
 		if h.count == 0 {
 			h = newHistogram()
@@ -311,8 +311,6 @@ func (p *publisher) flush(ctx context.Context) {
 				Dimensions: []types.Dimension{
 					{Name: aws.String("Method"), Value: aws.String(k.method)},
 					{Name: aws.String("Route"), Value: aws.String(k.route)},
-					{Name: aws.String("StatusCode"), Value: aws.String(k.status)},
-					{Name: aws.String("StatusClass"), Value: aws.String(k.statusClass)},
 					{Name: aws.String("Stat"), Value: aws.String(stat)},
 				},
 			})
