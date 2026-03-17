@@ -64,7 +64,7 @@ func (h *Handler) Ingest(c *gin.Context) {
 	}
 
 	for _, row := range rows {
-		metrics.TrackingEventsTotal.WithLabelValues(string(row.Event)).Inc()
+		metrics.RecordTrackingEvent(string(row.Event))
 	}
 
 	// Fire-and-forget with a fresh context — request context is cancelled

@@ -520,66 +520,62 @@ Logout:
 
 ## 7. Observability & Metrics
 
-### Prometheus endpoint
+### Overview
 
-The backend exposes a standard Prometheus scrape endpoint at:
+Metrics are pushed directly to **AWS CloudWatch** using `aws-sdk-go-v2/service/cloudwatch`. The app accumulates counters and duration statistics in memory and calls `PutMetricData` every **60 seconds** — no scraper, no sidecar, no exposed HTTP endpoint required.
 
-```
-GET /metrics
-```
+All metrics land in the **`SherryArchive`** CloudWatch namespace. Build a CloudWatch Dashboard from there (`Metrics → Custom namespaces → SherryArchive`).
 
-This endpoint is **not** proxied publicly by Nginx — it should only be accessible from the local host (CloudWatch Agent or Prometheus scraper running on the same EC2 instance). Add the following to the Nginx server block to block external access:
+At startup, `metrics.Init` loads AWS credentials from the EC2 instance role via IMDS. If CloudWatch is unavailable (e.g. local dev), it logs and all `Record*` calls become no-ops — the app continues normally.
 
-```nginx
-location /metrics {
-    allow 127.0.0.1;
-    deny all;
-    proxy_pass http://localhost:8080;
+### IAM requirement
+
+The EC2 instance role must have the following permission:
+
+```json
+{
+  "Effect": "Allow",
+  "Action": "cloudwatch:PutMetricData",
+  "Resource": "*",
+  "Condition": {
+    "StringEquals": { "cloudwatch:namespace": "SherryArchive" }
+  }
 }
 ```
 
-### AWS integration
-
-| Option | How |
-|---|---|
-| **CloudWatch** | Install CloudWatch Agent on EC2; configure Prometheus scraping in `amazon-cloudwatch-agent.json`; metrics appear under `CWAgent` namespace in CloudWatch — build a CloudWatch Dashboard from there |
-| **Amazon Managed Prometheus (AMP)** | Configure the CloudWatch Agent or a Prometheus server with `remote_write` to AMP, then connect Amazon Managed Grafana for dashboards |
-
 ### Metrics reference
 
-#### HTTP layer (`backend/internal/metrics/`)
+#### HTTP layer
 
-| Metric | Type | Labels | Description |
+| Metric name | Dimensions | Unit | Description |
 |---|---|---|---|
-| `http_requests_total` | Counter | `method`, `route`, `status_code` | Total requests; `route` is the Gin template (e.g. `/api/v1/mangas/:mangaID`), not the raw path — keeps cardinality low |
-| `http_request_duration_seconds` | Histogram | `method`, `route` | Request latency with default Prometheus buckets |
+| `HTTPRequestCount` | `Method`, `Route`, `StatusCode` | Count | Request count per route template (e.g. `/api/v1/mangas/:mangaID`), not raw URL — keeps dimension cardinality low |
+| `HTTPRequestDuration` | `Method`, `Route` | Seconds | StatisticSet (min/max/sum/count) of request latency per route |
 
 #### Database connection pool
 
-| Metric | Type | Description |
+Read from `db.Stats()` at each flush interval.
+
+| Metric name | Unit | Description |
 |---|---|---|
-| `db_open_connections` | Gauge | Total open connections (in-use + idle); polled every 15s |
-| `db_in_use_connections` | Gauge | Connections currently executing a query |
-| `db_idle_connections` | Gauge | Connections sitting idle in the pool |
-| `db_wait_count_total` | Gauge | Cumulative goroutine waits for a connection |
+| `DBOpenConnections` | Count | Total open connections (in-use + idle) |
+| `DBInUseConnections` | Count | Connections currently executing a query |
+| `DBIdleConnections` | Count | Connections sitting idle in the pool |
 
 #### Business metrics
 
-| Metric | Type | Labels | Description |
+| Metric name | Dimensions | Unit | Description |
 |---|---|---|---|
-| `tracking_events_total` | Counter | `event_type` | Events ingested via `POST /api/track` (manga_view, chapter_open, chapter_complete, …) |
-| `analytics_requests_total` | Counter | `endpoint` | Requests to analytics endpoints (`trending`, `suggestions`, `similar`) |
-
-#### Go runtime (auto-collected)
-
-Standard Go runtime metrics provided by `prometheus/client_golang` collectors: heap allocations, GC pause duration, goroutine count, open file descriptors, CPU time, etc.
+| `TrackingEvents` | `EventType` | Count | Events ingested via `POST /api/track` (`manga_view`, `chapter_open`, `chapter_complete`, …) |
+| `AnalyticsRequests` | `Endpoint` | Count | Requests to analytics endpoints (`trending`, `suggestions`, `similar`) |
 
 ### Implementation notes
 
-- HTTP middleware (`metrics.Middleware()`) is registered on the Gin engine via `router.go`.
-- DB pool stats are polled in a background goroutine started from `serve/server.go`, sharing the same `bgCtx` (cancelled on graceful shutdown).
-- Analytics and tracking handlers increment their respective counters directly before executing business logic.
-- The `/metrics` endpoint is mounted last on the Gin engine (after all API + SPA routes) and will not be caught by the SPA `NoRoute` handler.
+- `backend/internal/metrics/` — `metrics.go` (publisher + flush logic), `middleware.go` (Gin middleware)
+- HTTP middleware uses `c.FullPath()` (Gin route template) for the `Route` dimension — prevents high-cardinality explosion from path parameters.
+- `metrics.Init(ctx, region, namespace, db)` is called from `serve/server.go` after the background context is created, so the flush goroutine is cancelled on graceful shutdown.
+- The flush goroutine snapshots and resets accumulators atomically under a mutex before each `PutMetricData` call to avoid data races and double-counting.
+- `PutMetricData` batches up to 1000 data points per API call (CloudWatch limit).
 
 ---
 

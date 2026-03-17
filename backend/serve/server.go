@@ -11,7 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cobra"
 	"github.com/yumikokawaii/sherry-archive/internal/analytics"
@@ -171,9 +170,10 @@ func Server(cmd *cobra.Command, args []string) {
 	trackingStore := tracking.NewPostgresStore(db)
 	tracking.NewHandler(trackingStore, tokenMgr, analyticsStore).Mount(r)
 
-	// Metrics — Prometheus scrape endpoint; restrict to internal access via Nginx
-	r.GET("/metrics", gin.WrapH(metrics.Handler()))
-	go metrics.CollectDBStats(bgCtx, db.DB)
+	// Metrics — push to CloudWatch every 60s; no-op if CloudWatch is unavailable
+	if err := metrics.Init(bgCtx, cfg.S3.Region, "SherryArchive", db.DB); err != nil {
+		log.Printf("metrics: cloudwatch unavailable, disabled (%v)", err)
+	}
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Server.Port,
