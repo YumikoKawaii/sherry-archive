@@ -144,8 +144,9 @@ func Init(ctx context.Context, region, namespace string, db *sql.DB) error {
 }
 
 // RecordHTTP records one HTTP request. Called from the Gin metrics middleware.
+// Skips "unmatched" routes (SPA catch-all hits) to keep API metrics clean.
 func RecordHTTP(method, route, status string, durationSecs float64) {
-	if pub == nil {
+	if pub == nil || route == "unmatched" {
 		return
 	}
 	pub.mu.Lock()
@@ -227,49 +228,34 @@ func (p *publisher) flush(ctx context.Context) {
 		})
 	}
 
-	// HTTP latency — StatisticValues for avg/min/max, plus explicit p50 and p99
-	// computed from the in-memory histogram via linear bucket interpolation.
+	// HTTP latency — all stats pushed under the single metric name "HTTPRequestDuration"
+	// with a "Stat" dimension (avg/min/max/p50/p99). This keeps CloudWatch grouped as
+	// one entry per route instead of three separate metric names per route.
 	for k, h := range httpDurs {
 		if h.count == 0 {
 			continue
 		}
-		dims := []types.Dimension{
-			{Name: aws.String("Method"), Value: aws.String(k.method)},
-			{Name: aws.String("Route"), Value: aws.String(k.route)},
+		avg := h.sum / h.count
+		for stat, val := range map[string]float64{
+			"avg": avg,
+			"min": h.min,
+			"max": h.max,
+			"p50": h.percentile(0.50),
+			"p99": h.percentile(0.99),
+		} {
+			data = append(data, types.MetricDatum{
+				MetricName:        aws.String("HTTPRequestDuration"),
+				Timestamp:         aws.Time(windowStart),
+				Value:             aws.Float64(val),
+				Unit:              types.StandardUnitSeconds,
+				StorageResolution: aws.Int32(highRes),
+				Dimensions: []types.Dimension{
+					{Name: aws.String("Method"), Value: aws.String(k.method)},
+					{Name: aws.String("Route"), Value: aws.String(k.route)},
+					{Name: aws.String("Stat"), Value: aws.String(stat)},
+				},
+			})
 		}
-		// StatisticValues: lets CloudWatch compute Average, Min, Max natively.
-		data = append(data, types.MetricDatum{
-			MetricName:        aws.String("HTTPRequestDuration"),
-			Timestamp:         aws.Time(windowStart),
-			Unit:              types.StandardUnitSeconds,
-			StorageResolution: aws.Int32(highRes),
-			StatisticValues: &types.StatisticSet{
-				SampleCount: aws.Float64(h.count),
-				Sum:         aws.Float64(h.sum),
-				Minimum:     aws.Float64(h.min),
-				Maximum:     aws.Float64(h.max),
-			},
-			Dimensions: dims,
-		})
-		// Pre-computed percentiles pushed as separate metrics.
-		data = append(data,
-			types.MetricDatum{
-				MetricName:        aws.String("HTTPRequestDurationP50"),
-				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(h.percentile(0.50)),
-				Unit:              types.StandardUnitSeconds,
-				StorageResolution: aws.Int32(highRes),
-				Dimensions:        dims,
-			},
-			types.MetricDatum{
-				MetricName:        aws.String("HTTPRequestDurationP99"),
-				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(h.percentile(0.99)),
-				Unit:              types.StandardUnitSeconds,
-				StorageResolution: aws.Int32(highRes),
-				Dimensions:        dims,
-			},
-		)
 	}
 
 	for evtType, count := range trackEvts {
