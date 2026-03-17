@@ -7,6 +7,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"math"
 	"sync"
 	"time"
 
@@ -24,6 +25,75 @@ const flushInterval = 10 * time.Second
 // show 10s / 30s / 1m granularity instead of the default 1-minute minimum.
 const highRes = int32(1)
 
+// latencyBuckets defines upper bounds (in seconds) for the request duration histogram.
+// Linear interpolation within each bucket approximates p50/p99.
+var latencyBuckets = []float64{
+	0.005, 0.010, 0.025, 0.050, 0.100,
+	0.250, 0.500, 1.000, 2.500, 5.000,
+}
+
+// histogram tracks request latency using fixed buckets.
+// Gives min/max/avg via StatisticValues AND p50/p99 via bucket interpolation.
+type histogram struct {
+	// counts[i] = requests that fell in bucket i; counts[len(latencyBuckets)] = overflow (+Inf)
+	counts [11]float64
+	count  float64
+	sum    float64
+	min    float64
+	max    float64
+}
+
+func newHistogram() histogram {
+	return histogram{min: math.MaxFloat64}
+}
+
+func (h *histogram) observe(v float64) {
+	h.count++
+	h.sum += v
+	if v < h.min {
+		h.min = v
+	}
+	if v > h.max {
+		h.max = v
+	}
+	for i, upper := range latencyBuckets {
+		if v <= upper {
+			h.counts[i]++
+			return
+		}
+	}
+	h.counts[len(latencyBuckets)]++ // +Inf
+}
+
+// percentile computes an approximate quantile (0–1) via linear interpolation.
+func (h *histogram) percentile(q float64) float64 {
+	if h.count == 0 {
+		return 0
+	}
+	target := q * h.count
+	var cumulative float64
+	for i, cnt := range h.counts {
+		cumulative += cnt
+		if cumulative >= target {
+			lower := 0.0
+			if i > 0 {
+				lower = latencyBuckets[i-1]
+			}
+			upper := h.max // use observed max for the overflow bucket
+			if i < len(latencyBuckets) {
+				upper = latencyBuckets[i]
+			}
+			if cnt == 0 {
+				return lower
+			}
+			prev := cumulative - cnt
+			fraction := (target - prev) / cnt
+			return lower + fraction*(upper-lower)
+		}
+	}
+	return h.max
+}
+
 // package-level singleton — nil until Init is called.
 var pub *publisher
 
@@ -31,9 +101,9 @@ type httpKey struct {
 	method, route, status string
 }
 
-type durationStats struct {
-	count         float64
-	sum, min, max float64
+// durKey omits status so percentiles are computed per route across all statuses.
+type durKey struct {
+	method, route string
 }
 
 type publisher struct {
@@ -44,7 +114,7 @@ type publisher struct {
 	mu                sync.Mutex
 	windowStart       time.Time
 	httpRequests      map[httpKey]float64
-	httpDurations     map[httpKey]durationStats
+	httpDurations     map[durKey]histogram
 	trackingEvents    map[string]float64
 	analyticsRequests map[string]float64
 }
@@ -63,7 +133,7 @@ func Init(ctx context.Context, region, namespace string, db *sql.DB) error {
 		db:                db,
 		windowStart:       time.Now(),
 		httpRequests:      make(map[httpKey]float64),
-		httpDurations:     make(map[httpKey]durationStats),
+		httpDurations:     make(map[durKey]histogram),
 		trackingEvents:    make(map[string]float64),
 		analyticsRequests: make(map[string]float64),
 	}
@@ -77,19 +147,15 @@ func RecordHTTP(method, route, status string, durationSecs float64) {
 	if pub == nil {
 		return
 	}
-	k := httpKey{method, route, status}
 	pub.mu.Lock()
-	pub.httpRequests[k]++
-	s := pub.httpDurations[k]
-	s.count++
-	s.sum += durationSecs
-	if s.count == 1 || durationSecs < s.min {
-		s.min = durationSecs
+	pub.httpRequests[httpKey{method, route, status}]++
+	dk := durKey{method, route}
+	h := pub.httpDurations[dk]
+	if h.count == 0 {
+		h = newHistogram()
 	}
-	if durationSecs > s.max {
-		s.max = durationSecs
-	}
-	pub.httpDurations[k] = s
+	h.observe(durationSecs)
+	pub.httpDurations[dk] = h
 	pub.mu.Unlock()
 }
 
@@ -128,9 +194,6 @@ func (p *publisher) run(ctx context.Context) {
 
 func (p *publisher) flush(ctx context.Context) {
 	p.mu.Lock()
-	// Capture the window start timestamp before resetting — this is stamped on
-	// each data point so CloudWatch knows exactly which 10s window the counts
-	// belong to, giving accurate rate calculation (Sum / 10 = req/s).
 	windowStart := p.windowStart
 
 	httpReqs := p.httpRequests
@@ -140,13 +203,14 @@ func (p *publisher) flush(ctx context.Context) {
 
 	p.windowStart = time.Now()
 	p.httpRequests = make(map[httpKey]float64)
-	p.httpDurations = make(map[httpKey]durationStats)
+	p.httpDurations = make(map[durKey]histogram)
 	p.trackingEvents = make(map[string]float64)
 	p.analyticsRequests = make(map[string]float64)
 	p.mu.Unlock()
 
 	var data []types.MetricDatum
 
+	// HTTP request counts — one data point per (method, route, status) combination.
 	for k, count := range httpReqs {
 		data = append(data, types.MetricDatum{
 			MetricName:        aws.String("HTTPRequestCount"),
@@ -162,26 +226,49 @@ func (p *publisher) flush(ctx context.Context) {
 		})
 	}
 
-	for k, s := range httpDurs {
-		if s.count == 0 {
+	// HTTP latency — StatisticValues for avg/min/max, plus explicit p50 and p99
+	// computed from the in-memory histogram via linear bucket interpolation.
+	for k, h := range httpDurs {
+		if h.count == 0 {
 			continue
 		}
+		dims := []types.Dimension{
+			{Name: aws.String("Method"), Value: aws.String(k.method)},
+			{Name: aws.String("Route"), Value: aws.String(k.route)},
+		}
+		// StatisticValues: lets CloudWatch compute Average, Min, Max natively.
 		data = append(data, types.MetricDatum{
 			MetricName:        aws.String("HTTPRequestDuration"),
 			Timestamp:         aws.Time(windowStart),
 			Unit:              types.StandardUnitSeconds,
 			StorageResolution: aws.Int32(highRes),
 			StatisticValues: &types.StatisticSet{
-				SampleCount: aws.Float64(s.count),
-				Sum:         aws.Float64(s.sum),
-				Minimum:     aws.Float64(s.min),
-				Maximum:     aws.Float64(s.max),
+				SampleCount: aws.Float64(h.count),
+				Sum:         aws.Float64(h.sum),
+				Minimum:     aws.Float64(h.min),
+				Maximum:     aws.Float64(h.max),
 			},
-			Dimensions: []types.Dimension{
-				{Name: aws.String("Method"), Value: aws.String(k.method)},
-				{Name: aws.String("Route"), Value: aws.String(k.route)},
-			},
+			Dimensions: dims,
 		})
+		// Pre-computed percentiles pushed as separate metrics.
+		data = append(data,
+			types.MetricDatum{
+				MetricName:        aws.String("HTTPRequestDurationP50"),
+				Timestamp:         aws.Time(windowStart),
+				Value:             aws.Float64(h.percentile(0.50)),
+				Unit:              types.StandardUnitSeconds,
+				StorageResolution: aws.Int32(highRes),
+				Dimensions:        dims,
+			},
+			types.MetricDatum{
+				MetricName:        aws.String("HTTPRequestDurationP99"),
+				Timestamp:         aws.Time(windowStart),
+				Value:             aws.Float64(h.percentile(0.99)),
+				Unit:              types.StandardUnitSeconds,
+				StorageResolution: aws.Int32(highRes),
+				Dimensions:        dims,
+			},
+		)
 	}
 
 	for evtType, count := range trackEvts {

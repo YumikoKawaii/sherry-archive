@@ -550,7 +550,9 @@ The EC2 instance role must have the following permission:
 | Metric name | Dimensions | Unit | Description |
 |---|---|---|---|
 | `HTTPRequestCount` | `Method`, `Route`, `StatusCode` | Count | Request count per route template (e.g. `/api/v1/mangas/:mangaID`), not raw URL — keeps dimension cardinality low |
-| `HTTPRequestDuration` | `Method`, `Route` | Seconds | StatisticSet (min/max/sum/count) of request latency per route |
+| `HTTPRequestDuration` | `Method`, `Route` | Seconds | StatisticSet (min/max/sum/count) — supports Average, Min, Max natively in CloudWatch |
+| `HTTPRequestDurationP50` | `Method`, `Route` | Seconds | Median latency, pre-computed from in-memory histogram |
+| `HTTPRequestDurationP99` | `Method`, `Route` | Seconds | p99 latency, pre-computed from in-memory histogram |
 
 #### Database connection pool
 
@@ -579,6 +581,7 @@ Read from `db.Stats()` at each flush interval.
 - Each data point is stamped with `windowStart` (the time accumulation began, not the flush time) so CloudWatch places the counts in the correct 10s bucket — enabling accurate `Sum / 10 = req/s` calculations via CloudWatch Metric Math.
 - All metrics use `StorageResolution: 1` (high-resolution), which allows dashboard granularity down to 10s instead of the default 1-minute minimum.
 - Flush interval is 10s to limit data loss on deploys/crashes to at most one 10s window.
+- **p50/p99** are pre-computed in-app from a fixed-bucket histogram (10 buckets: 5ms→5s + overflow) using linear interpolation, then pushed as separate `HTTPRequestDurationP50` / `HTTPRequestDurationP99` metrics. CloudWatch does not natively compute percentiles from aggregated data, so this is done before the push. Accuracy depends on bucket granularity — requests between bucket boundaries are linearly interpolated.
 
 ---
 
