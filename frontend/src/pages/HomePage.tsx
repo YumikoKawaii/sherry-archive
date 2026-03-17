@@ -133,12 +133,12 @@ export function HomePage() {
               Manga Archive
             </p>
             <h1 className="text-4xl sm:text-5xl font-black text-mint-50 leading-tight">
-              Read what
-              <span className="text-jade-400"> moves </span>
-              you.
+              Your experience.
+              <span className="text-jade-400"> My traffic. </span>
+              Our future.
             </h1>
             <p className="mt-4 text-mint-200/60 text-lg leading-relaxed">
-              Browse thousands of manga, track your progress, and pick up exactly where you left off.
+              I am the bone of my code. Claude is my Servant, bound by Command Seal.
             </p>
           </motion.div>
         </div>
