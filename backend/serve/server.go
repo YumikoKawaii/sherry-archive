@@ -171,7 +171,7 @@ func Server(cmd *cobra.Command, args []string) {
 	tracking.NewHandler(trackingStore, tokenMgr, analyticsStore).Mount(r)
 
 	// Metrics — push to CloudWatch every 60s; no-op if CloudWatch is unavailable
-	if err := metrics.Init(bgCtx, cfg.S3.Region, "SherryArchive"); err != nil {
+	if err := metrics.Init(bgCtx, cfg.S3.Region, "SherryArchive", db.DB); err != nil {
 		log.Printf("metrics: cloudwatch unavailable, disabled (%v)", err)
 	}
 

@@ -5,6 +5,7 @@ package metrics
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"math"
 	"sync"
@@ -109,6 +110,11 @@ type durKey struct {
 type publisher struct {
 	client    *cloudwatch.Client
 	namespace string
+	db        *sql.DB
+
+	// previous cumulative values from sql.DBStats — used to compute per-window deltas
+	prevWaitCount    int64
+	prevWaitDuration int64 // nanoseconds
 
 	mu                sync.Mutex
 	windowStart       time.Time
@@ -121,7 +127,7 @@ type publisher struct {
 // Init creates the CloudWatch publisher and starts the background flush goroutine.
 // If CloudWatch is unavailable (e.g. local dev without IMDS), it logs a warning
 // and returns an error — all Record* functions remain no-ops.
-func Init(ctx context.Context, region, namespace string) error {
+func Init(ctx context.Context, region, namespace string, db *sql.DB) error {
 	cfg, err := awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(region))
 	if err != nil {
 		return err
@@ -129,6 +135,7 @@ func Init(ctx context.Context, region, namespace string) error {
 	p := &publisher{
 		client:            cloudwatch.NewFromConfig(cfg),
 		namespace:         namespace,
+		db:                db,
 		windowStart:       time.Now(),
 		httpRequests:      make(map[httpKey]float64),
 		httpDurations:     make(map[durKey]histogram),
@@ -277,6 +284,60 @@ func (p *publisher) flush(ctx context.Context) {
 				{Name: aws.String("Endpoint"), Value: aws.String(endpoint)},
 			},
 		})
+	}
+
+	if p.db != nil {
+		s := p.db.Stats()
+
+		// Gauges — current snapshot of the pool state.
+		data = append(data,
+			types.MetricDatum{
+				MetricName:        aws.String("DBPoolOpenConnections"),
+				Timestamp:         aws.Time(windowStart),
+				Value:             aws.Float64(float64(s.OpenConnections)),
+				Unit:              types.StandardUnitCount,
+				StorageResolution: aws.Int32(highRes),
+			},
+			types.MetricDatum{
+				MetricName:        aws.String("DBPoolInUse"),
+				Timestamp:         aws.Time(windowStart),
+				Value:             aws.Float64(float64(s.InUse)),
+				Unit:              types.StandardUnitCount,
+				StorageResolution: aws.Int32(highRes),
+			},
+			types.MetricDatum{
+				MetricName:        aws.String("DBPoolIdle"),
+				Timestamp:         aws.Time(windowStart),
+				Value:             aws.Float64(float64(s.Idle)),
+				Unit:              types.StandardUnitCount,
+				StorageResolution: aws.Int32(highRes),
+			},
+		)
+
+		// Deltas — how many waits and how much wait time occurred in this window.
+		// sql.DBStats.WaitCount and WaitDuration are cumulative since process start,
+		// so we subtract the previous snapshot to get the per-window value.
+		waitCountDelta := s.WaitCount - p.prevWaitCount
+		waitDurationDelta := s.WaitDuration.Nanoseconds() - p.prevWaitDuration
+		p.prevWaitCount = s.WaitCount
+		p.prevWaitDuration = s.WaitDuration.Nanoseconds()
+
+		data = append(data,
+			types.MetricDatum{
+				MetricName:        aws.String("DBPoolWaitCount"),
+				Timestamp:         aws.Time(windowStart),
+				Value:             aws.Float64(float64(waitCountDelta)),
+				Unit:              types.StandardUnitCount,
+				StorageResolution: aws.Int32(highRes),
+			},
+			types.MetricDatum{
+				MetricName:        aws.String("DBPoolWaitDuration"),
+				Timestamp:         aws.Time(windowStart),
+				Value:             aws.Float64(float64(waitDurationDelta) / 1e9), // nanoseconds → seconds
+				Unit:              types.StandardUnitSeconds,
+				StorageResolution: aws.Int32(highRes),
+			},
+		)
 	}
 
 	if len(data) == 0 {
