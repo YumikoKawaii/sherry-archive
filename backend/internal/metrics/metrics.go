@@ -105,9 +105,9 @@ type httpKey struct {
 	method, route, status string
 }
 
-// durKey omits status so percentiles are computed per route across all statuses.
+// durKey includes status so latency percentiles reflect only the relevant status class.
 type durKey struct {
-	method, route string
+	method, route, status string
 }
 
 type publisher struct {
@@ -167,7 +167,7 @@ func RecordHTTP(method, route, status string, durationSecs float64) {
 	}
 	pub.mu.Lock()
 	pub.httpRequests[httpKey{method, route, status}]++
-	dk := durKey{method, route}
+	dk := durKey{method, route, status}
 	h := pub.httpDurations[dk]
 	if h.count == 0 {
 		h = newHistogram()
@@ -270,9 +270,8 @@ func (p *publisher) flush(ctx context.Context) {
 		})
 	}
 
-	// HTTP latency — all stats pushed under the single metric name "HTTPRequestDuration"
-	// with a "Stat" dimension (avg/min/max/p50/p99). This keeps CloudWatch grouped as
-	// one entry per route instead of three separate metric names per route.
+	// HTTP latency — pushed per (method, route, status, stat) so percentiles reflect
+	// only the relevant status class (e.g. 200 latency is not polluted by 500s).
 	for k, h := range httpDurs {
 		if h.count == 0 {
 			continue
@@ -292,6 +291,7 @@ func (p *publisher) flush(ctx context.Context) {
 				Dimensions: []types.Dimension{
 					{Name: aws.String("Method"), Value: aws.String(k.method)},
 					{Name: aws.String("Route"), Value: aws.String(k.route)},
+					{Name: aws.String("StatusCode"), Value: aws.String(k.status)},
 					{Name: aws.String("Stat"), Value: aws.String(stat)},
 				},
 			})
