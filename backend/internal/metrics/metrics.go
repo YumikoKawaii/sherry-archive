@@ -5,7 +5,6 @@ package metrics
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"math"
 	"sync"
@@ -110,7 +109,6 @@ type durKey struct {
 type publisher struct {
 	client    *cloudwatch.Client
 	namespace string
-	db        *sql.DB
 
 	mu                sync.Mutex
 	windowStart       time.Time
@@ -123,7 +121,7 @@ type publisher struct {
 // Init creates the CloudWatch publisher and starts the background flush goroutine.
 // If CloudWatch is unavailable (e.g. local dev without IMDS), it logs a warning
 // and returns an error — all Record* functions remain no-ops.
-func Init(ctx context.Context, region, namespace string, db *sql.DB) error {
+func Init(ctx context.Context, region, namespace string) error {
 	cfg, err := awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(region))
 	if err != nil {
 		return err
@@ -131,7 +129,6 @@ func Init(ctx context.Context, region, namespace string, db *sql.DB) error {
 	p := &publisher{
 		client:            cloudwatch.NewFromConfig(cfg),
 		namespace:         namespace,
-		db:                db,
 		windowStart:       time.Now(),
 		httpRequests:      make(map[httpKey]float64),
 		httpDurations:     make(map[durKey]histogram),
@@ -280,33 +277,6 @@ func (p *publisher) flush(ctx context.Context) {
 				{Name: aws.String("Endpoint"), Value: aws.String(endpoint)},
 			},
 		})
-	}
-
-	if p.db != nil {
-		s := p.db.Stats()
-		data = append(data,
-			types.MetricDatum{
-				MetricName:        aws.String("DBOpenConnections"),
-				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(float64(s.OpenConnections)),
-				Unit:              types.StandardUnitCount,
-				StorageResolution: aws.Int32(highRes),
-			},
-			types.MetricDatum{
-				MetricName:        aws.String("DBInUseConnections"),
-				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(float64(s.InUse)),
-				Unit:              types.StandardUnitCount,
-				StorageResolution: aws.Int32(highRes),
-			},
-			types.MetricDatum{
-				MetricName:        aws.String("DBIdleConnections"),
-				Timestamp:         aws.Time(windowStart),
-				Value:             aws.Float64(float64(s.Idle)),
-				Unit:              types.StandardUnitCount,
-				StorageResolution: aws.Int32(highRes),
-			},
-		)
 	}
 
 	if len(data) == 0 {
