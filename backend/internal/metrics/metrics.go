@@ -102,12 +102,12 @@ func (h *histogram) percentile(q float64) float64 {
 var pub *publisher
 
 type httpKey struct {
-	method, route, status string
+	method, route, statusClass string
 }
 
-// durKey includes status but only 2xx responses are observed (see RecordHTTP).
+// durKey includes statusClass but only 2xx responses are observed (see RecordHTTP).
 type durKey struct {
-	method, route, status string
+	method, route, statusClass string
 }
 
 type publisher struct {
@@ -159,16 +159,34 @@ func Init(ctx context.Context, region, namespace string, db *sql.DB) error {
 	return nil
 }
 
+// statusClass maps a numeric status string to its class label ("2xx", "4xx", "5xx", "other").
+func statusClass(status string) string {
+	if len(status) == 0 {
+		return "other"
+	}
+	switch status[0] {
+	case '2':
+		return "2xx"
+	case '4':
+		return "4xx"
+	case '5':
+		return "5xx"
+	default:
+		return "other"
+	}
+}
+
 // RecordHTTP records one HTTP request. Called from the Gin metrics middleware.
 // Skips "unmatched" routes (SPA catch-all hits) to keep API metrics clean.
 func RecordHTTP(method, route, status string, durationSecs float64) {
 	if pub == nil || route == "unmatched" {
 		return
 	}
+	sc := statusClass(status)
 	pub.mu.Lock()
-	pub.httpRequests[httpKey{method, route, status}]++
-	if len(status) > 0 && status[0] == '2' {
-		dk := durKey{method, route, status}
+	pub.httpRequests[httpKey{method, route, sc}]++
+	if sc == "2xx" {
+		dk := durKey{method, route, sc}
 		h := pub.httpDurations[dk]
 		if h.count == 0 {
 			h = newHistogram()
@@ -267,7 +285,7 @@ func (p *publisher) flush(ctx context.Context) {
 			Dimensions: []types.Dimension{
 				{Name: aws.String("Method"), Value: aws.String(k.method)},
 				{Name: aws.String("Route"), Value: aws.String(k.route)},
-				{Name: aws.String("StatusCode"), Value: aws.String(k.status)},
+				{Name: aws.String("StatusClass"), Value: aws.String(k.statusClass)},
 			},
 		})
 	}
@@ -292,7 +310,7 @@ func (p *publisher) flush(ctx context.Context) {
 				Dimensions: []types.Dimension{
 					{Name: aws.String("Method"), Value: aws.String(k.method)},
 					{Name: aws.String("Route"), Value: aws.String(k.route)},
-					{Name: aws.String("StatusCode"), Value: aws.String(k.status)},
+					{Name: aws.String("StatusClass"), Value: aws.String(k.statusClass)},
 					{Name: aws.String("Stat"), Value: aws.String(stat)},
 				},
 			})
