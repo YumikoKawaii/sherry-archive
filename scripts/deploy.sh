@@ -9,6 +9,8 @@ ECR_REPO="sherry-archive"
 CONTAINER_NAME="sherry-archive"
 SSM_PATH="/sherry-archive/"
 ENV_FILE="/tmp/sherry-env-$(date +%s)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 echo "==> Resolving ECR registry..."
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
@@ -50,5 +52,8 @@ docker run -d \
 echo "==> Cleaning up..."
 rm -f "$ENV_FILE"
 docker image prune -f
+
+echo "==> Ensuring cAdvisor is running..."
+docker compose -f "$REPO_ROOT/docker-compose.cadvisor.yml" up -d --pull always
 
 echo "==> Deploy complete!"
