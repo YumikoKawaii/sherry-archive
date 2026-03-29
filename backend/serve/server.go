@@ -20,10 +20,12 @@ import (
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
 	"github.com/yumikokawaii/sherry-archive/internal/service"
 	"github.com/yumikokawaii/sherry-archive/internal/tracking"
+	"github.com/yumikokawaii/sherry-archive/internal/tracing"
 	"github.com/yumikokawaii/sherry-archive/pkg/queue"
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
+	"github.com/redis/go-redis/extra/redisotel/v9"
 )
 
 func Server(cmd *cobra.Command, args []string) {
@@ -31,6 +33,13 @@ func Server(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
+
+	// Tracing — must be initialised before DB/Redis so instrumented drivers are registered first.
+	tracingShutdown, dbDriverName, err := tracing.Init(cfg.Tracing)
+	if err != nil {
+		log.Fatalf("tracing: %v", err)
+	}
+	defer tracingShutdown()
 
 	// Parse duration strings
 	accessExpiry, err := time.ParseDuration(cfg.JWT.AccessTokenExpiry)
@@ -51,7 +60,7 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 
 	// Database
-	db, err := postgres.Connect(cfg.DB.DSN())
+	db, err := postgres.ConnectWithDriver(dbDriverName, cfg.DB.DSN())
 	if err != nil {
 		log.Fatalf("db connect: %v", err)
 	}
@@ -80,6 +89,11 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 	rdb := redis.NewClient(redisOpts)
 	defer rdb.Close()
+	if cfg.Tracing.Enabled {
+		if err := redisotel.InstrumentTracing(rdb); err != nil {
+			log.Fatalf("redis tracing: %v", err)
+		}
+	}
 
 	// Token manager
 	tokenMgr := token.NewManager(

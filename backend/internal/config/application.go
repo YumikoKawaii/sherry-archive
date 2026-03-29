@@ -7,14 +7,15 @@ import (
 
 // Application holds all runtime configuration for the server.
 type Application struct {
-	Server *ServerConfig `json:"server" mapstructure:"server" yaml:"server"`
-	DB     *DBConfig     `json:"db"     mapstructure:"db"     yaml:"db"`
-	JWT    *JWTConfig    `json:"jwt"    mapstructure:"jwt"    yaml:"jwt"`
-	S3     *S3Config     `json:"s3"     mapstructure:"s3"     yaml:"s3"`
-	Redis  *RedisConfig  `json:"redis"  mapstructure:"redis"  yaml:"redis"`
+	Server     *ServerConfig     `json:"server" mapstructure:"server" yaml:"server"`
+	DB         *DBConfig         `json:"db"     mapstructure:"db"     yaml:"db"`
+	JWT        *JWTConfig        `json:"jwt"    mapstructure:"jwt"    yaml:"jwt"`
+	S3         *S3Config         `json:"s3"     mapstructure:"s3"     yaml:"s3"`
+	Redis      *RedisConfig      `json:"redis"  mapstructure:"redis"  yaml:"redis"`
 	SQS        *SQSConfig        `json:"sqs"        mapstructure:"sqs"        yaml:"sqs"`
 	Analytics  *AnalyticsConfig  `json:"analytics"  mapstructure:"analytics"  yaml:"analytics"`
 	CloudFront *CloudFrontConfig `json:"cloudfront" mapstructure:"cloudfront" yaml:"cloudfront"`
+	Tracing    *TracingConfig    `json:"tracing"    mapstructure:"tracing"    yaml:"tracing"`
 }
 
 type ServerConfig struct {
@@ -87,6 +88,18 @@ type CloudFrontConfig struct {
 	PrivateKey string `json:"private_key"  mapstructure:"private_key"  yaml:"private_key"`
 }
 
+// TracingConfig holds OpenTelemetry tracing settings.
+// Env vars: TRACING__ENABLED, TRACING__ENDPOINT, TRACING__SAMPLE_RATE
+type TracingConfig struct {
+	// Enabled toggles tracing. Set to false to disable entirely (no provider, no instrumented driver).
+	Enabled bool `json:"enabled" mapstructure:"enabled" yaml:"enabled"`
+	// Endpoint is the OTLP HTTP collector endpoint in host:port format, e.g. "jaeger-host:4318".
+	// No scheme — TLS is disabled (WithInsecure). Default: "localhost:4318".
+	Endpoint string `json:"endpoint" mapstructure:"endpoint" yaml:"endpoint"`
+	// SampleRate is the fraction of traces to sample (0.0–1.0). Default: 1.0 (100%).
+	SampleRate float64 `json:"sample_rate" mapstructure:"sample_rate" yaml:"sample_rate"`
+}
+
 // AnalyticsConfig holds tuning parameters for the real-time analytics engine.
 // Env vars: ANALYTICS__CONTRIBUTION_CAP, ANALYTICS__DECAY_INTERVAL
 type AnalyticsConfig struct {
@@ -141,6 +154,11 @@ func loadDefault() *Application {
 			StopTags:        "oneshot",
 		},
 		CloudFront: &CloudFrontConfig{},
+		Tracing: &TracingConfig{
+			Enabled:    false,
+			Endpoint:   "localhost:4318",
+			SampleRate: 1.0,
+		},
 	}
 }
 

@@ -1,0 +1,30 @@
+# Jaeger all-in-one — deploy on a dedicated EC2 instance.
+#
+# Usage:
+#   docker compose -f docker-compose.jaeger.yml up -d
+#
+# Security: ports 4317/4318 (OTLP ingest) should be restricted to the app
+# EC2's security group only — they don't need to be public.
+# Port 16686 (UI) can be opened to your IP or tunnelled via SSH:
+#   ssh -L 16686:localhost:16686 ubuntu@<jaeger-ec2-ip>
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.62
+    restart: unless-stopped
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+      # In-memory storage — traces are lost on restart.
+      # Fine for performance investigation; swap SPAN_STORAGE_TYPE + add
+      # opensearch/elasticsearch service here if you need persistence.
+      SPAN_STORAGE_TYPE: memory
+      # Cap memory usage so the EC2 doesn't OOM under heavy trace load.
+      MEMORY_MAX_TRACES: "100000"
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # OTLP gRPC  (restrict to app SG in AWS)
+      - "4318:4318"    # OTLP HTTP  (restrict to app SG in AWS)
+    deploy:
+      resources:
+        limits:
+          memory: 1g
