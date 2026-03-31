@@ -44,7 +44,7 @@ docker rm "$CONTAINER_NAME"   2>/dev/null || true
 echo "==> Starting new container..."
 docker run -d \
   --name "$CONTAINER_NAME" \
-  -p 8080:8080 \
+  --network host \
   --restart unless-stopped \
   --env-file "$ENV_FILE" \
   "$ECR_REGISTRY/$ECR_REPO:latest"
