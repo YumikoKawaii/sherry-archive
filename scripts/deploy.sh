@@ -53,7 +53,4 @@ echo "==> Cleaning up..."
 rm -f "$ENV_FILE"
 docker image prune -f
 
-echo "==> Ensuring cAdvisor is running..."
-docker compose -f "$REPO_ROOT/docker-compose.cadvisor.yml" up -d --pull always
-
 echo "==> Deploy complete!"
