@@ -1,6 +1,6 @@
 services:
   jaeger:
-    image: jaegertracing/all-in-one:1.62
+    image: jaegertracing/all-in-one:1.76.0
     container_name: jaeger
     restart: unless-stopped
     user: "10001:10001"
@@ -13,8 +13,8 @@ services:
       - BADGER_SPAN_STORE_TTL=72h
       - BADGER_VALUE_LOG_GC_TRIGGER=0.8
     ports:
-      - "127.0.0.1:16686:16686"
-      - "127.0.0.1:4317:4317"
+      - "16686:16686"
+      - "4317:4317"
     volumes:
       - jaeger_data:/badger
 

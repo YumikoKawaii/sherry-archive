@@ -6,7 +6,7 @@ import (
 
 	"github.com/XSAM/otelsql"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -37,11 +37,11 @@ func Init(cfg *config.TracingConfig) (shutdown func(), driverName string, err er
 		return noop, "postgres", fmt.Errorf("otelsql register: %w", err)
 	}
 
-	// OTLP HTTP exporter — points at Jaeger (or OTel Collector).
-	// cfg.Endpoint is host:port, e.g. "jaeger-host:4318".
-	exp, err := otlptracehttp.New(context.Background(),
-		otlptracehttp.WithEndpoint(cfg.Endpoint),
-		otlptracehttp.WithInsecure(),
+	// OTLP gRPC exporter — points at Jaeger (or OTel Collector).
+	// cfg.Endpoint is host:port, e.g. "localhost:4317".
+	exp, err := otlptracegrpc.New(context.Background(),
+		otlptracegrpc.WithEndpoint(cfg.Endpoint),
+		otlptracegrpc.WithInsecure(),
 	)
 	if err != nil {
 		return noop, driverName, fmt.Errorf("otlp exporter: %w", err)

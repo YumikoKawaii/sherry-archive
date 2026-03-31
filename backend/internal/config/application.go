@@ -93,8 +93,8 @@ type CloudFrontConfig struct {
 type TracingConfig struct {
 	// Enabled toggles tracing. Set to false to disable entirely (no provider, no instrumented driver).
 	Enabled bool `json:"enabled" mapstructure:"enabled" yaml:"enabled"`
-	// Endpoint is the OTLP HTTP collector endpoint in host:port format, e.g. "jaeger-host:4318".
-	// No scheme — TLS is disabled (WithInsecure). Default: "localhost:4318".
+	// Endpoint is the OTLP gRPC collector endpoint in host:port format, e.g. "localhost:4317".
+	// No scheme — TLS is disabled (WithInsecure). Default: "localhost:4317".
 	Endpoint string `json:"endpoint" mapstructure:"endpoint" yaml:"endpoint"`
 	// SampleRate is the fraction of traces to sample (0.0–1.0). Default: 1.0 (100%).
 	SampleRate float64 `json:"sample_rate" mapstructure:"sample_rate" yaml:"sample_rate"`
@@ -156,7 +156,7 @@ func loadDefault() *Application {
 		CloudFront: &CloudFrontConfig{},
 		Tracing: &TracingConfig{
 			Enabled:    false,
-			Endpoint:   "localhost:4318",
+			Endpoint:   "localhost:4317",
 			SampleRate: 1.0,
 		},
 	}
