@@ -155,7 +155,7 @@ func loadDefault() *Application {
 		},
 		CloudFront: &CloudFrontConfig{},
 		Tracing: &TracingConfig{
-			Enabled:    false,
+			Enabled:    true,
 			Endpoint:   "localhost:4317",
 			SampleRate: 1.0,
 		},
