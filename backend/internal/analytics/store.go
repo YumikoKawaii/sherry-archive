@@ -27,6 +27,7 @@ const (
 	contributedPrefix  = "contributed:"
 	contributionWindow = 24 * time.Hour
 	mangaMetaTTL       = time.Hour
+	candidateCap       = 100
 )
 
 // Store updates and queries the Redis-backed real-time analytics data.
@@ -399,15 +400,21 @@ func (s *Store) querySuggestions(
 	// UNION deduplicates. $1 (seen array) is reused across all three branches.
 	var candidateIDs []uuid.UUID
 	err := s.db.SelectContext(ctx, &candidateIDs, `
-		SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND tags && $2::text[]
-		UNION
-		SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND author != '' AND author = ANY($3::text[])
-		UNION
-		SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND category != '' AND category = ANY($4::text[])`,
+		SELECT c.id FROM (
+			SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND tags && $2::text[]
+			UNION
+			SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND author != '' AND author = ANY($3::text[])
+			UNION
+			SELECT id FROM mangas WHERE id != ALL($1::uuid[]) AND category != '' AND category = ANY($4::text[])
+		) c
+		LEFT JOIN manga_popularity p ON p.manga_id = c.id
+		ORDER BY COALESCE(p.score, 0) DESC
+		LIMIT $5`,
 		pq.Array(seenIDs),
 		pq.Array(tags),
 		pq.Array(authors),
 		pq.Array(categories),
+		candidateCap,
 	)
 	if err != nil || len(candidateIDs) == 0 {
 		return nil, err
@@ -487,15 +494,21 @@ func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*m
 	// Each branch uses its own index (GIN for tags, B-tree for author/category).
 	var candidateIDs []uuid.UUID
 	err = s.db.SelectContext(ctx, &candidateIDs, `
-		SELECT id FROM mangas WHERE id != $1 AND tags && $2::text[]
-		UNION
-		SELECT id FROM mangas WHERE id != $1 AND author != '' AND author = $3
-		UNION
-		SELECT id FROM mangas WHERE id != $1 AND category != '' AND category = $4`,
+		SELECT c.id FROM (
+			SELECT id FROM mangas WHERE id != $1 AND tags && $2::text[]
+			UNION
+			SELECT id FROM mangas WHERE id != $1 AND author != '' AND author = $3
+			UNION
+			SELECT id FROM mangas WHERE id != $1 AND category != '' AND category = $4
+		) c
+		LEFT JOIN manga_popularity p ON p.manga_id = c.id
+		ORDER BY COALESCE(p.score, 0) ASC
+		LIMIT $5`,
 		srcID,
 		pq.Array(meta.Tags),
 		meta.Author,
 		meta.Category,
+		candidateCap,
 	)
 	if err != nil || len(candidateIDs) == 0 {
 		return nil, err

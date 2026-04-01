@@ -67,6 +67,13 @@ go test -C backend ./internal/service/ # run a specific package's tests
 - `ProcessEvents` only updates the `seen:{device_id}` Redis set in real-time; interest scoring is done in the batch job
 - Login/register accept optional `device_id` to populate `device_user_mappings` for identity resolution in the jobs
 
+### Analytics — Recommendation Design Decisions
+
+- **Suggestions candidate pool**: Phase 1 (UNION of tag/author/category index scans) is capped at 100, sorted by popularity `DESC`. Target is popular manga the user hasn't seen — relevance first, popularity as tiebreaker.
+- **Similar candidate pool**: Phase 1 capped at 100, sorted by popularity `ASC`. Intentional — surfaces undiscovered manga that are genuinely similar, giving low-popularity titles exposure.
+- Both pools feed a Phase 2 Jaccard ranking (tag overlap / union) with popularity as tiebreaker in their respective directions.
+- `candidateCap = 100` in `analytics/store.go` — changing this affects both endpoints.
+
 ### Analytics Config (env vars)
 
 - `ANALYTICS__CONTRIBUTION_CAP` — max trending points a device can contribute to one manga per 24h window (default: `15`)
