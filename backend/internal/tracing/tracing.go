@@ -3,6 +3,7 @@
 package tracing
 
 import (
+	"github.com/aws/aws-xray-sdk-go/strategy/ctxmissing"
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 )
@@ -14,7 +15,8 @@ func Init(cfg *config.TracingConfig) error {
 		return nil
 	}
 	return xray.Configure(xray.Config{
-		DaemonAddr:     cfg.DaemonAddr,
-		ServiceVersion: "1.0.0",
+		DaemonAddr:             cfg.DaemonAddr,
+		ServiceVersion:         "1.0.0",
+		ContextMissingStrategy: ctxmissing.NewDefaultIgnoreErrorStrategy(),
 	})
 }
