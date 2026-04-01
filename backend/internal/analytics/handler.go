@@ -43,11 +43,20 @@ func (h *Handler) Trending(c *gin.Context) {
 		TrendingScore float64 `json:"trending_score"`
 	}
 
+	keys := make([]string, len(results))
+	for i, r := range results {
+		keys[i] = r.Manga.CoverKey
+	}
+	urls, _ := h.urlCache.ResolveMany(c.Request.Context(), keys)
+
 	out := make([]trendingItem, 0, len(results))
-	for _, r := range results {
-		coverURL, _ := h.urlCache.Resolve(c.Request.Context(), r.Manga.CoverKey)
+	for i, r := range results {
+		url := ""
+		if i < len(urls) {
+			url = urls[i]
+		}
 		out = append(out, trendingItem{
-			MangaResponse: dto.NewMangaResponse(r.Manga, coverURL),
+			MangaResponse: dto.NewMangaResponse(r.Manga, url),
 			TrendingScore: r.Score,
 		})
 	}
@@ -85,10 +94,19 @@ func (h *Handler) Suggestions(c *gin.Context) {
 		return
 	}
 
+	keys := make([]string, len(mangas))
+	for i, m := range mangas {
+		keys[i] = m.CoverKey
+	}
+	urls, _ := h.urlCache.ResolveMany(c.Request.Context(), keys)
+
 	out := make([]dto.MangaResponse, 0, len(mangas))
-	for _, m := range mangas {
-		coverURL, _ := h.urlCache.Resolve(c.Request.Context(), m.CoverKey)
-		out = append(out, dto.NewMangaResponse(m, coverURL))
+	for i, m := range mangas {
+		url := ""
+		if i < len(urls) {
+			url = urls[i]
+		}
+		out = append(out, dto.NewMangaResponse(m, url))
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": out})
@@ -110,10 +128,19 @@ func (h *Handler) Similar(c *gin.Context) {
 		return
 	}
 
+	keys := make([]string, len(mangas))
+	for i, m := range mangas {
+		keys[i] = m.CoverKey
+	}
+	urls, _ := h.urlCache.ResolveMany(c.Request.Context(), keys)
+
 	out := make([]dto.MangaResponse, 0, len(mangas))
-	for _, m := range mangas {
-		coverURL, _ := h.urlCache.Resolve(c.Request.Context(), m.CoverKey)
-		out = append(out, dto.NewMangaResponse(m, coverURL))
+	for i, m := range mangas {
+		url := ""
+		if i < len(urls) {
+			url = urls[i]
+		}
+		out = append(out, dto.NewMangaResponse(m, url))
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": out})
