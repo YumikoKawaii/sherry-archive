@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cobra"
 	"github.com/yumikokawaii/sherry-archive/internal/analytics"
@@ -24,7 +25,6 @@ import (
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
-	"github.com/redis/go-redis/extra/redisotel/v9"
 	"go.uber.org/zap"
 )
 
@@ -34,12 +34,10 @@ func Server(cmd *cobra.Command, args []string) {
 		zap.L().Fatal("config", zap.Error(err))
 	}
 
-	// Tracing — must be initialised before DB/Redis so instrumented drivers are registered first.
-	tracingShutdown, dbDriverName, err := tracing.Init(cfg.Tracing)
-	if err != nil {
+	// Tracing — initialise X-Ray before connecting to DB so the instrumented driver is ready.
+	if err := tracing.Init(cfg.Tracing); err != nil {
 		zap.L().Fatal("tracing", zap.Error(err))
 	}
-	defer tracingShutdown()
 
 	// Parse duration strings
 	accessExpiry, err := time.ParseDuration(cfg.JWT.AccessTokenExpiry)
@@ -59,8 +57,13 @@ func Server(cmd *cobra.Command, args []string) {
 		zap.L().Fatal("invalid analytics.decay_interval", zap.String("value", cfg.Analytics.DecayInterval), zap.Error(err))
 	}
 
-	// Database
-	db, err := postgres.ConnectWithDriver(dbDriverName, cfg.DB.DSN())
+	// Database — use X-Ray instrumented connection when tracing is enabled.
+	var db *sqlx.DB
+	if cfg.Tracing.Enabled {
+		db, err = postgres.ConnectXRay(cfg.DB.DSN())
+	} else {
+		db, err = postgres.Connect(cfg.DB.DSN())
+	}
 	if err != nil {
 		zap.L().Fatal("db connect", zap.Error(err))
 	}
@@ -89,11 +92,6 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 	rdb := redis.NewClient(redisOpts)
 	defer rdb.Close()
-	if cfg.Tracing.Enabled {
-		if err := redisotel.InstrumentTracing(rdb); err != nil {
-			zap.L().Fatal("redis tracing", zap.Error(err))
-		}
-	}
 
 	// Token manager
 	tokenMgr := token.NewManager(

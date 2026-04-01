@@ -1,0 +1,9 @@
+services:
+  xray-daemon:
+    image: amazon/aws-xray-daemon:3
+    container_name: xray-daemon
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - AWS_REGION=ap-southeast-1
+    command: --bind 0.0.0.0:2000

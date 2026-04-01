@@ -88,16 +88,14 @@ type CloudFrontConfig struct {
 	PrivateKey string `json:"private_key"  mapstructure:"private_key"  yaml:"private_key"`
 }
 
-// TracingConfig holds OpenTelemetry tracing settings.
-// Env vars: TRACING__ENABLED, TRACING__ENDPOINT, TRACING__SAMPLE_RATE
+// TracingConfig holds AWS X-Ray tracing settings.
+// Env vars: TRACING__ENABLED, TRACING__DAEMON_ADDR
 type TracingConfig struct {
-	// Enabled toggles tracing. Set to false to disable entirely (no provider, no instrumented driver).
+	// Enabled toggles tracing. Set to false to disable entirely.
 	Enabled bool `json:"enabled" mapstructure:"enabled" yaml:"enabled"`
-	// Endpoint is the OTLP gRPC collector endpoint in host:port format, e.g. "localhost:4317".
-	// No scheme — TLS is disabled (WithInsecure). Default: "localhost:4317".
-	Endpoint string `json:"endpoint" mapstructure:"endpoint" yaml:"endpoint"`
-	// SampleRate is the fraction of traces to sample (0.0–1.0). Default: 1.0 (100%).
-	SampleRate float64 `json:"sample_rate" mapstructure:"sample_rate" yaml:"sample_rate"`
+	// DaemonAddr is the X-Ray daemon UDP endpoint in host:port format.
+	// Default: "127.0.0.1:2000". On EC2 with --network host the daemon binds to this address.
+	DaemonAddr string `json:"daemon_addr" mapstructure:"daemon_addr" yaml:"daemon_addr"`
 }
 
 // AnalyticsConfig holds tuning parameters for the real-time analytics engine.
@@ -156,8 +154,7 @@ func loadDefault() *Application {
 		CloudFront: &CloudFrontConfig{},
 		Tracing: &TracingConfig{
 			Enabled:    true,
-			Endpoint:   "localhost:4317",
-			SampleRate: 1.0,
+			DaemonAddr: "127.0.0.1:2000",
 		},
 	}
 }

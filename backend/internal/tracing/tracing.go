@@ -1,68 +1,20 @@
+// Package tracing configures AWS X-Ray for distributed tracing.
+// Call Init once at startup; all instrumentation is a no-op when disabled.
 package tracing
 
 import (
-	"context"
-	"fmt"
-
-	"github.com/XSAM/otelsql"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
-
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 )
 
-// Init sets up the OpenTelemetry tracer provider with a Jaeger OTLP exporter.
-// Returns a shutdown function that flushes pending spans and a SQL driver name
-// to pass to postgres.ConnectWithDriver.
-//
-// When disabled, returns a no-op shutdown and the plain "postgres" driver name
-// so the rest of serve.go works unchanged.
-func Init(cfg *config.TracingConfig) (shutdown func(), driverName string, err error) {
-	noop := func() {}
-
+// Init configures the X-Ray SDK. When disabled, the SDK is not initialised
+// and all xray.BeginSubsegment / xray.Capture calls are safe no-ops.
+func Init(cfg *config.TracingConfig) error {
 	if !cfg.Enabled {
-		return noop, "postgres", nil
+		return nil
 	}
-
-	// Register an instrumented wrapper around lib/pq under a new driver name.
-	driverName, err = otelsql.Register("postgres",
-		otelsql.WithAttributes(semconv.DBSystemPostgreSQL),
-		otelsql.WithSpanOptions(otelsql.SpanOptions{DisableErrSkip: true}),
-	)
-	if err != nil {
-		return noop, "postgres", fmt.Errorf("otelsql register: %w", err)
-	}
-
-	// OTLP gRPC exporter — points at Jaeger (or OTel Collector).
-	// cfg.Endpoint is host:port, e.g. "localhost:4317".
-	exp, err := otlptracegrpc.New(context.Background(),
-		otlptracegrpc.WithEndpoint(cfg.Endpoint),
-		otlptracegrpc.WithInsecure(),
-	)
-	if err != nil {
-		return noop, driverName, fmt.Errorf("otlp exporter: %w", err)
-	}
-
-	res := resource.NewWithAttributes(
-		semconv.SchemaURL,
-		semconv.ServiceName("sherry-archive"),
-	)
-
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exp),
-		sdktrace.WithResource(res),
-		sdktrace.WithSampler(sdktrace.TraceIDRatioBased(cfg.SampleRate)),
-	)
-
-	otel.SetTracerProvider(tp)
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
-		propagation.TraceContext{},
-		propagation.Baggage{},
-	))
-
-	return func() { _ = tp.Shutdown(context.Background()) }, driverName, nil
+	return xray.Configure(xray.Config{
+		DaemonAddr:     cfg.DaemonAddr,
+		ServiceVersion: "1.0.0",
+	})
 }

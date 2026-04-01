@@ -7,7 +7,6 @@ import (
 	"github.com/yumikokawaii/sherry-archive/internal/metrics"
 	"github.com/yumikokawaii/sherry-archive/internal/middleware"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 type Handlers struct {
@@ -23,7 +22,7 @@ type Handlers struct {
 
 func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 	r := gin.New()
-	r.Use(gin.Recovery(), otelgin.Middleware("sherry-archive"), middleware.Logger(), metrics.Middleware())
+	r.Use(gin.Recovery(), middleware.XRay("sherry-archive"), middleware.Logger(), metrics.Middleware())
 
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
