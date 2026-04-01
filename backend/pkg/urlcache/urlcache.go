@@ -10,7 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-const keyPrefix = "presign:"
+const keyPrefix = "{presign}:"
 
 // Signer generates signed/presigned URLs for object storage keys.
 type Signer interface {
