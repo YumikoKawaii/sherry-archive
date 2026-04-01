@@ -39,9 +39,19 @@ func (h *MangaHandler) toResponse(ctx context.Context, m *model.Manga) dto.Manga
 }
 
 func (h *MangaHandler) toResponseList(ctx context.Context, ms []*model.Manga) []dto.MangaResponse {
+	keys := make([]string, len(ms))
+	for i, m := range ms {
+		keys[i] = m.CoverKey
+	}
+	urls, _ := h.urlCache.ResolveMany(ctx, keys)
+
 	out := make([]dto.MangaResponse, len(ms))
 	for i, m := range ms {
-		out[i] = h.toResponse(ctx, m)
+		url := ""
+		if i < len(urls) {
+			url = urls[i]
+		}
+		out[i] = dto.NewMangaResponse(m, url)
 	}
 	return out
 }
