@@ -8,12 +8,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 	"github.com/yumikokawaii/sherry-archive/internal/apperror"
 	"github.com/yumikokawaii/sherry-archive/internal/model"
 	"github.com/yumikokawaii/sherry-archive/internal/repository"
 	"github.com/yumikokawaii/sherry-archive/pkg/password"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 )
+
+var authTracer = otel.Tracer("auth")
 
 // InterestCacheInvalidator is implemented by analytics.Store.
 type InterestCacheInvalidator interface {
@@ -114,6 +117,9 @@ type LoginInput struct {
 }
 
 func (s *AuthService) Login(ctx context.Context, in LoginInput) (*model.User, *TokenPair, error) {
+	ctx, span := authTracer.Start(ctx, "auth.Login")
+	defer span.End()
+
 	u, err := s.userRepo.GetByEmail(ctx, in.Email)
 	if errors.Is(err, apperror.ErrNotFound) {
 		return nil, nil, apperror.ErrUnauthorized
@@ -122,7 +128,10 @@ func (s *AuthService) Login(ctx context.Context, in LoginInput) (*model.User, *T
 		return nil, nil, err
 	}
 
-	if !password.Verify(u.PasswordHash, in.Password) {
+	_, pwSpan := authTracer.Start(ctx, "auth.bcrypt.Verify")
+	ok := password.Verify(u.PasswordHash, in.Password)
+	pwSpan.End()
+	if !ok {
 		return nil, nil, apperror.ErrUnauthorized
 	}
 
@@ -175,6 +184,8 @@ func (s *AuthService) Me(ctx context.Context, userID uuid.UUID) (*model.User, er
 }
 
 func (s *AuthService) issueTokenPair(ctx context.Context, userID uuid.UUID) (*TokenPair, error) {
+	ctx, span := authTracer.Start(ctx, "auth.issueTokenPair")
+	defer span.End()
 	accessToken, err := s.tokenMgr.IssueAccessToken(userID)
 	if err != nil {
 		return nil, err
@@ -207,6 +218,8 @@ func hashToken(t string) string {
 // mergeDeviceData copies seen_manga and user_interests from the device identity
 // into the user identity. Called fire-and-forget after login/register.
 func (s *AuthService) mergeDeviceData(ctx context.Context, deviceID, userID uuid.UUID) {
+	ctx, span := authTracer.Start(ctx, "auth.mergeDeviceData")
+	defer span.End()
 	_ = s.seenMangaRepo.MergeInto(ctx, deviceID, userID)
 	_ = s.userInterestRepo.MergeInto(ctx, deviceID, userID)
 	s.cacheInvalidator.InvalidateInterestCache(ctx, userID)
