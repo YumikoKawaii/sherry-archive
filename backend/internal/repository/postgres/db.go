@@ -17,6 +17,9 @@ func ConnectWithDriver(driverName, dsn string) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Tell sqlx to use PostgreSQL-style $N bind vars regardless of the
+	// registered driver name (otelsql wraps postgres under a generated name).
+	db = sqlx.NewDb(db.DB, "postgres")
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
