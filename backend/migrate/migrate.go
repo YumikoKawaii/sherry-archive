@@ -2,12 +2,12 @@ package migrate
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/golang-migrate/migrate/v4"
 	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
 )
@@ -15,19 +15,19 @@ import (
 func Up(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("config: %v", err)
+		zap.L().Fatal("config", zap.Error(err))
 	}
 
 	db, err := postgres.Connect(cfg.DB.DSN())
 	if err != nil {
-		log.Fatalf("db connect: %v", err)
+		zap.L().Fatal("db connect", zap.Error(err))
 	}
 	defer db.Close()
 
 	if err := up(db.DB, cfg.GetMigrationFolder()); err != nil {
-		log.Fatalf("migrate up: %v", err)
+		zap.L().Fatal("migrate up", zap.Error(err))
 	}
-	log.Println("migrations applied successfully")
+	zap.L().Info("migrations applied successfully")
 }
 
 func up(db *sql.DB, source string) error {

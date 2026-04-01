@@ -6,11 +6,11 @@ package metrics
 import (
 	"context"
 	"database/sql"
-	"log"
 	"math"
 	"sync"
 	"time"
 
+	"go.uber.org/zap"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -419,7 +419,7 @@ func (p *publisher) flush(ctx context.Context) {
 			Namespace:  aws.String(p.namespace),
 			MetricData: data[i:end],
 		}); err != nil {
-			log.Printf("metrics: cloudwatch flush error: %v", err)
+			zap.L().Error("metrics: cloudwatch flush error", zap.Error(err))
 		}
 	}
 }

@@ -3,7 +3,6 @@ package serve
 import (
 	"context"
 	"crypto/tls"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -26,43 +25,44 @@ import (
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
 	"github.com/redis/go-redis/extra/redisotel/v9"
+	"go.uber.org/zap"
 )
 
 func Server(cmd *cobra.Command, args []string) {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("config: %v", err)
+		zap.L().Fatal("config", zap.Error(err))
 	}
 
 	// Tracing — must be initialised before DB/Redis so instrumented drivers are registered first.
 	tracingShutdown, dbDriverName, err := tracing.Init(cfg.Tracing)
 	if err != nil {
-		log.Fatalf("tracing: %v", err)
+		zap.L().Fatal("tracing", zap.Error(err))
 	}
 	defer tracingShutdown()
 
 	// Parse duration strings
 	accessExpiry, err := time.ParseDuration(cfg.JWT.AccessTokenExpiry)
 	if err != nil {
-		log.Fatalf("invalid jwt.access_token_expiry %q: %v", cfg.JWT.AccessTokenExpiry, err)
+		zap.L().Fatal("invalid jwt.access_token_expiry", zap.String("value", cfg.JWT.AccessTokenExpiry), zap.Error(err))
 	}
 	refreshExpiry, err := time.ParseDuration(cfg.JWT.RefreshTokenExpiry)
 	if err != nil {
-		log.Fatalf("invalid jwt.refresh_token_expiry %q: %v", cfg.JWT.RefreshTokenExpiry, err)
+		zap.L().Fatal("invalid jwt.refresh_token_expiry", zap.String("value", cfg.JWT.RefreshTokenExpiry), zap.Error(err))
 	}
 	presignExpiry, err := time.ParseDuration(cfg.S3.PresignExpiry)
 	if err != nil {
-		log.Fatalf("invalid s3.presign_expiry %q: %v", cfg.S3.PresignExpiry, err)
+		zap.L().Fatal("invalid s3.presign_expiry", zap.String("value", cfg.S3.PresignExpiry), zap.Error(err))
 	}
 	decayInterval, err := time.ParseDuration(cfg.Analytics.DecayInterval)
 	if err != nil {
-		log.Fatalf("invalid analytics.decay_interval %q: %v", cfg.Analytics.DecayInterval, err)
+		zap.L().Fatal("invalid analytics.decay_interval", zap.String("value", cfg.Analytics.DecayInterval), zap.Error(err))
 	}
 
 	// Database
 	db, err := postgres.ConnectWithDriver(dbDriverName, cfg.DB.DSN())
 	if err != nil {
-		log.Fatalf("db connect: %v", err)
+		zap.L().Fatal("db connect", zap.Error(err))
 	}
 	defer db.Close()
 
@@ -75,7 +75,7 @@ func Server(cmd *cobra.Command, args []string) {
 		presignExpiry,
 	)
 	if err != nil {
-		log.Fatalf("s3: %v", err)
+		zap.L().Fatal("s3", zap.Error(err))
 	}
 
 	// Redis
@@ -91,7 +91,7 @@ func Server(cmd *cobra.Command, args []string) {
 	defer rdb.Close()
 	if cfg.Tracing.Enabled {
 		if err := redisotel.InstrumentTracing(rdb); err != nil {
-			log.Fatalf("redis tracing: %v", err)
+			zap.L().Fatal("redis tracing", zap.Error(err))
 		}
 	}
 
@@ -106,7 +106,7 @@ func Server(cmd *cobra.Command, args []string) {
 	// SQS
 	sqsClient, err := queue.NewClient(context.Background(), cfg.S3.Region, cfg.SQS.QueueURL)
 	if err != nil {
-		log.Fatalf("sqs: %v", err)
+		zap.L().Fatal("sqs", zap.Error(err))
 	}
 
 	// Repositories
@@ -132,7 +132,7 @@ func Server(cmd *cobra.Command, args []string) {
 			presignExpiry,
 		)
 		if err != nil {
-			log.Fatalf("cloudfront signer: %v", err)
+			zap.L().Fatal("cloudfront signer", zap.Error(err))
 		}
 		signer = cfSigner
 	}
@@ -186,7 +186,7 @@ func Server(cmd *cobra.Command, args []string) {
 
 	// Metrics — push to CloudWatch every 60s; no-op if CloudWatch is unavailable
 	if err := metrics.Init(bgCtx, cfg.S3.Region, "SherryArchive", db.DB); err != nil {
-		log.Printf("metrics: cloudwatch unavailable, disabled (%v)", err)
+		zap.L().Warn("metrics: cloudwatch unavailable, disabled", zap.Error(err))
 	}
 
 	srv := &http.Server{
@@ -195,21 +195,21 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 
 	go func() {
-		log.Printf("server starting on :%s", cfg.Server.Port)
+		zap.L().Info("server starting", zap.String("port", cfg.Server.Port))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("server: %v", err)
+			zap.L().Fatal("server", zap.Error(err))
 		}
 	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("shutting down...")
+	zap.L().Info("shutting down")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("forced shutdown: %v", err)
+		zap.L().Fatal("forced shutdown", zap.Error(err))
 	}
-	log.Println("server stopped")
+	zap.L().Info("server stopped")
 }

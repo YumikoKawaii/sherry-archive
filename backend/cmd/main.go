@@ -1,15 +1,18 @@
 package main
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 	"github.com/yumikokawaii/sherry-archive/jobs"
 	"github.com/yumikokawaii/sherry-archive/migrate"
+	"github.com/yumikokawaii/sherry-archive/pkg/logger"
 	"github.com/yumikokawaii/sherry-archive/serve"
+	"go.uber.org/zap"
 )
 
 func main() {
+	flush := logger.Init()
+	defer flush()
+
 	cmd := &cobra.Command{Use: "sherry-archive"}
 
 	cmd.AddCommand(&cobra.Command{
@@ -31,6 +34,6 @@ func main() {
 	})
 
 	if err := cmd.Execute(); err != nil {
-		log.Fatal(err)
+		zap.L().Fatal("command failed", zap.Error(err))
 	}
 }

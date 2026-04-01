@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 	"github.com/yumikokawaii/sherry-archive/internal/config"
 	"github.com/yumikokawaii/sherry-archive/internal/model"
 	"github.com/yumikokawaii/sherry-archive/internal/repository/postgres"
@@ -28,18 +28,18 @@ const (
 func Run(_ *cobra.Command, _ []string) {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("config: %v", err)
+		zap.L().Fatal("config", zap.Error(err))
 	}
 
 	db, err := postgres.Connect(cfg.DB.DSN())
 	if err != nil {
-		log.Fatalf("db connect: %v", err)
+		zap.L().Fatal("db connect", zap.Error(err))
 	}
 	defer db.Close()
 
 	rdb, err := connectRedis(cfg)
 	if err != nil {
-		log.Fatalf("redis connect: %v", err)
+		zap.L().Fatal("redis connect", zap.Error(err))
 	}
 	defer rdb.Close()
 
@@ -54,14 +54,13 @@ func Run(_ *cobra.Command, _ []string) {
 	}
 
 	ctx := context.Background()
-	log.Println("==> Starting interest aggregation job")
-	log.Printf("  stop tags: %v", cfg.Analytics.StopTags)
+	zap.L().Info("starting interest aggregation job", zap.String("stop_tags", cfg.Analytics.StopTags))
 
 	if err := runAggregation(ctx, db, rdb, stopTags, cfg.Analytics.ContributionCap); err != nil {
-		log.Fatalf("aggregation failed: %v", err)
+		zap.L().Fatal("aggregation failed", zap.Error(err))
 	}
 
-	log.Println("==> Done")
+	zap.L().Info("done")
 }
 
 func runAggregation(ctx context.Context, db *sqlx.DB, rdb *redis.Client, stopTags map[string]struct{}, cap float64) error {
@@ -78,7 +77,7 @@ func runAggregation(ctx context.Context, db *sqlx.DB, rdb *redis.Client, stopTag
 		return fmt.Errorf("fetch devices: %w", err)
 	}
 
-	log.Printf("  processing %d device(s)", len(deviceIDs))
+	zap.L().Info("processing devices", zap.Int("count", len(deviceIDs)))
 	jobTime := time.Now()
 
 	for _, deviceID := range deviceIDs {
@@ -96,16 +95,16 @@ func runAggregation(ctx context.Context, db *sqlx.DB, rdb *redis.Client, stopTag
 		}
 
 		if err := processIdentity(ctx, db, rdb, interestRepo, watermarkRepo, deviceID, identityID, since, jobTime, stopTags, cap, popularityDeltas); err != nil {
-			log.Printf("  [WARN] identity %s: %v", identityID, err)
+			zap.L().Warn("identity processing failed", zap.String("identity_id", identityID.String()), zap.Error(err))
 			continue
 		}
 	}
 
 	// Upsert popularity scores
 	if len(popularityDeltas) > 0 {
-		log.Printf("  upserting popularity for %d manga(s)", len(popularityDeltas))
+		zap.L().Info("upserting popularity", zap.Int("manga_count", len(popularityDeltas)))
 		if err := upsertPopularity(ctx, db, popularityDeltas); err != nil {
-			log.Printf("  [WARN] upsert popularity: %v", err)
+			zap.L().Warn("upsert popularity", zap.Error(err))
 		}
 	}
 
@@ -133,7 +132,7 @@ func processIdentity(
 		return nil
 	}
 
-	log.Printf("    device %s → identity %s: %d event(s)", deviceID, identityID, len(events))
+	zap.L().Info("processing events", zap.String("device_id", deviceID.String()), zap.String("identity_id", identityID.String()), zap.Int("events", len(events)))
 
 	// Fetch manga metadata for all unique manga_ids in events
 	mangaIDs := extractMangaIDs(events)
@@ -234,7 +233,7 @@ func processIdentity(
 
 	// Populate Redis cache
 	if err := populateCache(ctx, rdb, identityID.String(), interests); err != nil {
-		log.Printf("  [WARN] redis cache for %s: %v", identityID, err)
+		zap.L().Warn("redis cache populate failed", zap.String("identity_id", identityID.String()), zap.Error(err))
 	}
 
 	// Update watermark
@@ -392,7 +391,7 @@ func upsertPopularity(ctx context.Context, db *sqlx.DB, deltas map[string]float6
 			mangaID, delta, now,
 		)
 		if err != nil {
-			log.Printf("  [WARN] popularity upsert for %s: %v", mangaIDStr, err)
+			zap.L().Warn("popularity upsert failed", zap.String("manga_id", mangaIDStr), zap.Error(err))
 		}
 	}
 	return nil
