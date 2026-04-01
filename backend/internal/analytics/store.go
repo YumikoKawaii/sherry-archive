@@ -12,10 +12,13 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"go.opentelemetry.io/otel"
 	"github.com/yumikokawaii/sherry-archive/internal/model"
 	"github.com/yumikokawaii/sherry-archive/internal/repository"
 	"github.com/yumikokawaii/sherry-archive/internal/tracking"
 )
+
+var tracer = otel.Tracer("analytics")
 
 const (
 	trendingKey        = "trending"
@@ -128,6 +131,8 @@ type mangaMeta struct {
 }
 
 func (s *Store) getMangaMeta(ctx context.Context, mangaID string) (*mangaMeta, error) {
+	ctx, span := tracer.Start(ctx, "analytics.getMangaMeta")
+	defer span.End()
 	cacheKey := mangaMetaPrefix + mangaID
 
 	// Try Redis cache first
@@ -181,6 +186,8 @@ type TrendingResult struct {
 }
 
 func (s *Store) GetTrending(ctx context.Context, limit int) ([]*TrendingResult, error) {
+	ctx, span := tracer.Start(ctx, "analytics.GetTrending")
+	defer span.End()
 	items, err := s.rdb.ZRevRangeWithScores(ctx, trendingKey, 0, int64(limit-1)).Result()
 	if err != nil || len(items) == 0 {
 		return nil, err
@@ -221,6 +228,8 @@ const interestCacheTTL = 24 * time.Hour
 // If userID is non-nil, the user's interest profile is used with fallback to deviceID.
 // If contextMangaID is non-nil, the currently viewing manga's metadata boosts matching.
 func (s *Store) GetSuggestions(ctx context.Context, userID *uuid.UUID, deviceID string, contextMangaID *uuid.UUID, limit int) ([]*model.Manga, error) {
+	ctx, span := tracer.Start(ctx, "analytics.GetSuggestions")
+	defer span.End()
 	var identityID string
 	if userID != nil {
 		identityID = userID.String()
@@ -329,6 +338,8 @@ type interestDim struct {
 
 // loadInterests fetches interest dimensions for an identity, using Redis as cache-aside.
 func (s *Store) loadInterests(ctx context.Context, identityID string) ([]interestDim, error) {
+	ctx, span := tracer.Start(ctx, "analytics.loadInterests")
+	defer span.End()
 	cacheKey := interestsPrefix + identityID
 
 	// Try Redis cache first
@@ -377,6 +388,8 @@ func (s *Store) querySuggestions(
 	seenIDs []uuid.UUID,
 	limit int,
 ) ([]*model.Manga, error) {
+	ctx, span := tracer.Start(ctx, "analytics.querySuggestions")
+	defer span.End()
 	if len(tags) == 0 && len(authors) == 0 && len(categories) == 0 {
 		return nil, nil
 	}
@@ -455,6 +468,8 @@ func (s *Store) coldStartSuggestions(ctx context.Context, contextMangaID *uuid.U
 // Series siblings (same title prefix) are capped at 50% of the results to keep
 // the shelf diverse — users who want the full series can use search.
 func (s *Store) GetSimilar(ctx context.Context, mangaID string, limit int) ([]*model.Manga, error) {
+	ctx, span := tracer.Start(ctx, "analytics.GetSimilar")
+	defer span.End()
 	meta, err := s.getMangaMeta(ctx, mangaID)
 	if err != nil || meta == nil {
 		return nil, err
