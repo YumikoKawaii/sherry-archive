@@ -9,6 +9,7 @@ import { Spinner } from '../components/Spinner'
 import { Layout } from '../components/Layout'
 import { getDeviceId } from '../lib/tracking'
 import { useAuth } from '../contexts/AuthContext'
+import { useMeta } from '../lib/useMeta'
 
 const STATUSES: { value: MangaStatus | ''; label: string }[] = [
   { value: '', label: 'All' },
@@ -50,6 +51,8 @@ function MangaShelf({ title, items, badge }: {
 }
 
 export function HomePage() {
+  useMeta({ ogUrl: 'https://sherry-archive.com/' })
+
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const [mangas, setMangas] = useState<Manga[]>([])

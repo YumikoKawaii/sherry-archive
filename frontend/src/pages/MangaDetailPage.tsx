@@ -13,6 +13,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../lib/api'
 import { CommentSection } from '../components/CommentSection'
 import { tracker, getDeviceId } from '../lib/tracking'
+import { useMeta } from '../lib/useMeta'
 
 const STATUSES: { value: MangaStatus; label: string }[] = [
   { value: 'ongoing', label: 'Ongoing' },
@@ -59,6 +60,45 @@ export function MangaDetailPage() {
   const [editTagInput, setEditTagInput] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
+
+  const metaDescription = manga?.description
+    ? manga.description.length > 160 ? manga.description.slice(0, 157) + '…' : manga.description
+    : undefined
+
+  useMeta({
+    title: manga?.title,
+    description: metaDescription,
+    ogImage: manga?.cover_url || undefined,
+    ogUrl: `https://sherry-archive.com/manga/${mangaID}`,
+    ogType: 'book',
+  })
+
+  useEffect(() => {
+    if (!manga) return
+    const ld: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': manga.type === 'series' ? 'ComicSeries' : 'Book',
+      name: manga.title,
+      url: `https://sherry-archive.com/manga/${manga.id}`,
+    }
+    if (manga.description) ld.description = manga.description
+    if (manga.cover_url) ld.image = manga.cover_url
+    if (manga.author) ld.author = { '@type': 'Person', name: manga.author }
+    if (manga.artist && manga.artist !== manga.author) {
+      ld.illustrator = { '@type': 'Person', name: manga.artist }
+    }
+    if (manga.tags.length > 0) ld.genre = manga.tags
+    if (manga.type === 'series' && chapters.length > 0) ld.numberOfEpisodes = chapters.length
+
+    const script = document.createElement('script')
+    script.type = 'application/ld+json'
+    script.id = 'page-jsonld'
+    script.textContent = JSON.stringify(ld)
+    document.getElementById('page-jsonld')?.remove()
+    document.head.appendChild(script)
+
+    return () => { document.getElementById('page-jsonld')?.remove() }
+  }, [manga, chapters.length])
 
   useEffect(() => {
     if (!mangaID) return
