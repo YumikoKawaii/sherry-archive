@@ -58,7 +58,7 @@ func (c *URLCache) Resolve(ctx context.Context, key string) (string, error) {
 	}
 	raw := u.String()
 
-	go c.rdb.Set(context.Background(), cacheKey, raw, c.ttl) // fire-and-forget
+	c.rdb.Set(ctx, cacheKey, raw, c.ttl) // best-effort, ignore error
 
 	return raw, nil
 }
@@ -108,9 +108,7 @@ func (c *URLCache) ResolveMany(ctx context.Context, keys []string) ([]string, er
 			mu.Lock()
 			urls[idx] = raw
 			mu.Unlock()
-			// SET is fire-and-forget: response does not wait for the cache write.
-			// Using context.Background() so the write survives request completion.
-			go c.rdb.Set(context.Background(), keyPrefix+key, raw, c.ttl)
+			c.rdb.Set(ctx, keyPrefix+key, raw, c.ttl) // best-effort
 		}(i, keys[i])
 	}
 
