@@ -247,6 +247,7 @@ export function MangaDetailPage() {
                             shadow-[0_0_30px_rgba(34,197,94,0.08)]">
               {manga.cover_url ? (
                 <img src={manga.cover_url} alt={manga.title}
+                  fetchPriority="high"
                   className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-forest-800 flex items-center justify-center">
