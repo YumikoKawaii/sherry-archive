@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/google/uuid"
 	"github.com/yumikokawaii/sherry-archive/internal/apperror"
 	"github.com/yumikokawaii/sherry-archive/internal/model"
@@ -277,6 +278,9 @@ func (s *PageService) ReorderPages(ctx context.Context, requesterID, mangaID, ch
 }
 
 func (s *PageService) GetPagesWithURLs(ctx context.Context, chapterID uuid.UUID) ([]*model.Page, []string, error) {
+	ctx, sub := xray.BeginSubsegment(ctx, "page.GetPagesWithURLs")
+	defer sub.Close(nil)
+
 	pages, err := s.pageRepo.GetByChapter(ctx, chapterID)
 	if err != nil {
 		return nil, nil, err
@@ -287,7 +291,9 @@ func (s *PageService) GetPagesWithURLs(ctx context.Context, chapterID uuid.UUID)
 		keys[i] = p.ObjectKey
 	}
 
+	_, urlSub := xray.BeginSubsegment(ctx, "page.ResolveURLs")
 	urls, err := s.urlCache.ResolveMany(ctx, keys)
+	urlSub.Close(nil)
 	if err != nil {
 		return nil, nil, err
 	}

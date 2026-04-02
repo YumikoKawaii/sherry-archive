@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/google/uuid"
 	"github.com/yumikokawaii/sherry-archive/internal/apperror"
 	"github.com/yumikokawaii/sherry-archive/internal/model"
@@ -130,6 +131,8 @@ func (s *ChapterService) Delete(ctx context.Context, requesterID, chapterID uuid
 }
 
 func (s *ChapterService) GetByID(ctx context.Context, id uuid.UUID) (*model.Chapter, error) {
+	ctx, sub := xray.BeginSubsegment(ctx, "chapter.GetByID")
+	defer sub.Close(nil)
 	return s.chapterRepo.GetByID(ctx, id)
 }
 

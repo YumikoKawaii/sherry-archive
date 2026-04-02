@@ -25,6 +25,7 @@ import (
 	"github.com/yumikokawaii/sherry-archive/pkg/storage"
 	"github.com/yumikokawaii/sherry-archive/pkg/token"
 	"github.com/yumikokawaii/sherry-archive/pkg/urlcache"
+	"github.com/yumikokawaii/sherry-archive/pkg/xrayhook"
 	"go.uber.org/zap"
 )
 
@@ -92,6 +93,9 @@ func Server(cmd *cobra.Command, args []string) {
 	}
 	rdb := redis.NewClient(redisOpts)
 	defer rdb.Close()
+	if cfg.Tracing.Enabled {
+		rdb.AddHook(xrayhook.New())
+	}
 
 	// Token manager
 	tokenMgr := token.NewManager(
