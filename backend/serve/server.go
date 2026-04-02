@@ -171,6 +171,7 @@ func Server(cmd *cobra.Command, args []string) {
 		User:       handler.NewUserHandler(userSvc, storageClient),
 		Comment:    handler.NewCommentHandler(commentSvc),
 		UploadTask: handler.NewUploadTaskHandler(uploadTaskSvc),
+		Sitemap:    handler.NewSitemapHandler(mangaRepo, chapterRepo),
 	}
 
 	r := handler.SetupRouter(handlers, tokenMgr)

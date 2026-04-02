@@ -92,6 +92,12 @@ func (r *MangaRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+func (r *MangaRepo) ListAllForSitemap(ctx context.Context) ([]*model.Manga, error) {
+	var rows []*model.Manga
+	err := r.db.SelectContext(ctx, &rows, `SELECT id, updated_at FROM mangas ORDER BY updated_at DESC`)
+	return rows, err
+}
+
 func (r *MangaRepo) SlugExists(ctx context.Context, slug string) (bool, error) {
 	var exists bool
 	err := r.db.GetContext(ctx, &exists, `SELECT EXISTS(SELECT 1 FROM mangas WHERE slug = $1)`, slug)

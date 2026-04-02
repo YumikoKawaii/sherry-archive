@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /api/
+Disallow: /manga/*/manage
+Disallow: /manga/new
+Disallow: /me
+Disallow: /login
+
+Sitemap: https://sherry-archive.com/sitemap.xml

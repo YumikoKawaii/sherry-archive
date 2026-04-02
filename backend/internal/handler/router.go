@@ -18,6 +18,7 @@ type Handlers struct {
 	User       *UserHandler
 	Comment    *CommentHandler
 	UploadTask *UploadTaskHandler
+	Sitemap    *SitemapHandler
 }
 
 func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
@@ -27,6 +28,9 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+
+	r.GET("/sitemap.xml", h.Sitemap.Sitemap)
+	r.StaticFile("/robots.txt", "./public/robots.txt")
 
 	// Serve built frontend static assets (Vite outputs to dist/assets/)
 	r.Static("/assets", "./public/assets")

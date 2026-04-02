@@ -33,6 +33,7 @@ type MangaRepository interface {
 	GetBySlug(ctx context.Context, slug string) (*model.Manga, error)
 	List(ctx context.Context, filter MangaFilter, p pagination.Params) ([]*model.Manga, int, error)
 	ListByOwner(ctx context.Context, ownerID uuid.UUID, p pagination.Params) ([]*model.Manga, int, error)
+	ListAllForSitemap(ctx context.Context) ([]*model.Manga, error)
 	Update(ctx context.Context, m *model.Manga) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	SlugExists(ctx context.Context, slug string) (bool, error)
@@ -43,6 +44,7 @@ type ChapterRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Chapter, error)
 	GetByMangaAndNumber(ctx context.Context, mangaID uuid.UUID, number float64) (*model.Chapter, error)
 	ListByManga(ctx context.Context, mangaID uuid.UUID) ([]*model.Chapter, error)
+	ListAllForSitemap(ctx context.Context) ([]*model.Chapter, error)
 	Update(ctx context.Context, ch *model.Chapter) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	UpdatePageCount(ctx context.Context, id uuid.UUID, count int) error

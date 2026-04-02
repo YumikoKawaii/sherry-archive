@@ -47,6 +47,12 @@ func (r *ChapterRepo) ListByManga(ctx context.Context, mangaID uuid.UUID) ([]*mo
 	return rows, err
 }
 
+func (r *ChapterRepo) ListAllForSitemap(ctx context.Context) ([]*model.Chapter, error) {
+	var rows []*model.Chapter
+	err := r.db.SelectContext(ctx, &rows, `SELECT id, manga_id, updated_at FROM chapters ORDER BY updated_at DESC`)
+	return rows, err
+}
+
 func (r *ChapterRepo) Update(ctx context.Context, ch *model.Chapter) error {
 	const q = `UPDATE chapters SET number=:number, title=:title, updated_at=:updated_at WHERE id=:id`
 	_, err := r.db.NamedExecContext(ctx, q, ch)
