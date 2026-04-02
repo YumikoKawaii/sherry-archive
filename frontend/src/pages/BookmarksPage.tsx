@@ -46,7 +46,7 @@ export function BookmarksPage() {
         </h1>
 
         {entries.length === 0 ? (
-          <div className="text-center py-24 text-mint-200/30">
+          <div className="text-center py-24 text-mint-200/50">
             <p className="text-4xl mb-4">栞</p>
             <p className="text-sm">No bookmarks yet.</p>
             <Link to="/" className="mt-4 inline-block text-jade-400 hover:underline text-sm">
@@ -85,7 +85,7 @@ export function BookmarksPage() {
                                transition-colors truncate block">
                     {manga.title}
                   </Link>
-                  <p className="text-xs text-mint-200/40 mt-0.5">
+                  <p className="text-xs text-mint-200/60 mt-0.5">
                     Page {bookmark.last_page_number}
                   </p>
                 </div>

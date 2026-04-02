@@ -218,7 +218,7 @@ export function MangaDetailPage() {
   if (loading) return <Layout><div className="flex justify-center py-32"><Spinner size="lg" /></div></Layout>
   if (error || !manga) return (
     <Layout>
-      <div className="flex flex-col items-center justify-center py-32 text-mint-200/40">
+      <div className="flex flex-col items-center justify-center py-32 text-mint-200/60">
         <p className="text-5xl mb-4">錯</p>
         <p>{error || 'Manga not found'}</p>
         <Link to="/" className="mt-6 text-jade-400 hover:underline text-sm">← Back to browse</Link>
@@ -281,7 +281,7 @@ export function MangaDetailPage() {
                 {manga.artist && manga.artist !== manga.author && (
                   <span>art <span className="text-mint-200/80">{manga.artist}</span></span>
                 )}
-                {manga.category && <span className="text-mint-200/40">{manga.category}</span>}
+                {manga.category && <span className="text-mint-200/60">{manga.category}</span>}
               </div>
             )}
 
@@ -298,7 +298,7 @@ export function MangaDetailPage() {
             )}
 
             {!isOneshot && (
-              <div className="mt-4 text-xs text-mint-200/30">
+              <div className="mt-4 text-xs text-mint-200/50">
                 <p>{chapters.length} chapter{chapters.length !== 1 ? 's' : ''}</p>
               </div>
             )}
@@ -315,7 +315,7 @@ export function MangaDetailPage() {
                     Read Oneshot →
                   </Link>
                 ) : (
-                  <span className="text-sm text-mint-200/30 italic">No chapter yet.</span>
+                  <span className="text-sm text-mint-200/50 italic">No chapter yet.</span>
                 )
               ) : (
                 <>
@@ -371,6 +371,7 @@ export function MangaDetailPage() {
                 <>
                   <button
                     onClick={editing ? () => setEditing(false) : openEdit}
+                    aria-expanded={editing}
                     className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition ${
                       editing
                         ? 'bg-jade-500/20 border-jade-500/60 text-jade-300'
@@ -445,6 +446,7 @@ export function MangaDetailPage() {
                 <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
                 <button
                   type="button"
+                  aria-label="Change cover image"
                   onClick={() => coverInputRef.current?.click()}
                   disabled={coverUploading}
                   className="relative w-24 h-32 rounded-lg overflow-hidden border border-forest-600
@@ -511,8 +513,9 @@ export function MangaDetailPage() {
               {/* Author / Artist / Category */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Author</label>
+                  <label htmlFor="edit-author" className="block text-xs font-medium text-mint-200/60 mb-1.5">Author</label>
                   <input
+                    id="edit-author"
                     type="text"
                     value={editAuthor}
                     onChange={e => setEditAuthor(e.target.value)}
@@ -523,8 +526,9 @@ export function MangaDetailPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Artist</label>
+                  <label htmlFor="edit-artist" className="block text-xs font-medium text-mint-200/60 mb-1.5">Artist</label>
                   <input
+                    id="edit-artist"
                     type="text"
                     value={editArtist}
                     onChange={e => setEditArtist(e.target.value)}
@@ -535,8 +539,9 @@ export function MangaDetailPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Category</label>
+                  <label htmlFor="edit-category" className="block text-xs font-medium text-mint-200/60 mb-1.5">Category</label>
                   <input
+                    id="edit-category"
                     type="text"
                     value={editCategory}
                     onChange={e => setEditCategory(e.target.value)}
@@ -550,7 +555,7 @@ export function MangaDetailPage() {
 
               {/* Tags */}
               <div>
-                <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Tags</label>
+                <label htmlFor="edit-tags" className="block text-xs font-medium text-mint-200/60 mb-1.5">Tags</label>
                 <div className="rounded-lg bg-forest-800 border border-forest-600
                                 focus-within:border-jade-500/60 focus-within:ring-1 focus-within:ring-jade-500/25
                                 transition p-2 min-h-[42px] flex flex-wrap gap-1.5 items-center">
@@ -559,11 +564,12 @@ export function MangaDetailPage() {
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs
                                  bg-jade-500/15 text-jade-300 border border-jade-500/25">
                       {tag}
-                      <button type="button" onClick={() => setEditTags(prev => prev.filter(t => t !== tag))}
+                      <button type="button" aria-label={`Remove tag ${tag}`} onClick={() => setEditTags(prev => prev.filter(t => t !== tag))}
                         className="text-jade-400/60 hover:text-jade-300 transition leading-none">×</button>
                     </span>
                   ))}
                   <input
+                    id="edit-tags"
                     type="text"
                     value={editTagInput}
                     onChange={e => setEditTagInput(e.target.value)}
@@ -628,7 +634,7 @@ export function MangaDetailPage() {
             </div>
 
             {chapters.length === 0 ? (
-              <p className="text-mint-200/30 text-sm py-8 text-center border border-forest-700 rounded-lg">
+              <p className="text-mint-200/50 text-sm py-8 text-center border border-forest-700 rounded-lg">
                 No chapters yet.
               </p>
             ) : (
@@ -649,11 +655,11 @@ export function MangaDetailPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-                      <span className="text-xs text-mint-200/30">{ch.page_count}p</span>
-                      <span className="text-xs text-mint-200/20">
+                      <span className="text-xs text-mint-200/50">{ch.page_count}p</span>
+                      <span className="text-xs text-mint-200/40">
                         {new Date(ch.created_at).toLocaleDateString()}
                       </span>
-                      <svg className="w-4 h-4 text-mint-200/20 group-hover:text-jade-400 transition-colors"
+                      <svg aria-hidden="true" className="w-4 h-4 text-mint-200/40 group-hover:text-jade-400 transition-colors"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                       </svg>

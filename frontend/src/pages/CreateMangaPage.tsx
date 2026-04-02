@@ -87,7 +87,7 @@ export function CreateMangaPage() {
         >
           {/* Header */}
           <div className="mb-8">
-            <Link to="/" className="text-xs text-mint-200/40 hover:text-mint-200/70 transition mb-3 inline-block">
+            <Link to="/" className="text-xs text-mint-200/60 hover:text-mint-200/80 transition mb-3 inline-block">
               ← Back to browse
             </Link>
             <h1 className="text-2xl font-bold text-mint-50 flex items-center gap-2">
@@ -104,6 +104,7 @@ export function CreateMangaPage() {
                 <p className="text-xs font-medium text-mint-200/60 mb-1.5">Cover</p>
                 <button
                   type="button"
+                  aria-label="Upload cover image"
                   onClick={() => fileRef.current?.click()}
                   className="w-28 aspect-[3/4] rounded-lg overflow-hidden border border-dashed border-forest-600
                              hover:border-jade-500/60 transition group relative bg-forest-800"
@@ -140,10 +141,11 @@ export function CreateMangaPage() {
               {/* Title + Type + Status */}
               <div className="flex-1 space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-mint-200/60 mb-1.5">
+                  <label htmlFor="create-title" className="block text-xs font-medium text-mint-200/60 mb-1.5">
                     Title <span className="text-jade-400">*</span>
                   </label>
                   <input
+                    id="create-title"
                     type="text"
                     value={title}
                     onChange={e => setTitle(e.target.value)}
@@ -201,8 +203,9 @@ export function CreateMangaPage() {
             {/* Author / Artist / Category */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Author</label>
+                <label htmlFor="create-author" className="block text-xs font-medium text-mint-200/60 mb-1.5">Author</label>
                 <input
+                  id="create-author"
                   type="text"
                   value={author}
                   onChange={e => setAuthor(e.target.value)}
@@ -214,8 +217,9 @@ export function CreateMangaPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Artist</label>
+                <label htmlFor="create-artist" className="block text-xs font-medium text-mint-200/60 mb-1.5">Artist</label>
                 <input
+                  id="create-artist"
                   type="text"
                   value={artist}
                   onChange={e => setArtist(e.target.value)}
@@ -227,8 +231,9 @@ export function CreateMangaPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Category</label>
+                <label htmlFor="create-category" className="block text-xs font-medium text-mint-200/60 mb-1.5">Category</label>
                 <input
+                  id="create-category"
                   type="text"
                   value={category}
                   onChange={e => setCategory(e.target.value)}
@@ -243,8 +248,9 @@ export function CreateMangaPage() {
 
             {/* Description */}
             <div>
-              <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Description</label>
+              <label htmlFor="create-description" className="block text-xs font-medium text-mint-200/60 mb-1.5">Description</label>
               <textarea
+                id="create-description"
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 placeholder="Write a short synopsis…"
@@ -258,7 +264,7 @@ export function CreateMangaPage() {
 
             {/* Tags */}
             <div>
-              <label className="block text-xs font-medium text-mint-200/60 mb-1.5">Tags</label>
+              <label htmlFor="create-tags" className="block text-xs font-medium text-mint-200/60 mb-1.5">Tags</label>
               <div className="rounded-lg bg-forest-800 border border-forest-600
                               focus-within:border-jade-500/60 focus-within:ring-1 focus-within:ring-jade-500/25
                               transition p-2 min-h-[42px] flex flex-wrap gap-1.5 items-center">
@@ -267,11 +273,12 @@ export function CreateMangaPage() {
                     className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs
                                bg-jade-500/15 text-jade-300 border border-jade-500/25">
                     {tag}
-                    <button type="button" onClick={() => removeTag(tag)}
+                    <button type="button" aria-label={`Remove tag ${tag}`} onClick={() => removeTag(tag)}
                       className="text-jade-400/60 hover:text-jade-300 transition leading-none">×</button>
                   </span>
                 ))}
                 <input
+                  id="create-tags"
                   type="text"
                   value={tagInput}
                   onChange={e => setTagInput(e.target.value)}
@@ -282,7 +289,7 @@ export function CreateMangaPage() {
                              placeholder-mint-200/20 outline-none"
                 />
               </div>
-              <p className="mt-1 text-[10px] text-mint-200/30">Press Enter or comma to add a tag</p>
+              <p className="mt-1 text-[10px] text-mint-200/50">Press Enter or comma to add a tag</p>
             </div>
 
             {/* Error */}

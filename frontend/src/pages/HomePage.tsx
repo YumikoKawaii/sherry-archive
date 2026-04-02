@@ -195,6 +195,7 @@ export function HomePage() {
             value={author}
             onChange={e => setFilter('author', e.target.value)}
             placeholder="Author…"
+            aria-label="Filter by author"
             className="h-9 px-3 rounded-lg text-sm bg-forest-900 border border-forest-700
                        text-mint-200 placeholder-mint-200/30
                        focus:outline-none focus:border-jade-500/60 transition w-32"
@@ -206,6 +207,7 @@ export function HomePage() {
             value={category}
             onChange={e => setFilter('category', e.target.value)}
             placeholder="Category…"
+            aria-label="Filter by category"
             className="h-9 px-3 rounded-lg text-sm bg-forest-900 border border-forest-700
                        text-mint-200 placeholder-mint-200/30
                        focus:outline-none focus:border-jade-500/60 transition w-32"
@@ -215,6 +217,7 @@ export function HomePage() {
           <select
             value={sort}
             onChange={e => setFilter('sort', e.target.value)}
+            aria-label="Sort order"
             className="h-9 px-3 rounded-lg text-sm bg-forest-900 border border-forest-700
                        text-mint-200 focus:outline-none focus:border-jade-500/60 cursor-pointer"
           >
@@ -246,7 +249,7 @@ export function HomePage() {
           ))}
 
           {/* Result count */}
-          <span className="ml-auto text-sm text-mint-200/40">
+          <span className="ml-auto text-sm text-mint-200/60">
             {total} {total === 1 ? 'title' : 'titles'}
           </span>
         </div>
@@ -257,7 +260,7 @@ export function HomePage() {
         {loading ? (
           <div className="flex justify-center py-24"><Spinner size="lg" /></div>
         ) : mangas.length === 0 ? (
-          <div className="text-center py-24 text-mint-200/30">
+          <div className="text-center py-24 text-mint-200/50">
             <p className="text-5xl mb-4">空</p>
             <p className="text-lg">No manga found.</p>
           </div>
@@ -286,7 +289,7 @@ export function HomePage() {
             >
               ← Prev
             </button>
-            <span className="text-sm text-mint-200/40">
+            <span className="text-sm text-mint-200/60">
               {page} / {totalPages}
             </span>
             <button

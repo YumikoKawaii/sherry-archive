@@ -63,7 +63,7 @@ setError(err instanceof ApiError ? err.message : 'Login failed')
         {/* Logo */}
         <Link to="/" className="flex justify-center mb-8">
           <span className="text-2xl font-black tracking-widest text-jade-400">SHERRY</span>
-          <span className="ml-1.5 self-end text-xs font-medium tracking-[0.2em] text-mint-200/40">ARCHIVE</span>
+          <span className="ml-1.5 self-end text-xs font-medium tracking-[0.2em] text-mint-200/60">ARCHIVE</span>
         </Link>
 
         <div className="bg-forest-900 border border-forest-700 rounded-xl overflow-hidden
@@ -77,7 +77,7 @@ setError(err instanceof ApiError ? err.message : 'Login failed')
                 className={`flex-1 py-3.5 text-sm font-medium capitalize transition-colors ${
                   tab === t
                     ? 'text-jade-400 border-b-2 border-jade-500 -mb-px'
-                    : 'text-mint-200/40 hover:text-mint-200/70'
+                    : 'text-mint-200/60 hover:text-mint-200/80'
                 }`}
               >
                 {t}
@@ -136,10 +136,12 @@ function Field({ label, type, value, onChange, placeholder }: {
   label: string; type: string; value: string
   onChange: (v: string) => void; placeholder: string
 }) {
+  const id = `field-${label.toLowerCase().replace(/\s+/g, '-')}`
   return (
     <div>
-      <label className="block text-xs font-medium text-mint-200/60 mb-1.5">{label}</label>
+      <label htmlFor={id} className="block text-xs font-medium text-mint-200/60 mb-1.5">{label}</label>
       <input
+        id={id}
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}

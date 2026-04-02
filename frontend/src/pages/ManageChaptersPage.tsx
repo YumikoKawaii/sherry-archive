@@ -121,7 +121,7 @@ export function ManageChaptersPage() {
   if (loading) return <Layout><div className="flex justify-center py-32"><Spinner size="lg" /></div></Layout>
   if (pageError || !manga) return (
     <Layout>
-      <div className="flex flex-col items-center justify-center py-32 text-mint-200/40">
+      <div className="flex flex-col items-center justify-center py-32 text-mint-200/60">
         <p className="text-5xl mb-4">錯</p>
         <p>{pageError || 'Not found'}</p>
         <Link to="/" className="mt-6 text-jade-400 hover:underline text-sm">← Back to browse</Link>
@@ -137,14 +137,14 @@ export function ManageChaptersPage() {
           {/* Header */}
           <div className="mb-8">
             <Link to={`/manga/${manga.id}`}
-              className="text-xs text-mint-200/40 hover:text-mint-200/70 transition mb-3 inline-block">
+              className="text-xs text-mint-200/60 hover:text-mint-200/80 transition mb-3 inline-block">
               ← {manga.title}
             </Link>
             <h1 className="text-2xl font-bold text-mint-50 flex items-center gap-2">
               <span className="w-1 h-6 rounded-full bg-jade-500 inline-block" />
               Manage Chapters
               {isOneshot && (
-                <span className="text-xs font-normal px-2 py-0.5 rounded bg-forest-800 border border-forest-600 text-mint-200/40 ml-1">
+                <span className="text-xs font-normal px-2 py-0.5 rounded bg-forest-800 border border-forest-600 text-mint-200/60 ml-1">
                   Oneshot
                 </span>
               )}
@@ -156,7 +156,7 @@ export function ManageChaptersPage() {
             !oneshotHasChapter && (
               <div className="bg-forest-900 border border-forest-700 rounded-xl p-5 mb-6">
                 <h2 className="text-sm font-semibold text-mint-200 mb-1">Upload Oneshot</h2>
-                <p className="text-xs text-mint-200/40 mb-4">
+                <p className="text-xs text-mint-200/60 mb-4">
                   Upload a ZIP of images. A chapter will be created automatically.
                   Include a <code className="text-jade-400/80">metadata.json</code> in the ZIP to pre-fill author, tags and more.
                 </p>
@@ -191,8 +191,9 @@ export function ManageChaptersPage() {
               <h2 className="text-sm font-semibold text-mint-200 mb-4">Add Chapter</h2>
               <form onSubmit={handleCreate} className="flex gap-3 flex-wrap">
                 <div>
-                  <label className="block text-xs text-mint-200/50 mb-1">Number *</label>
+                  <label htmlFor="new-chapter-number" className="block text-xs text-mint-200/50 mb-1">Number *</label>
                   <input
+                    id="new-chapter-number"
                     type="number"
                     step="0.1"
                     min="0"
@@ -206,8 +207,9 @@ export function ManageChaptersPage() {
                   />
                 </div>
                 <div className="flex-1 min-w-40">
-                  <label className="block text-xs text-mint-200/50 mb-1">Title</label>
+                  <label htmlFor="new-chapter-title" className="block text-xs text-mint-200/50 mb-1">Title</label>
                   <input
+                    id="new-chapter-title"
                     type="text"
                     value={newTitle}
                     onChange={e => setNewTitle(e.target.value)}
@@ -251,18 +253,19 @@ export function ManageChaptersPage() {
                   <h2 className="text-sm font-semibold text-jade-300">Metadata detected in ZIP</h2>
                   <button
                     onClick={() => setSuggestions(null)}
-                    className="text-mint-200/30 hover:text-mint-200/60 transition text-lg leading-none"
+                    aria-label="Dismiss metadata suggestions"
+                    className="text-mint-200/50 hover:text-mint-200/80 transition text-lg leading-none"
                   >×</button>
                 </div>
                 <div className="space-y-1 text-xs text-mint-200/60 mb-4">
-                  {suggestions.author && <p><span className="text-mint-200/40">Author:</span> {suggestions.author}</p>}
-                  {suggestions.artist && <p><span className="text-mint-200/40">Artist:</span> {suggestions.artist}</p>}
-                  {suggestions.category && <p><span className="text-mint-200/40">Category:</span> {suggestions.category}</p>}
+                  {suggestions.author && <p><span className="text-mint-200/60">Author:</span> {suggestions.author}</p>}
+                  {suggestions.artist && <p><span className="text-mint-200/60">Artist:</span> {suggestions.artist}</p>}
+                  {suggestions.category && <p><span className="text-mint-200/60">Category:</span> {suggestions.category}</p>}
                   {suggestions.tags && suggestions.tags.length > 0 && (
-                    <p><span className="text-mint-200/40">Tags:</span> {suggestions.tags.join(', ')}</p>
+                    <p><span className="text-mint-200/60">Tags:</span> {suggestions.tags.join(', ')}</p>
                   )}
-                  {suggestions.language && <p><span className="text-mint-200/40">Language:</span> {suggestions.language}</p>}
-                  {suggestions.chapter_title && <p><span className="text-mint-200/40">Chapter title:</span> {suggestions.chapter_title}</p>}
+                  {suggestions.language && <p><span className="text-mint-200/60">Language:</span> {suggestions.language}</p>}
+                  {suggestions.chapter_title && <p><span className="text-mint-200/60">Chapter title:</span> {suggestions.chapter_title}</p>}
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -306,7 +309,7 @@ export function ManageChaptersPage() {
             </h2>
 
             {chapters.length === 0 ? (
-              <p className="text-mint-200/30 text-sm py-8 text-center border border-forest-700 rounded-lg">
+              <p className="text-mint-200/50 text-sm py-8 text-center border border-forest-700 rounded-lg">
                 No chapters yet — add one above.
               </p>
             ) : (
@@ -439,11 +442,11 @@ function ChapterRow({ chapter, mangaId, isOneshot, onUpdate, onDelete, onSuggest
             </span>
           )}
           <span className="text-sm text-mint-200 truncate">
-            {chapter.title || (isOneshot ? 'Oneshot' : <span className="text-mint-200/30 italic">No title</span>)}
+            {chapter.title || (isOneshot ? 'Oneshot' : <span className="text-mint-200/50 italic">No title</span>)}
           </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs text-mint-200/30 hidden sm:block">{chapter.page_count}p</span>
+          <span className="text-xs text-mint-200/50 hidden sm:block">{chapter.page_count}p</span>
           <ActionBtn
             active={mode === 'upload'}
             onClick={() => { setRowError(''); setMode(mode === 'upload' ? 'idle' : 'upload') }}
@@ -461,7 +464,7 @@ function ChapterRow({ chapter, mangaId, isOneshot, onUpdate, onDelete, onSuggest
             className={`text-xs px-2.5 py-1 rounded border transition ${
               mode === 'delete'
                 ? 'bg-red-500/20 border-red-500/50 text-red-300'
-                : 'border-forest-600 text-mint-200/40 hover:border-red-500/40 hover:text-red-400'
+                : 'border-forest-600 text-mint-200/60 hover:border-red-500/40 hover:text-red-400'
             }`}
           >
             Delete
@@ -483,8 +486,9 @@ function ChapterRow({ chapter, mangaId, isOneshot, onUpdate, onDelete, onSuggest
             <div className="px-4 py-3 bg-forest-800/40 flex gap-3 flex-wrap items-end">
               {!isOneshot && (
                 <div>
-                  <label className="block text-xs text-mint-200/50 mb-1">Number</label>
+                  <label htmlFor={`edit-number-${chapter.id}`} className="block text-xs text-mint-200/50 mb-1">Number</label>
                   <input
+                    id={`edit-number-${chapter.id}`}
                     type="number"
                     step="0.1"
                     min="0"
@@ -496,8 +500,9 @@ function ChapterRow({ chapter, mangaId, isOneshot, onUpdate, onDelete, onSuggest
                 </div>
               )}
               <div className="flex-1 min-w-40">
-                <label className="block text-xs text-mint-200/50 mb-1">Title</label>
+                <label htmlFor={`edit-title-${chapter.id}`} className="block text-xs text-mint-200/50 mb-1">Title</label>
                 <input
+                  id={`edit-title-${chapter.id}`}
                   type="text"
                   value={editTitle}
                   onChange={e => setEditTitle(e.target.value)}
@@ -610,7 +615,7 @@ function ActionBtn({ active, onClick, children }: {
       className={`text-xs px-2.5 py-1 rounded border transition ${
         active
           ? 'bg-jade-500/20 border-jade-500/50 text-jade-300'
-          : 'border-forest-600 text-mint-200/40 hover:border-jade-500/40 hover:text-jade-300'
+          : 'border-forest-600 text-mint-200/60 hover:border-jade-500/40 hover:text-jade-300'
       }`}
     >
       {children}

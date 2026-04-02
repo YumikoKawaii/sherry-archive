@@ -13,7 +13,7 @@ export function NotFoundPage() {
         <p className="text-8xl font-black text-jade-500/10 mb-2 select-none">404</p>
         <p className="text-6xl mb-6 select-none">迷</p>
         <h1 className="text-2xl font-bold text-mint-50 mb-2">Page not found</h1>
-        <p className="text-mint-200/40 mb-8 text-sm">The page you're looking for doesn't exist.</p>
+        <p className="text-mint-200/60 mb-8 text-sm">The page you're looking for doesn't exist.</p>
         <Link to="/"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold
                      bg-jade-500 text-forest-950 hover:bg-jade-400 transition-colors">

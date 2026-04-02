@@ -90,7 +90,7 @@ export function ReaderPage() {
   )
 
   if (error || !data) return (
-    <div className="min-h-screen bg-forest-950 flex flex-col items-center justify-center gap-4 text-mint-200/40">
+    <div className="min-h-screen bg-forest-950 flex flex-col items-center justify-center gap-4 text-mint-200/60">
       <p className="text-5xl">錯</p>
       <p>{error || 'Chapter not found'}</p>
       <Link to={`/manga/${mangaID}`} className="text-jade-400 hover:underline text-sm">← Back to manga</Link>
@@ -124,7 +124,7 @@ export function ReaderPage() {
                 Chapter {data.chapter.number}
                 {data.chapter.title && ` — ${data.chapter.title}`}
               </p>
-              <p className="text-xs text-mint-200/30">{data.pages.length} pages</p>
+              <p className="text-xs text-mint-200/50">{data.pages.length} pages</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -148,7 +148,7 @@ export function ReaderPage() {
       </AnimatePresence>
 
       {/* Pages — vertical scroll */}
-      <div className="flex flex-col items-center pt-12 pb-16">
+      <main id="main-content" className="flex flex-col items-center pt-12 pb-16">
         {data.pages.map((page, i) => {
           const isLast = i === data.pages.length - 1
           return (
@@ -177,7 +177,7 @@ export function ReaderPage() {
             />
           )
         })}
-      </div>
+      </main>
 
       {/* Bottom nav */}
       <div className="flex justify-center gap-4 pb-10 pt-4">

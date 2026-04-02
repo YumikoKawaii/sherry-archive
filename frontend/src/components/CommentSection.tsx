@@ -108,7 +108,7 @@ export function CommentSection({ mangaId, chapterId, title = 'Comments' }: Props
         <span className="w-1 h-5 rounded-full bg-jade-500 inline-block" />
         {title}
         {data && data.total > 0 && (
-          <span className="text-xs font-normal text-mint-200/30 ml-1">({data.total})</span>
+          <span className="text-xs font-normal text-mint-200/50 ml-1">({data.total})</span>
         )}
       </h2>
 
@@ -120,6 +120,7 @@ export function CommentSection({ mangaId, chapterId, title = 'Comments' }: Props
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Write a comment…"
+            aria-label="Write a comment"
             rows={3}
             maxLength={2000}
             className="w-full rounded-lg px-3 py-2.5 text-sm bg-forest-900 border border-forest-700
@@ -144,9 +145,9 @@ export function CommentSection({ mangaId, chapterId, title = 'Comments' }: Props
 
       {/* List */}
       {loading ? (
-        <div className="text-center py-8 text-mint-200/30 text-sm">Loading…</div>
+        <div className="text-center py-8 text-mint-200/50 text-sm">Loading…</div>
       ) : !data || data.items.length === 0 ? (
-        <p className="text-sm text-mint-200/30 py-8 text-center border border-forest-700 rounded-lg">
+        <p className="text-sm text-mint-200/50 py-8 text-center border border-forest-700 rounded-lg">
           No comments yet.{user ? ' Be the first!' : ''}
         </p>
       ) : (
@@ -176,11 +177,11 @@ export function CommentSection({ mangaId, chapterId, title = 'Comments' }: Props
                     <span className="text-xs font-medium text-mint-200/80 truncate">
                       {comment.author.username}
                     </span>
-                    <span className="text-xs text-mint-200/30 flex-shrink-0">
+                    <span className="text-xs text-mint-200/50 flex-shrink-0">
                       {timeAgo(comment.created_at)}
                     </span>
                     {comment.edited && (
-                      <span className="text-[10px] text-mint-200/20 flex-shrink-0">(edited)</span>
+                      <span className="text-[10px] text-mint-200/40 flex-shrink-0">(edited)</span>
                     )}
                   </div>
 
@@ -189,14 +190,14 @@ export function CommentSection({ mangaId, chapterId, title = 'Comments' }: Props
                       {editingId !== comment.id && (
                         <button
                           onClick={() => startEdit(comment)}
-                          className="text-xs text-mint-200/30 hover:text-jade-400 transition"
+                          className="text-xs text-mint-200/50 hover:text-jade-400 transition"
                         >
                           Edit
                         </button>
                       )}
                       <button
                         onClick={() => handleDelete(comment.id)}
-                        className="text-xs text-mint-200/30 hover:text-red-400 transition"
+                        className="text-xs text-mint-200/50 hover:text-red-400 transition"
                       >
                         Delete
                       </button>
@@ -209,6 +210,7 @@ export function CommentSection({ mangaId, chapterId, title = 'Comments' }: Props
                     <textarea
                       value={editInput}
                       onChange={e => setEditInput(e.target.value)}
+                      aria-label="Edit comment"
                       rows={3}
                       maxLength={2000}
                       className="w-full rounded-lg px-3 py-2 text-sm bg-forest-800 border border-forest-600
@@ -219,7 +221,7 @@ export function CommentSection({ mangaId, chapterId, title = 'Comments' }: Props
                     <div className="mt-2 flex gap-2 justify-end">
                       <button
                         onClick={() => setEditingId(null)}
-                        className="text-xs text-mint-200/40 hover:text-mint-200 transition"
+                        className="text-xs text-mint-200/60 hover:text-mint-200 transition"
                       >
                         Cancel
                       </button>
@@ -255,7 +257,7 @@ export function CommentSection({ mangaId, chapterId, title = 'Comments' }: Props
           >
             ← Prev
           </button>
-          <span className="flex items-center text-xs text-mint-200/30">
+          <span className="flex items-center text-xs text-mint-200/50">
             {page} / {totalPages}
           </span>
           <button

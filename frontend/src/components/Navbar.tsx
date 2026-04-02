@@ -48,15 +48,16 @@ export function Navbar() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search manga…"
+              aria-label="Search manga"
               className="w-full h-8 pl-3 pr-9 rounded-md text-sm bg-forest-800
                          border border-forest-600 text-mint-50 placeholder-mint-200/30
                          focus:outline-none focus:border-jade-500/60 focus:ring-1
                          focus:ring-jade-500/30 transition"
             />
-            <button type="submit"
+            <button type="submit" aria-label="Search"
               className="absolute right-2 top-1/2 -translate-y-1/2 text-mint-200/40
                          hover:text-jade-400 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round"
                   d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
               </svg>
@@ -92,9 +93,14 @@ export function Navbar() {
         </div>
 
         {/* Mobile menu button */}
-        <button onClick={() => setMenuOpen(v => !v)}
-          className="sm:hidden ml-auto p-1.5 rounded text-mint-200/60 hover:text-mint-50 transition">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <button
+          onClick={() => setMenuOpen(v => !v)}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          className="sm:hidden ml-auto p-1.5 rounded text-mint-200/60 hover:text-mint-50 transition"
+        >
+          <svg className="w-5 h-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             {menuOpen
               ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />}
@@ -106,6 +112,7 @@ export function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            id="mobile-menu"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -136,6 +143,7 @@ export function Navbar() {
 function NavLink({ to, active, children }: { to: string; active: boolean; children: React.ReactNode }) {
   return (
     <Link to={to}
+      aria-current={active ? 'page' : undefined}
       className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
         active
           ? 'text-jade-400 bg-jade-500/10'
