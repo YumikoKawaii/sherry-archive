@@ -31,6 +31,7 @@ func SetupRouter(h Handlers, tokenMgr *token.Manager) *gin.Engine {
 
 	r.GET("/sitemap.xml", h.Sitemap.Sitemap)
 	r.StaticFile("/robots.txt", "./public/robots.txt")
+	r.StaticFile("/google5f925dbb5678ce05.html", "./public/google5f925dbb5678ce05.html")
 
 	// Serve built frontend static assets (Vite outputs to dist/assets/)
 	r.Static("/assets", "./public/assets")
