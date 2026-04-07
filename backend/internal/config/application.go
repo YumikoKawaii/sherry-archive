@@ -153,7 +153,7 @@ func loadDefault() *Application {
 		},
 		CloudFront: &CloudFrontConfig{},
 		Tracing: &TracingConfig{
-			Enabled:    true,
+			Enabled:    false,
 			DaemonAddr: "127.0.0.1:2000",
 		},
 	}
