@@ -29,3 +29,6 @@ redis:
   password: ""
   db: 0
   tls: true  # set to false for local dev without TLS
+
+metrics:
+  enabled: false  # set to true to publish CloudWatch metrics (incurs AWS costs)

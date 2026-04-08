@@ -16,6 +16,7 @@ type Application struct {
 	Analytics  *AnalyticsConfig  `json:"analytics"  mapstructure:"analytics"  yaml:"analytics"`
 	CloudFront *CloudFrontConfig `json:"cloudfront" mapstructure:"cloudfront" yaml:"cloudfront"`
 	Tracing    *TracingConfig    `json:"tracing"    mapstructure:"tracing"    yaml:"tracing"`
+	Metrics    *MetricsConfig    `json:"metrics"    mapstructure:"metrics"    yaml:"metrics"`
 }
 
 type ServerConfig struct {
@@ -88,6 +89,13 @@ type CloudFrontConfig struct {
 	PrivateKey string `json:"private_key"  mapstructure:"private_key"  yaml:"private_key"`
 }
 
+// MetricsConfig holds CloudWatch metrics settings.
+// Env vars: METRICS__ENABLED
+type MetricsConfig struct {
+	// Enabled toggles CloudWatch metric publishing. Set to false to disable entirely.
+	Enabled bool `json:"enabled" mapstructure:"enabled" yaml:"enabled"`
+}
+
 // TracingConfig holds AWS X-Ray tracing settings.
 // Env vars: TRACING__ENABLED, TRACING__DAEMON_ADDR
 type TracingConfig struct {
@@ -155,6 +163,9 @@ func loadDefault() *Application {
 		Tracing: &TracingConfig{
 			Enabled:    false,
 			DaemonAddr: "127.0.0.1:2000",
+		},
+		Metrics: &MetricsConfig{
+			Enabled: false,
 		},
 	}
 }
